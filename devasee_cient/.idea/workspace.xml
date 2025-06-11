@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+<<<<<<< Updated upstream
   <component name="AutoImportSettings">
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
@@ -8,6 +9,10 @@
       <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
     </list>
+=======
+  <component name="ChangeListManager">
+    <list default="true" id="26e41786-3e36-4caf-afc8-3b3a97e609f2" name="Changes" comment="" />
+>>>>>>> Stashed changes
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -41,6 +46,7 @@
     &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+<<<<<<< Updated upstream
     &quot;git-widget-placeholder&quot;: &quot;main&quot;,
     &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
     &quot;last_opened_file_path&quot;: &quot;/Users/g.m.sakujashamalgajanayake/Documents/Group project/devasee_cient&quot;,
@@ -48,6 +54,11 @@
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+=======
+    &quot;git-widget-placeholder&quot;: &quot;sakuja&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/g.m.sakujashamalgajanayake/Documents/Group project/devasee_cient&quot;,
+>>>>>>> Stashed changes
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
@@ -69,10 +80,13 @@
       <updated>1749661993637</updated>
       <workItem from="1749661995387" duration="53000" />
       <workItem from="1749662131036" duration="35000" />
+<<<<<<< Updated upstream
       <workItem from="1749662289606" duration="184000" />
       <workItem from="1749662476819" duration="405000" />
       <workItem from="1749662913782" duration="10000" />
       <workItem from="1749662925891" duration="8000" />
+=======
+>>>>>>> Stashed changes
     </task>
     <servers />
   </component>
