@@ -1,13 +1,13 @@
-package com.devasee_server.devasee_server;
+package org.devasee.productservice;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class DevaseeServerApplicationTests {
+class ProductsApplicationTests {
 
-	@Test
-	void contextLoads() {
-	}
+    @Test
+    void contextLoads() {
+    }
 
 }
