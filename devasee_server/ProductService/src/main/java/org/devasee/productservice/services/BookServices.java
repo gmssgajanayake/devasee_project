@@ -2,6 +2,7 @@ package org.devasee.productservice.services;
 
 import jakarta.transaction.Transactional;
 import org.devasee.productservice.dto.BookDTO;
+import org.devasee.productservice.entity.Book;
 import org.devasee.productservice.repo.BookRepo;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
@@ -23,7 +24,22 @@ public class BookServices {
         return modelMapper.map(bookRepo.findAll(), new TypeToken<List<BookDTO>>(){}.getType());
     }
 
-    public String saveBook(BookDTO bookDTO) {
-        return "Book Saved";
+    public BookDTO  getBookById(int id) {
+        return modelMapper.map(bookRepo.findById(id), BookDTO.class);
+    }
+
+    public BookDTO saveBook(BookDTO bookDTO) {
+        bookRepo.save(modelMapper.map(bookDTO, Book.class));
+        return bookDTO;
+    }
+
+    public BookDTO updateBook(BookDTO bookDTO) {
+        bookRepo.save(modelMapper.map(bookDTO, Book.class));
+        return bookDTO;
+    }
+
+    public boolean deleteBook(BookDTO bookDTO) {
+        bookRepo.delete(modelMapper.map(bookDTO, Book.class));
+        return true;
     }
 }
