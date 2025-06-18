@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 7, "column": 0}, "map": {"version":3,"sources":["file:///Users/g.m.sakujashamalgajanayake/Documents/Group%20Project/uni%20final%20project/devasee_project/devasee_cient/src/app/not-found.tsx"],"sourcesContent":["export default function NotFoundPage(){\n    return (\n        <div className={\"w-full h-screen flex flex-col items-center gap-5 justify-center\"}>not found</div>\n    );\n}"],"names":[],"mappings":";;;;;AAAe,SAAS;IACpB,qBACI,8OAAC;QAAI,WAAW;kBAAmE;;;;;;AAE3F","debugId":null}}]
+}
