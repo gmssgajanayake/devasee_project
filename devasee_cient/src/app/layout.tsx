@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     openGraph: {
         title: "Devasee | Bookshop & Printing",
         description: "Discover and order your favorite books and printing services at Devasee.",
-        url: "https://www.devasee.com",
+        url: "https://www.devasee.lk",
         siteName: "Devasee",
         locale: "en_US",
         type: "website",

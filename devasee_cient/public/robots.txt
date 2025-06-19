@@ -1,4 +1,9 @@
+# *
 User-agent: *
 Allow: /
 
-Sitemap: https://www.devasee.com/sitemap.xml
+# Host
+Host: https://www.devasee.lk
+
+# Sitemaps
+Sitemap: https://www.devasee.lk/sitemap.xml
