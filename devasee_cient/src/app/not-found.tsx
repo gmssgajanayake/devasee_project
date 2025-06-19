@@ -7,7 +7,7 @@ export default function NotFoundPage(){
             <Image
                 src={logo}
                 alt="Devasee logo"
-                className="w-36 h-auto"
+                className="w-36 h-auto  bg-white rounded-full"
                 priority
             />
             <div className={"flex flex-col items-center justify-center"}>
