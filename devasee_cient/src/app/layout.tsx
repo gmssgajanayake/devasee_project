@@ -2,8 +2,8 @@ import type {Metadata} from "next";
 import {Inter} from "next/font/google";
 import "./globals.css";
 import Head from "@/app/head";
-// import ContactBar from "@/app/_components/ContactBar";
-// import Footer from "@/app/_components/Footer";
+import ContactBar from "@/app/_components/ContactBar";
+import Footer from "@/app/_components/Footer";
 
 const inter = Inter({
     subsets: ["latin"],
@@ -38,9 +38,8 @@ export default function RootLayout({
         <html lang="en">
         <Head/>
         <body className={`${inter.variable} font-sans antialiased`}>
-        {/*<ContactBar/>*/}
         {children}
-        {/*<Footer/>*/}
+        <Footer/>
         </body>
         </html>
     );

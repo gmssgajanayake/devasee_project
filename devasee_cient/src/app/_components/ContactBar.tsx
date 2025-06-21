@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPhone } from "@fortawesome/free-solid-svg-icons/faPhone";
+import { faPhone } from "@fortawesome/free-solid-svg-icons";
 import {
     faFacebookF,
     faLinkedinIn,
@@ -17,7 +17,7 @@ interface ContactBarProps {
 
 export default function ContactBar({ iconSize = "w-3 h-3" }: ContactBarProps) {
     return (
-        <nav className="w-full flex justify-center sm:justify-between bg-[#0000FF] px-8 py-1.5">
+        <nav className="w-full flex justify-center sm:justify-between bg-[#0000FF]  lg:px-8 px-6 py-1.5">
             {/* Phone */}
             <div className="flex items-center">
                 <FontAwesomeIcon icon={faPhone} className={`mr-2 text-gray-50 ${iconSize}`} />
