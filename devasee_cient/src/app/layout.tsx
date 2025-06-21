@@ -1,19 +1,14 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import type {Metadata} from "next";
+import {Inter} from "next/font/google";
 import "./globals.css";
 import Head from "@/app/head";
 // import ContactBar from "@/app/_components/ContactBar";
 // import Footer from "@/app/_components/Footer";
 
-
-const geistSans = Geist({
-    variable: "--font-geist-sans",
+const inter = Inter({
     subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-    variable: "--font-geist-mono",
-    subsets: ["latin"],
+    weight: ["400", "500", "600", "700"], // Add only the weights you use
+    variable: "--font-inter", // Tailwind will use this
 });
 
 export const metadata: Metadata = {
@@ -42,9 +37,7 @@ export default function RootLayout({
     return (
         <html lang="en">
         <Head/>
-        <body
-            className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        >
+        <body className={`${inter.variable} font-sans antialiased`}>
         {/*<ContactBar/>*/}
         {children}
         {/*<Footer/>*/}
