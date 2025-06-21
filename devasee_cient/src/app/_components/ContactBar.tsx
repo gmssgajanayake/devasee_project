@@ -28,19 +28,19 @@ export default function ContactBar({ iconSize = "w-3 h-3" }: ContactBarProps) {
 
             {/* Social Icons */}
             <div className="hidden sm:flex items-center gap-6">
-                <Link href="#">
+                <Link href="https://www.facebook.com/devaseepvtltd/">
                     <FontAwesomeIcon icon={faFacebookF} className={"text-gray-50 w-2 h-2"} />
                 </Link>
-                <Link href="#">
+                <Link href="https://www.instagram.com/devaseelk/">
                     <FontAwesomeIcon icon={faInstagram} className={`text-gray-50 ${iconSize}`} />
                 </Link>
                 <Link href="#">
                     <FontAwesomeIcon icon={faLinkedinIn} className={`text-gray-50 ${iconSize}`} />
                 </Link>
-                <Link href="#">
+                <Link href="https://x.com/Devaseelk">
                     <FontAwesomeIcon icon={faXTwitter} className={`text-gray-50 ${iconSize}`} />
                 </Link>
-                <Link href="#">
+                <Link href="https://www.threads.com/@devaseelk">
                     <FontAwesomeIcon icon={faThreads} className={`text-gray-50 ${iconSize}`} />
                 </Link>
             </div>
