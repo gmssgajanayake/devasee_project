@@ -2,7 +2,6 @@ import type {Metadata} from "next";
 import {Inter} from "next/font/google";
 import "./globals.css";
 import Head from "@/app/head";
-import ContactBar from "@/app/_components/ContactBar";
 import Footer from "@/app/_components/Footer";
 
 const inter = Inter({
