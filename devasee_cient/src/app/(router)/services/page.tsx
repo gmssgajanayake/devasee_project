@@ -1,10 +1,12 @@
-import SubNavBar from "@/app/(router)/_components/SubNavBar";
+//import SubNavBar from "@/app/(router)/_components/SubNavBar";
+import Maintenance from "@/components/Maintenance";
 
 export default function Page(){
     return (
         <div>
-            <SubNavBar/>
-            <p>Printing page</p>
+            <Maintenance/>
+            {/*<SubNavBar/>
+            <p>Printing page</p>*/}
         </div>
     );
 }

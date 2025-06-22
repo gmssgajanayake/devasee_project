@@ -1,9 +1,11 @@
+import Maintenance from "@/components/Maintenance";
 
 
 export default function Page(){
     return (
-        <div>
+        <Maintenance/>
+        /*<div>
             <p>Products page</p>
-        </div>
+        </div>*/
     );
 }
