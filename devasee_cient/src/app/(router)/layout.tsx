@@ -1,4 +1,4 @@
-import SubNavBar from "@/app/(router)/_components/SubNavBar";
+//import SubNavBar from "@/app/(router)/_components/SubNavBar";
 
 export default function RouterLayout({
                                          children,
@@ -7,8 +7,8 @@ export default function RouterLayout({
 }) {
     return (
         <div>
-            <SubNavBar/>
-            <div className="min-h-screen p-4">{children}</div>
+            {/*<SubNavBar/>*/}
+            <div className={"w-screen"}>{children}</div>
         </div>
     );
 }

@@ -4,7 +4,7 @@ import Maintenance from "@/components/Maintenance";
 export default function Home() {
   return (
       <Maintenance/>
-      /*<div>
+     /* <div>
           <Advertisement/>
           {/!*Want to implement other sub-sections*!/}
       </div>*/
