@@ -15,8 +15,15 @@
   <packaging>pom</packaging>
   <name>Archetype - devasee_server</name>
   <url>http://maven.apache.org</url>
+
   <modules>
-    <module>ProductService</module>
+    <module>product</module>
+    <module>inventory</module>
+    <module>auth</module>
+    <module>orders</module>
+    <module>delivery</module>
+    <module>analytics</module>
+    <module>users</module>
   </modules>
 
   <build>
