@@ -6,28 +6,16 @@
         <artifactId>devasee_server</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-    <artifactId>ProductService</artifactId>
-    <name>Archetype - ProductService</name>
+    <artifactId>analytics</artifactId>
+    <name>Archetype - analytics</name>
     <url>http://maven.apache.org</url>
 
     <dependencies>
-        <!-- jpa -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jpa</artifactId>
-        </dependency>
 
         <!-- web starter -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-
-        <!-- lombok -->
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <optional>true</optional>
         </dependency>
 
         <!-- default -->
@@ -44,13 +32,13 @@
             <version>3.2.3</version>
         </dependency>
 
-        <!-- PostgresSQL  connector -->
+        <!-- PostgresSQL connector -->
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
+            <version>42.7.3</version>
             <scope>runtime</scope>
         </dependency>
 
     </dependencies>
-
 </project>
