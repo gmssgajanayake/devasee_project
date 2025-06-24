@@ -2,7 +2,7 @@ import type {Metadata} from "next";
 import {Inter} from "next/font/google";
 import "./globals.css";
 import Head from "@/app/head";
-// import Footer from "@/app/_components/Footer";
+/*import Footer from "@/app/_components/Footer";*/
 
 const inter = Inter({
     subsets: ["latin"],
@@ -11,12 +11,12 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-    title: "Devasee | Bookshop & Printing",
+    title: "Devasee | Bookshop & Printing Services",
     description: "Discover and order your favorite books and printing services at Devasee.",
     keywords: ["bookshop", "printing", "Devasee", "Sri Lanka", "custom print", "educational books"],
     metadataBase: new URL("https://devasee.lk"),
     openGraph: {
-        title: "Devasee | Bookshop & Printing",
+        title: "Devasee | Bookshop & Printing Services",
         description: "Discover and order your favorite books and printing services at Devasee.",
         url: "https://www.devasee.lk",
         siteName: "Devasee",
