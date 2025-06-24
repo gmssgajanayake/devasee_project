@@ -5,7 +5,6 @@ import Maintenance from "@/components/Maintenance";
 export default function Home() {
   return (
       <div>
-          {/*TEST COMMENT*/}
           <Maintenance/>
           {/*<Advertisement/>*/}
           {/*Want to implement other sub-sections*/}
