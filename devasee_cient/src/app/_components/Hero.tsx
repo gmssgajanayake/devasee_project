@@ -17,7 +17,7 @@ export default function Hero() {
     }, []);
 
     return (
-        <section ref={textRef} className="p-10 text-center w-full h-full bg-blue-50">
+        <section ref={textRef} className="p-10 mt-24 lg:mt-28 text-center w-full h-full bg-blue-50">
             <h1  className="text-4xl font-bold">
                 Welcome to Devasee Bookshop
             </h1>

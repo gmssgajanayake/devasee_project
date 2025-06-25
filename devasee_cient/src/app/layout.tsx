@@ -38,7 +38,7 @@ export default function RootLayout({
     return (
         <html lang="en">
         <Head/>
-        <body className={`${inter.variable} font-sans antialiased`}>
+        <body className={`${inter.variable} font-sans antialiased bg-white`}>
         {children}
         {/*<Footer/>*/}
         </body>
