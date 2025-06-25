@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: apigatgeway
+  cloud:
+    gateway:
+      server:
+        webflux:
+          routes:
+            - id: product
+              uri: lb://product
+              predicates:
+                - Path=/api/v1/product/**
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+      
+server:
+  port: 8080
+
+logging:
+  level:
+    root: INFO
+    org.springframework.cloud.gateway.route.RouteDefinitionLocator: INFO
+    org.springframework.cloud.gateway: TRACE
