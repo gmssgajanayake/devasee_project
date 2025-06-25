@@ -20,7 +20,7 @@ public class BookController {
         return bookServices.getAllBooks();
     }
 
-    @GetMapping("/bookItem/{bookId}")
+    @GetMapping("/{bookId}")
     public BookDTO getBookById(@PathVariable int bookId) {
         return bookServices.getBookById(bookId);
     }
