@@ -18,10 +18,10 @@
       <module name="analytics" target="17" />
       <module name="auth" target="17" />
       <module name="delivery" target="17" />
-      <module name="devasee_server" target="17" />
       <module name="inventory" target="17" />
       <module name="orders" target="17" />
       <module name="product" target="17" />
+      <module name="ProductService" target="17" />
       <module name="users" target="17" />
     </bytecodeTargetLevel>
   </component>
