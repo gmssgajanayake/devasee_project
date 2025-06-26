@@ -34,7 +34,8 @@ export default function Hero() {
                         Devasee Bookshop
                     </h1>
                     <p className="text-sm text-left md:text-lg text-[#2b216d] mt-2">
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                        Devasee Bookshop offers a wide collection of books across various genres including education, fiction, and children’s literature. It’s a trusted destination for readers and students seeking quality books in Sri Lanka.
+
                     </p>
                     <Link href={"about"} className={"flex"}>
                         <button className="mt-6 mb-6 px-4 py-2 text-[12px] md:text-sm border border-[#2b216d] rounded-md text-[#2b216d] font-extralight tracking-widest hover:bg-[#2b216d] hover:text-white transition-colors duration-300">
