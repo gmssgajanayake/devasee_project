@@ -32,23 +32,31 @@ export default function MainNavBar() {
     }, []);
 
     const toggleMobileMenu = () => {
+        const body = document.body;
+
         if (menuRef.current) {
             if (!isMobileMenuOpen) {
                 gsap.fromTo(menuRef.current, { y: -50, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease: "power3.out" });
                 setIsMobileMenuOpen(true);
+                body.classList.add("overflow-hidden"); // prevent scrolling
             } else {
                 gsap.to(menuRef.current, {
                     y: -50,
                     opacity: 0,
                     duration: 0.3,
                     ease: "power2.in",
-                    onComplete: () => setIsMobileMenuOpen(false),
+                    onComplete: () => {
+                        setIsMobileMenuOpen(false);
+                        body.classList.remove("overflow-hidden"); // restore scrolling
+                    },
                 });
             }
         } else {
             setIsMobileMenuOpen(!isMobileMenuOpen);
+            body.classList.toggle("overflow-hidden");
         }
     };
+
 
     const linkStyle = "text-sm font-semibold tracking-wide text-gray-600 dark:text-gray-800 transition-colors duration-200 hover:text-[#0000FF] relative after:absolute after:left-0 after:bottom-0 after:w-0 after:h-[2px] after:bg-[#0000FF] after:transition-all after:duration-300 hover:after:w-full";
 
