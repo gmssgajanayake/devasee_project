@@ -6,7 +6,7 @@ export default function Home() {
       <div className={"bg-white"}>
           {/*<Maintenance/>*/}
           <AdvertisementSlides/>
-          <div className={"h-screen"}></div>
+          <div className={"h-screen bg-blue-300"}></div>
           {/*Want to implement other sub-sections*/}
       </div>
   );

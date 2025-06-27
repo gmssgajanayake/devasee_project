@@ -47,7 +47,7 @@ export default function Advertisement({
                     </p>
                     <Link href={"about"} className="flex justify-center md:justify-start">
                         <button
-                            className="my-6 cursor-pointer px-4 py-2 text-sm border border-[#2b216d] rounded-md text-[#2b216d] hover:bg-[#2b216d] hover:text-white transition duration-300">
+                            className=" mt-4 cursor-pointer px-4 py-2 text-sm border border-[#2b216d] rounded-md text-[#2b216d] hover:bg-[#2b216d] hover:text-white transition duration-300">
                             READ MORE
                         </button>
                     </Link>

@@ -15,19 +15,19 @@ export function AdvertisementSlides() {
         {
             id: 1,
             title: "Devasee Bookshop",
-            description: "Wide collection of books across various genres including education, fiction, and children’s literature.",
+            description: "Devasee Bookshop offers a wide collection of books across various genres including education, fiction, and children’s literature. It’s a trusted destination for readers and students seeking quality books in Sri Lanka.",
             image: adImage1,
         },
         {
             id: 2,
             title: "Personalized Printing",
-            description: "We print on mugs, t-shirts, banners, and more — customized to your needs.",
+            description: "Personalized printing adds a custom touch to items like gifts, apparel, and stationery. It enhances uniqueness, making products more meaningful for personal use, branding, or special occasions.",
             image: adImage1,
         },
         {
             id: 3,
             title: "Student Stationery Deals",
-            description: "Find great deals on pens, papers, files, and all student essentials at Devasee.",
+            description: "Student stationery deals offer affordable bundles of essential school supplies like pens, notebooks, highlighters, and folders. These budget-friendly packs are perfect for students preparing for a new term.",
             image: adImage1,
         },
     ];
@@ -54,10 +54,9 @@ export function AdvertisementSlides() {
                     key={demoAds[currentIndex].id}
                     title={demoAds[currentIndex].title}
                     description={demoAds[currentIndex].description}
-                    image={demoAds[currentIndex].image}
+                    image={demoAds[currentIndex].image.src}
                     total={demoAds.length}
-                    current={currentIndex}
-                />
+                    current={currentIndex}></Advertisement>
                 {/* Left Arrow */}
                 <div
                     className="absolute hidden lg:flex left-8 top-1/2 transform -translate-y-1/2 z-10 w-12 h-12  items-center justify-center cursor-pointer"
