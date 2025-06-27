@@ -5,6 +5,8 @@ import MainNavBar from "@/app/_components/MainNavBar";
 import Advertisement from "@/app/_components/Advertisement";
 import ContactBar from "@/app/_components/ContactBar";
 import adImage1 from "@/assets/devasee-p1.png";
+import adImage2 from "@/assets/devasee-p2.png";
+import adImage3 from "@/assets/devasee-p3.png";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faArrowLeft, faArrowRight} from "@fortawesome/free-solid-svg-icons";
 
@@ -22,13 +24,13 @@ export function AdvertisementSlides() {
             id: 2,
             title: "Personalized Printing",
             description: "Personalized printing adds a custom touch to items like gifts, apparel, and stationery. It enhances uniqueness, making products more meaningful for personal use, branding, or special occasions.",
-            image: adImage1,
+            image: adImage2,
         },
         {
             id: 3,
             title: "Student Stationery Deals",
             description: "Student stationery deals offer affordable bundles of essential school supplies like pens, notebooks, highlighters, and folders. These budget-friendly packs are perfect for students preparing for a new term.",
-            image: adImage1,
+            image: adImage3,
         },
     ];
 

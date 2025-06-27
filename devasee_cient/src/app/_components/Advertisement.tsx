@@ -36,9 +36,9 @@ export default function Advertisement({
         <section
             className="p-10 mt-16 flex items-center justify-center text-center w-full h-full bg-gradient-to-b md:bg-gradient-to-r from-[#e8ebff] to-white"
         >
-            <div className="flex flex-col gap-6 md:flex-row items-center justify-between w-full max-w-6xl mx-auto">
+            <div ref={textRef} className="flex flex-col gap-6 md:flex-row items-center justify-between w-full max-w-6xl mx-auto">
                 {/* Content */}
-                <div ref={textRef} className="w-full gap-2 h-1/2 md:w-1/2 flex flex-col justify-center items-center md:items-start">
+                <div  className="w-full gap-2 h-1/2 md:w-1/2 flex flex-col justify-center items-center md:items-start">
                     <h1 className="text-4xl lg:text-5xl text-center md:text-left font-bold text-[#2b216d]">
                         {title}
                     </h1>
@@ -75,7 +75,7 @@ export default function Advertisement({
                 </div>
 
                 {/* Image */}
-                <div className="w-full md:w-1/2 h-1/2 flex flex-col justify-center items-center md:items-end">
+                <div ref={textRef} className="w-full md:w-1/2 h-1/2 flex flex-col justify-center items-center md:items-end">
                     <Image
                         src={image}
                         alt={"Devasee"}
