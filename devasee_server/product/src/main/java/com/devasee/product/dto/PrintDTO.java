@@ -8,15 +8,14 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 
-public class BookDTO {
+public class PrintDTO {
     private int id;
-    private String author;
-    private String publisher;
-    private String category;
-    private String description;
-    private String language;
+    private String title;
+    private String type;
+    private String material;
+    private String size;
+    private String color;
     private double price;
     private int stockQuantity;
-    private long isbn;
     private String imgUrl;
 }
