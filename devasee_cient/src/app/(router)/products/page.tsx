@@ -1,9 +1,10 @@
-
+import Item from "@/app/(router)/products/_components/Item";
 
 export default function Page(){
     return (
         <div>
-            <p>Products page</p>
+            <Item/>
+          
         </div>
     );
 }
