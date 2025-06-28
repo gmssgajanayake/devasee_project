@@ -1,13 +1,44 @@
-export default function ItemCard(){
+import Image from "next/image";
+
+interface ItemCardProps {
+    isHovered: boolean;
+    imageUrl: string;
+    title: string;
+    author: string;
+    price: number;
+}
+
+export default function ItemCard({
+                                     imageUrl,
+                                     title,
+                                     author,
+                                     price,
+                                 }: ItemCardProps) {
     return (
-      <div className="overflow-hidden group">
-              <div className="w-48 h-64 shadow-lg relative flex-col flex justify-end items-center">
-                <img src="https://grantha.lk/media/catalog/product/cache/25fccda23befa3a8b49210419c7720b7/i/m/img_20220130_0005.jpg" alt="cover photo"
-                className="mb-5 w-36 h-54 object-cover" />
-                <button className="absolute bg-[#0000FF] mb-16 tracking-widest text-white text-[12px] px-10 py-2 hover:bg-blue-700 transition duration-200">ADD TO CART</button>
-              </div>
-             
-              <div className=""></div>
-      </div>
+        <div className="flex items-center justify-center flex-col gap-6">
+            <div className="group w-72 h-96 relative flex justify-center items-center bg-white shadow-md overflow-hidden">
+                <Image
+                    src={imageUrl}
+                    alt="product"
+                    width={224}
+                    height={288}
+                    className="absolute w-full h-full z-10 object-contain"
+                />
+                <div className="w-full h-full p-4 bg-white relative flex-col flex justify-end items-center">
+                    {/* Hover button */}
+                    <button
+                        className="absolute w-64 cursor-pointer bg-[#0000FF] z-40 justify-center items-center mb-20 tracking-widest text-white text-[12px] py-3 hover:bg-blue-700 transition duration-200 hidden group-hover:flex"
+                    >
+                        ADD TO CART
+                    </button>
+                </div>
+            </div>
+
+            <div className="text-center mb-8">
+                <h2 className="text-lg font-semibold text-gray-800">{title}</h2>
+                <p className="text-sm text-gray-600">{author}</p>
+                <p className="text-lg font-bold text-[#0000FF] mt-2">${price}</p>
+            </div>
+        </div>
     );
 }

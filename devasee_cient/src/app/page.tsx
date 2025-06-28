@@ -10,6 +10,7 @@ export default function Home() {
           <AdvertisementSlides/>
           <TopCategories/>
           <NewRelease/>
+          <div className={"h-[5000px]"}></div>
           {/*Want to implement other sub-sections*/}
       </div>
   );
