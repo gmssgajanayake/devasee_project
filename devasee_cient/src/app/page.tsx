@@ -1,4 +1,6 @@
 import {AdvertisementSlides} from "@/app/_components/AdvertisementSlides";
+import TopCategories from "@/app/_components/TopCategories";
+import NewRelease from "@/app/_components/NewRelease";
 // import Maintenance from "@/components/Maintenance";
 
 export default function Home() {
@@ -6,7 +8,8 @@ export default function Home() {
       <div className={"bg-white"}>
           {/*<Maintenance/>*/}
           <AdvertisementSlides/>
-          <div className={"h-screen bg-blue-300"}></div>
+          <TopCategories/>
+          <NewRelease/>
           {/*Want to implement other sub-sections*/}
       </div>
   );

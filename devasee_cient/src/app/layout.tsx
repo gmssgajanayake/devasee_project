@@ -12,7 +12,13 @@ const inter = Inter({
 
 export const metadata: Metadata = {
     title: "Devasee | Bookshop & Printing Services",
-    description: "Discover and order your favorite books and printing services at Devasee.",
+    description: "Devasee is a leading bookshop and professional printing service based in Sri Lanka, dedicated to delivering high-quality products at affordable prices. We offer an extensive range of books, including academic texts, novels, children’s books, and more, catering to the needs of students, educators, and book lovers alike. In addition to our diverse book collection, Devasee specializes in a variety of printing services tailored for both personal and business purposes.\n" +
+        "\n" +
+        "Our printing solutions include advertising banner printing, customized gift mug printing, T-shirt printing, flyers, brochures, wedding cards, and more. We focus on ensuring every printed product meets high standards of clarity, color accuracy, and durability. Whether you're a student preparing for a project, a business looking for promotional materials, or an individual seeking personalized gifts, we have a solution for you.\n" +
+        "\n" +
+        "At Devasee, customer satisfaction is our priority. Our website offers a seamless browsing and ordering experience, allowing you to explore our products, request custom prints, and place orders from the comfort of your home. We deliver across Sri Lanka with fast, reliable service.\n" +
+        "\n" +
+        "With a strong reputation for trust, quality, and innovation, Devasee is your go-to partner for books and printing services anywhere in Sri Lanka.",
     keywords: ["bookshop", "printing", "Devasee", "Sri Lanka", "custom print", "educational books"],
     metadataBase: new URL("https://devasee.lk"),
     openGraph: {
