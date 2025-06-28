@@ -4,9 +4,9 @@ import { useEffect, useState } from "react";
 import MainNavBar from "@/app/_components/MainNavBar";
 import Advertisement from "@/app/_components/Advertisement";
 import ContactBar from "@/app/_components/ContactBar";
-import adImage1 from "@/assets/devasee-p1.png";
-import adImage2 from "@/assets/devasee-p2.png";
-import adImage3 from "@/assets/devasee-p3.png";
+import adImage1 from "@/assets/advertisement image/devasee-p1.png";
+import adImage2 from "@/assets/advertisement image/devasee-p2.png";
+import adImage3 from "@/assets/advertisement image/devasee-p3.png";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faArrowLeft, faArrowRight} from "@fortawesome/free-solid-svg-icons";
 

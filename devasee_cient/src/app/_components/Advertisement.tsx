@@ -4,6 +4,7 @@ import Link from "next/link";
 import {useEffect, useRef} from "react";
 import gsap from "gsap";
 import Image from "next/image";
+import MainButton from "@/components/MainButton";
 
 interface AdvertisementProps {
     title: string;
@@ -46,10 +47,7 @@ export default function Advertisement({
                         {description}
                     </p>
                     <Link href={"about"} className="flex justify-center md:justify-start">
-                        <button
-                            className=" mt-4 cursor-pointer px-4 py-2 text-sm border border-[#2b216d] rounded-md text-[#2b216d] hover:bg-[#2b216d] hover:text-white transition duration-300">
-                            READ MORE
-                        </button>
+                        <MainButton className={"mt-4"} name={"READ MORE"}/>
                     </Link>
 
                     {/* Indicator Dots */}
