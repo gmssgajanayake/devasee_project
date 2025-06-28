@@ -1,4 +1,4 @@
-import Item from "@/app/(router)/products/_components/Item";
+import Item from "@/components/Item";
 
 export default function Page(){
     return (
