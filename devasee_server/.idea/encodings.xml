@@ -10,8 +10,13 @@
     <file url="file://$PROJECT_DIR$/ProductService/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/UserService/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/analytics/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/apigateway/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/auth/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/delivery/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/discoveryserver/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/eureka/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/eurekadiscoveryserver/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/eurekanetflix/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/inventory/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/orders/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/product/src/main/java" charset="UTF-8" />
