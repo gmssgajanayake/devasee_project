@@ -16,20 +16,19 @@ export default function TopCategories(){
                 <h2 className={"font-bold text-[#2b216d] text-lg md:text-3xl  w-full"}>Explore our Top Categories</h2>
             </div>
             {/*Books are displayed area*/}
-            <div className={"w-full px-4 gap-4 md:px-8    flex items-center justify-start  my-8"}>
-                <div className={"w-1/3 h-auto flex items-center justify-center flex-col gap-8"}>
+            <div className={"w-full px-4 gap-8 md:gap-4 md:px-8   flex-col md:flex-row flex items-center justify-start  my-8"}>
+                <div className={"md:w-1/3 h-auto flex items-center justify-center flex-col gap-8"}>
                     <Image src={c1} alt={"Category Image"} className={"w-full h-64"}/>
                     <h2 className={"text-xl text-center font-bold text-[#2b216d]"}>Higher Education</h2>
                 </div>
-                <div className={"w-1/3 h-auto flex items-center justify-center flex-col gap-8"}>
+                <div className={"md:w-1/3 h-auto flex items-center justify-center flex-col gap-8"}>
                     <Image src={c2} alt={"Category Image"} className={"w-full h-64"}/>
-                    <h2 className={"text-xl text-center font-bold text-[#2b216d]"}>Higher Education</h2>
+                    <h2 className={"text-xl text-center font-bold text-[#2b216d]"}>Management Books</h2>
                 </div>
-                <div className={"w-1/3 h-auto flex items-center justify-center flex-col gap-8"}>
+                <div className={"md:w-1/3 h-auto flex items-center justify-center flex-col gap-8"}>
                     <Image src={c3} alt={"Category Image"} className={"w-full h-64"}/>
-                    <h2 className={"text-xl text-center font-bold text-[#2b216d]"}>Higher Education</h2>
+                    <h2 className={"text-xl text-center font-bold text-[#2b216d]"}>Engineering Books</h2>
                 </div>
-
             </div>
             <Link href={"products"} className={"w-full flex text-center mb-12  justify-center items-center  "}>
                 <MainButton name={"VIEW MORE"}/>
