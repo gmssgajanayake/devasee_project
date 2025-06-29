@@ -3,7 +3,11 @@ import Maintenance from "@/components/Maintenance";
 
 export default function Page(){
     return (
-        <Maintenance/>
+        <div>
+            <Maintenance/>
+        </div>
+
+
         /*<div>
             <SubNavBar/>
             <p>About page</p>
