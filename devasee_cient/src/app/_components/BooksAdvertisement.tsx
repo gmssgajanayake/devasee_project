@@ -50,7 +50,7 @@ export default function BooksAdvertisement({
 
     return (
         <section
-            className="p-10 mt-16  flex items-center justify-center text-center w-full h-full bg-[#f2f3f7]"
+            className="p-10 mt-16 flex-col  flex items-center justify-center text-center w-full h-full bg-[#f2f3f7]"
         >
             <div ref={textRef} className="flex flex-col gap-12  md:flex-row items-center justify-center w-full max-w-6xl mx-auto">
 
@@ -67,7 +67,7 @@ export default function BooksAdvertisement({
 
                 {/* Content */}
                 <div  className="w-full gap-4 h-1/2 md:w-1/2 flex flex-col justify-center items-center  md:items-start">
-                    <h2 className="text-4xl lg:text-5xl text-center md:text-left font-bold text-[#2b216d]">
+                    <h2 className="text-3xl lg:text-5xl text-center md:text-left font-bold text-[#2b216d]">
                         Featured Books
                     </h2>
                     <div className={"w-[80px] mt-10 h-[2px] bg-[#0000ff]"}></div>
@@ -85,25 +85,30 @@ export default function BooksAdvertisement({
                         <MainButton className={"mt-4"} name={"READ MORE"}/>
                     </Link>
 
-                    {/* Indicator Dots */}
-                    <div className="hidden md:flex mt-4 gap-2">
-                        {Array.from({length: total}).map((_, index) => (
-                            <div
-                                key={index}
-                                className="w-[30px] h-[30px] flex justify-center items-center"
-                            >
-                                <div className={`h-[30px] w-[30px] rounded-full flex items-center justify-center ${
-                                    index === current ? "border border-[#0000ff]" : "border-0 "
-                                }`}>
-                                    <div
-                                        className={`h-[10px] w-[10px] rounded-full ${
-                                            index === current ? "bg-[#0000ff]" : "bg-gray-400/30"
-                                        }`}
-                                    ></div>
-                                </div>
+
+                </div>
+
+            </div>
+            <div className={"w-full h-auto mt-8 transition duration-300 flex items-center justify-center "}>
+
+                {/* Indicator Dots */}
+                <div className=" flex  gap-2">
+                    {Array.from({length: total}).map((_, index) => (
+                        <div
+                            key={index}
+                            className="w-[30px]  h-[30px] flex justify-center items-center"
+                        >
+                            <div className={`h-[30px] w-[30px] rounded-full flex items-center justify-center ${
+                                index === current ? "border border-[#0000ff]" : "border-0 "
+                            }`}>
+                                <div
+                                    className={`h-[10px] w-[10px] rounded-full ${
+                                        index === current ? "bg-[#0000ff]" : "bg-gray-400/30"
+                                    }`}
+                                ></div>
                             </div>
-                        ))}
-                    </div>
+                        </div>
+                    ))}
                 </div>
             </div>
         </section>

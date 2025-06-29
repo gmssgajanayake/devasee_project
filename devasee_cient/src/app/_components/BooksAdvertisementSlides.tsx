@@ -51,7 +51,7 @@ export default function BooksAdvertisementSlides() {
     }, []);
 
     return (
-        <div className="w-screen h-auto overflow-hidden bg-white">
+        <div className="w-screen h-auto mb-14 overflow-hidden bg-white">
             <ContactBar />
             <MainNavBar />
             <div className="w-full h-auto relative">
