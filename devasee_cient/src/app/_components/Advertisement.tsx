@@ -62,7 +62,7 @@ export default function Advertisement({
                                 }`}>
                                     <div
                                         className={`h-[10px] w-[10px] rounded-full ${
-                                            index === current ? "bg-[#0000ff]" : "bg-gray-400"
+                                            index === current ? "bg-[#0000ff]" : "bg-gray-400/30"
                                         }`}
                                     ></div>
                                 </div>
