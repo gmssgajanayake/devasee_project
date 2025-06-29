@@ -18,15 +18,12 @@ import Link from "next/link";
 gsap.registerPlugin(ScrollTrigger);
 
 const books = [
-    { image: book1, title: "Learn React", author: "John Doe", price: 29.99 },
-    { image: book2, title: "Advanced React", author: "Jane Doe", price: 39.99 },
-    { image: book3, title: "React Native", author: "Alex Smith", price: 34.99 },
-    { image: book4, title: "React Hooks", author: "Sara Lee", price: 24.99 },
-    { image: book5, title: "React + TypeScript", author: "Chris Ray", price: 32.99 },
-    { image: book6, title: "React Testing", author: "Emma Stone", price: 28.99 },
-    { image: book4, title: "React Hooks", author: "Sara Lee", price: 24.99 },
-    { image: book5, title: "React + TypeScript", author: "Chris Ray", price: 32.99 },
-    { image: book6, title: "React Testing", author: "Emma Stone", price: 28.99 },
+    { image: book1, title: "Learn React", author: "John Doe", price: 1299.00 },
+    { image: book2, title: "Advanced React", author: "Jane Doe", price: 1399.00 },
+    { image: book3, title: "React Native", author: "Alex Smith", price: 1349.00 },
+    { image: book4, title: "React Hooks", author: "Sara Lee", price: 1249.00 },
+    { image: book5, title: "React + TypeScript", author: "Chris Ray", price: 1329.00 },
+    { image: book6, title: "React Testing", author: "Emma Stone", price: 1289.00 },
 ];
 
 export default function NewRelease() {
