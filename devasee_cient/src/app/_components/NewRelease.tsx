@@ -65,7 +65,7 @@ export default function NewRelease() {
             <p className="text-xs tracking-widest text-center text-gray-800/50">SOME QUALITY ITEMS</p>
             <div className="flex items-center justify-center w-screen px-8 my-6">
                 <hr className="w-full text-gray-300/80" />
-                <h2 className="text-3xl md:text-5xl mx-4 font-bold text-[#2b216d]">
+                <h2 className="text-3xl md:text-4xl mx-4 font-bold text-[#2b216d]">
                     New&nbsp;Release&nbsp;Books
                 </h2>
                 <hr className="w-full text-gray-300/80" />
@@ -76,7 +76,7 @@ export default function NewRelease() {
                 <div
                     ref={scrollContainerRef}
                     className="flex gap-10 px-10"
-                    style={{ width: `${books.length * 300}px` }} // Adjust if needed
+                    style={{ width: `${books.length * 224}px` }} // Adjust if needed
                 >
                     {books.map((book, index) => (
                         <ItemCard

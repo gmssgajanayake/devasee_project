@@ -16,7 +16,7 @@ export default function ItemCard({
                                  }: ItemCardProps) {
     return (
         <div className="flex items-center justify-center flex-col gap-6">
-            <div className="group w-72 h-96 relative flex justify-center items-center bg-white shadow-md overflow-hidden">
+            <div className="group w-56 h-72 relative flex justify-center items-center bg-white shadow-md overflow-hidden">
                 <Image
                     src={imageUrl}
                     alt="product"
@@ -27,7 +27,7 @@ export default function ItemCard({
                 <div className="w-full h-full p-4 bg-white relative flex-col flex justify-end items-center">
                     {/* Hover button */}
                     <button
-                        className="absolute w-64 cursor-pointer bg-[#0000FF] z-40 justify-center items-center mb-20 tracking-widest text-white text-[12px] py-3 hover:bg-blue-700 transition duration-200 hidden group-hover:flex"
+                        className="absolute w-48 cursor-pointer bg-[#0000FF] z-40 justify-center items-center mb-20 tracking-widest text-white text-[12px] py-3 hover:bg-blue-700 transition duration-200 hidden group-hover:flex"
                     >
                         ADD TO CART
                     </button>
