@@ -1,6 +1,7 @@
 import {AdvertisementSlides} from "@/app/_components/AdvertisementSlides";
 import TopCategories from "@/app/_components/TopCategories";
 import NewRelease from "@/app/_components/NewRelease";
+import BooksAdvertisementSlides from "@/app/_components/BooksAdvertisementSlides";
 // import Maintenance from "@/components/Maintenance";
 
 export default function Home() {
@@ -10,6 +11,7 @@ export default function Home() {
           <AdvertisementSlides/>
           <TopCategories/>
           <NewRelease/>
+          <BooksAdvertisementSlides/>
           <div className={"h-[5000px]"}></div>
           {/*Want to implement other sub-sections*/}
       </div>
