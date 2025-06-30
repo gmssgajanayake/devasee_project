@@ -1,15 +1,24 @@
 "use client";
 
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
+import { StaticImageData } from "next/image";
 import MainNavBar from "@/app/_components/MainNavBar";
 import ContactBar from "@/app/_components/ContactBar";
 import book1 from "@/assets/offer img.png";
 import Offers from "@/app/_components/Offers";
 
+interface OfferAd {
+    id: number;
+    title: string;
+    description: string;
+    image: StaticImageData;
+    endDate: string;
+}
+
 export default function OffersSlides() {
     const [currentIndex, setCurrentIndex] = useState(0);
 
-    const demoAds = [
+    const demoAds: OfferAd[] = [
         {
             id: 2,
             title: "Computer science books are 10% off now! Don't miss such a deal!",
@@ -41,23 +50,25 @@ export default function OffersSlides() {
     };
 
     useEffect(() => {
-        const interval = setInterval(goToNextAd, 4500);
+        const interval = setInterval(goToNextAd, 4500); // 4.5s auto-scroll
         return () => clearInterval(interval);
     }, []);
 
+    const currentAd = demoAds[currentIndex];
+
     return (
         <div className="w-screen h-auto overflow-hidden bg-white">
-            <ContactBar/>
-            <MainNavBar/>
+            <ContactBar />
+            <MainNavBar />
             <div className="w-full h-auto relative">
                 <Offers
-                    key={demoAds[currentIndex].id}
-                    title={demoAds[currentIndex].title}
-                    description={demoAds[currentIndex].description}
-                    image={demoAds[currentIndex].image.src}
+                    key={currentAd.id}
+                    title={currentAd.title}
+                    description={currentAd.description}
+                    image={currentAd.image.src}
                     total={demoAds.length}
                     current={currentIndex}
-                    endDate={demoAds[currentIndex].endDate}
+                    endDate={currentAd.endDate}
                 />
             </div>
         </div>
