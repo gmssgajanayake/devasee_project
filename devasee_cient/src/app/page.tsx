@@ -4,6 +4,7 @@ import NewRelease from "@/app/_components/NewRelease";
 import BooksAdvertisementSlides from "@/app/_components/BooksAdvertisementSlides";
 import OffersSlides from "@/app/_components/OffersSlides";
 import NewsSubscribe from "@/app/_components/NewsSubscribe";
+import Article from "@/app/_components/Article";
 // import Maintenance from "@/components/Maintenance";
 
 export default function Home() {
@@ -16,8 +17,7 @@ export default function Home() {
           <BooksAdvertisementSlides/>
           <OffersSlides/>
           <NewsSubscribe/>
-          <div className={"h-[5000px]"}></div>
-          {/*Want to implement other sub-sections*/}
+          <Article/>
       </div>
   );
 }

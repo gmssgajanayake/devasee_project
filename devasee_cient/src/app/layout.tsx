@@ -2,7 +2,7 @@ import type {Metadata} from "next";
 import {Inter} from "next/font/google";
 import "./globals.css";
 import Head from "@/app/head";
-/*import Footer from "@/app/_components/Footer";*/
+import Footer from "@/app/_components/Footer";
 
 const inter = Inter({
     subsets: ["latin"],
@@ -52,7 +52,7 @@ export default function RootLayout({
         <Head/>
         <body className={`${inter.variable} font-sans antialiased bg-white`}>
         {children}
-        {/*<Footer/>*/}
+        <Footer/>
         </body>
         </html>
     );
