@@ -69,9 +69,11 @@ export default function NewRelease() {
     }, [totalPages]);
 
     return (
-        <div ref={sectionRef} className="relative w-full overflow-hidden bg-[#e8ebff] py-20">
+        <div ref={sectionRef} className="relative w-full overflow-x-hidden bg-[#e8ebff] py-20"> {/* ✅ overflow-x-hidden added */}
             {/* Title */}
-            <p className="text-xs tracking-widest text-center text-gray-800/50">SOME QUALITY ITEMS</p>
+            <p className="text-xs tracking-widest text-center text-gray-800/50">
+                SOME QUALITY ITEMS
+            </p>
             <div className="flex items-center justify-center w-full px-8 my-6">
                 <hr className="w-full text-gray-300/80" />
                 <h2 className="text-3xl md:text-4xl mx-4 font-bold text-[#2b216d]">
@@ -80,12 +82,12 @@ export default function NewRelease() {
                 <hr className="w-full text-gray-300/80" />
             </div>
 
-            {/* Hidden-scroll horizontal container */}
+            {/* Scrollable content */}
             <div className="pt-8 w-full overflow-hidden">
                 <div
                     ref={scrollContainerRef}
                     className="flex gap-10 px-10 no-scrollbar"
-                    style={{ minWidth: `${books.length * 250}px` }}
+                    style={{ minWidth: `${books.length * 250}px` }} // no overflow due to outer containment
                 >
                     {books.map((book, index) => (
                         <ItemCard
@@ -102,9 +104,10 @@ export default function NewRelease() {
 
             <hr className="w-full text-gray-300/80" />
 
-            {/* Dots and CTA */}
+            {/* Page Dots and CTA */}
             <div className="flex justify-center md:justify-end items-center px-4 mt-6">
                 <div className="w-full md:w-1/2 flex items-center justify-between">
+                    {/* Dots */}
                     <div className="flex gap-4">
                         {Array.from({ length: totalPages }).map((_, index) => (
                             <div
@@ -122,6 +125,7 @@ export default function NewRelease() {
                         ))}
                     </div>
 
+                    {/* View All CTA */}
                     <div>
                         <Link
                             href={"products"}
