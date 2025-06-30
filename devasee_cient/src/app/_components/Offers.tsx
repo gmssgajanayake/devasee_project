@@ -61,7 +61,9 @@ const Offers: React.FC<BookAdvertisementProps> = ({
             }
 
             const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const hours = Math.floor(
+                (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+            );
             const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
@@ -73,23 +75,30 @@ const Offers: React.FC<BookAdvertisementProps> = ({
         return () => clearInterval(interval);
     }, [endDate]);
 
-    // GSAP animation
+    // GSAP animation with proper cleanup handling refs safely
     useLayoutEffect(() => {
+        const textEl = textRef.current;
+        const imageEl = imageRef.current;
+
         const tl = gsap.timeline();
 
-        tl.fromTo(
-            textRef.current,
-            { autoAlpha: 0, x: -50 },
-            { autoAlpha: 1, x: 0, duration: 0.6, ease: "power2.out" }
-        ).fromTo(
-            imageRef.current,
-            { autoAlpha: 0, x: 50 },
-            { autoAlpha: 1, x: 0, duration: 0.6, ease: "power2.out" },
-            "<"
-        );
+        if (textEl && imageEl) {
+            tl.fromTo(
+                textEl,
+                { autoAlpha: 0, x: -50 },
+                { autoAlpha: 1, x: 0, duration: 0.6, ease: "power2.out" }
+            ).fromTo(
+                imageEl,
+                { autoAlpha: 0, x: 50 },
+                { autoAlpha: 1, x: 0, duration: 0.6, ease: "power2.out" },
+                "<"
+            );
+        }
 
         return () => {
-            gsap.set([textRef.current, imageRef.current], { clearProps: "all" });
+            if (textEl && imageEl) {
+                gsap.set([textEl, imageEl], { clearProps: "all" });
+            }
         };
     }, [current]);
 
@@ -111,14 +120,12 @@ const Offers: React.FC<BookAdvertisementProps> = ({
                     {/* Countdown */}
                     <div className="w-full flex items-center justify-center md:justify-start gap-6 mt-2">
                         {!timeLeft.expired ? (
-                            ["days", "hours", "minutes", "seconds"].map((unit, index) => (
+                            ["days", "hours", "minutes", "seconds"].map((unit) => (
                                 <div key={unit} className="flex flex-col items-center">
                                     <p className="text-xl font-bold text-blue-700">
                                         {timeLeft[unit as keyof TimeLeft]}
                                     </p>
-                                    <p className="text-xs text-gray-600">
-                                        {unit.toUpperCase().slice(0, 3)}
-                                    </p>
+                                    <p className="text-xs text-gray-600">{unit.toUpperCase().slice(0, 3)}</p>
                                 </div>
                             ))
                         ) : (
@@ -129,7 +136,10 @@ const Offers: React.FC<BookAdvertisementProps> = ({
                     {/* Dot Indicator */}
                     <div className="flex gap-2 mt-4">
                         {Array.from({ length: total }).map((_, index) => (
-                            <div key={index} className="w-[30px] h-[30px] flex justify-center items-center">
+                            <div
+                                key={index}
+                                className="w-[30px] h-[30px] flex justify-center items-center"
+                            >
                                 <div
                                     className={`h-[30px] w-[30px] rounded-full flex items-center justify-center ${
                                         index === current ? "border border-[#0000ff]" : "border-0"
@@ -147,7 +157,10 @@ const Offers: React.FC<BookAdvertisementProps> = ({
                 </div>
 
                 {/* Right: Image */}
-                <div ref={imageRef} className="w-full md:w-1/2 flex justify-center items-center">
+                <div
+                    ref={imageRef}
+                    className="w-full md:w-1/2 flex justify-center items-center"
+                >
                     <Image
                         src={image}
                         alt={title}
