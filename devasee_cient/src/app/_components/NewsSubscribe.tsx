@@ -75,7 +75,7 @@ export default function NewsSubscribe() {
                     </div>
                 </div>
             </div>
-            <div className={"mt-14 gap-4 lg:hidden  bg-[#0000ff] pt-2 flex flex-col justify-center items-center"}>
+            <div className={"mt-14 gap-4 px-6 lg:hidden  bg-[#0000ff] pt-2 flex flex-col justify-center items-center"}>
                 <div className="w-screen h-auto bg-[#0000ff] p-4  flex flex-col justify-center items-center">
                     <h3 className={"text-2xl text-center mt-3 md:text-4xl lg:text-5xl text-white font-bold "}>Subscibe to Our
                         Newsletter</h3>
@@ -83,7 +83,7 @@ export default function NewsSubscribe() {
                         updated with the latest news, exclusive offers, and promotions! Subscribe to our newsletter for
                         curated content delivered straight to your inbox</p>
                 </div>
-                <div className="flex mb-8 w-sm bg-white items-center px-3  md:px-4 md:py-3 py-2 ">
+                <div className="flex mb-8 w-full  sm:w-96 bg-white items-center px-3  md:px-4 md:py-3 py-2 ">
                     <FontAwesomeIcon icon={faEnvelope} className="text-gray-400 mr-2"/>
                     <input
                         id="price"
@@ -93,7 +93,7 @@ export default function NewsSubscribe() {
                         className="block min-w-0 grow text-base border-0 text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm"
                     />
                     <button
-                        className={"bg-[#0000ff] cursor-pointer text-white px-10 py-4 font-extrabold text-xs tracking-wider"}>
+                        className={"bg-[#0000ff] cursor-pointer text-white px-6 py-4 sm:px-10  font-extrabold text-xs tracking-wider"}>
                         SUBSCRIBE
                     </button>
                 </div>
