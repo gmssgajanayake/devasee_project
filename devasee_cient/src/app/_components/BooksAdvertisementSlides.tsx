@@ -4,10 +4,10 @@ import { useEffect, useState } from "react";
 import MainNavBar from "@/app/_components/MainNavBar";
 import ContactBar from "@/app/_components/ContactBar";
 import book1 from "@/assets/items image/img_4.png";
-import book3 from "@/assets/items image/img_2.png";
 import book2 from "@/assets/items image/img_3.png";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faArrowLeft, faArrowRight} from "@fortawesome/free-solid-svg-icons";
+import book3 from "@/assets/items image/img_2.png";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowLeft, faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import BooksAdvertisement from "@/app/_components/BooksAdvertisement";
 
 export default function BooksAdvertisementSlides() {
@@ -17,28 +17,33 @@ export default function BooksAdvertisementSlides() {
         {
             id: 1,
             title: "Devasee Bookshop",
-            description: "Devasee Bookshop offers a wide collection of books across various genres including education, fiction, and children’s literature. It’s a trusted destination for readers and students seeking quality books in Sri Lanka.",
+            description:
+                "Devasee Bookshop offers a wide collection of books across various genres including education, fiction, and children’s literature. It’s a trusted destination for readers and students seeking quality books in Sri Lanka.",
             image: book1,
-            price: 1299.00,
+            price: 1299.0,
         },
         {
             id: 2,
             title: "Personalized Printing",
-            description: "Personalized printing adds a custom touch to items like gifts, apparel, and stationery. It enhances uniqueness, making products more meaningful for personal use, branding, or special occasions.",
+            description:
+                "Personalized printing adds a custom touch to items like gifts, apparel, and stationery. It enhances uniqueness, making products more meaningful for personal use, branding, or special occasions.",
             image: book2,
-            price: 1299.00,
+            price: 1299.0,
         },
         {
             id: 3,
             title: "Student Stationery Deals",
-            description: "Student stationery deals offer affordable bundles of essential school supplies like pens, notebooks, highlighters, and folders. These budget-friendly packs are perfect for students preparing for a new term.",
+            description:
+                "Student stationery deals offer affordable bundles of essential school supplies like pens, notebooks, highlighters, and folders. These budget-friendly packs are perfect for students preparing for a new term.",
             image: book3,
-            price: 1299.00,
+            price: 1299.0,
         },
     ];
 
     const goToPreviousAd = () => {
-        setCurrentIndex((prevIndex) => (prevIndex === 0 ? demoAds.length - 1 : prevIndex - 1));
+        setCurrentIndex((prevIndex) =>
+            prevIndex === 0 ? demoAds.length - 1 : prevIndex - 1
+        );
     };
 
     const goToNextAd = () => {
@@ -51,7 +56,7 @@ export default function BooksAdvertisementSlides() {
     }, []);
 
     return (
-        <div className="w-screen h-auto mb-14 overflow-hidden bg-white">
+        <div className="w-full mb-14 overflow-x-hidden overflow-hidden bg-white"> {/* ✅ FIXED */}
             <ContactBar />
             <MainNavBar />
             <div className="w-full h-auto relative">
@@ -62,11 +67,11 @@ export default function BooksAdvertisementSlides() {
                     image={demoAds[currentIndex].image.src}
                     total={demoAds.length}
                     current={currentIndex}
-                    price={demoAds[currentIndex].price}>
-                </BooksAdvertisement>
+                    price={demoAds[currentIndex].price}
+                />
                 {/* Left Arrow */}
                 <div
-                    className="absolute hidden lg:flex left-8 top-1/2 transform -translate-y-1/2 z-10 w-12 h-12  items-center justify-center cursor-pointer"
+                    className="absolute hidden lg:flex left-8 top-1/2 transform -translate-y-1/2 z-10 w-12 h-12 items-center justify-center cursor-pointer"
                     onClick={goToPreviousAd}
                 >
                     <div className="w-10 h-10 bg-white rounded-full border border-[#0000ff] flex items-center justify-center shadow-md">
