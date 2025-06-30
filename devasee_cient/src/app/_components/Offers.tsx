@@ -31,6 +31,7 @@ const Offers: React.FC<BookAdvertisementProps> = ({
                                                   }) => {
     const textRef = useRef<HTMLDivElement>(null);
     const imageRef = useRef<HTMLDivElement>(null);
+
     const [timeLeft, setTimeLeft] = useState<TimeLeft>({
         days: 0,
         hours: 0,
@@ -39,56 +40,72 @@ const Offers: React.FC<BookAdvertisementProps> = ({
         expired: false,
     });
 
+    // Countdown logic
     useEffect(() => {
+        if (!endDate) return;
+
         const updateCountdown = () => {
             const now = new Date().getTime();
-            const target = new Date(endDate!).getTime();
+            const target = new Date(endDate).getTime();
             const distance = target - now;
 
             if (distance < 0) {
-                setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0, expired: true });
+                setTimeLeft({
+                    days: 0,
+                    hours: 0,
+                    minutes: 0,
+                    seconds: 0,
+                    expired: true,
+                });
                 return;
             }
 
             const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const hours = Math.floor(
+                (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+            );
             const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
             setTimeLeft({ days, hours, minutes, seconds, expired: false });
         };
 
-        if (endDate) {
-            updateCountdown();
-            const interval = setInterval(updateCountdown, 1000);
-            return () => clearInterval(interval);
-        }
-    }, [title, endDate]);
+        updateCountdown();
+        const interval = setInterval(updateCountdown, 1000);
+        return () => clearInterval(interval);
+    }, [endDate]);
 
+    // GSAP animation with proper cleanup handling refs safely
     useLayoutEffect(() => {
+        const textEl = textRef.current;
+        const imageEl = imageRef.current;
+
         const tl = gsap.timeline();
 
-        tl.fromTo(
-            textRef.current,
-            { autoAlpha: 0, x: -50 },
-            { autoAlpha: 1, x: 0, duration: 0.6, ease: "power2.out" }
-        ).fromTo(
-            imageRef.current,
-            { autoAlpha: 0, x: 50 },
-            { autoAlpha: 1, x: 0, duration: 0.6, ease: "power2.out" },
-            "<" // run both animations at the same time
-        );
+        if (textEl && imageEl) {
+            tl.fromTo(
+                textEl,
+                { autoAlpha: 0, x: -50 },
+                { autoAlpha: 1, x: 0, duration: 0.6, ease: "power2.out" }
+            ).fromTo(
+                imageEl,
+                { autoAlpha: 0, x: 50 },
+                { autoAlpha: 1, x: 0, duration: 0.6, ease: "power2.out" },
+                "<"
+            );
+        }
 
         return () => {
-            gsap.set(textRef.current, { clearProps: "all" });
-            gsap.set(imageRef.current, { clearProps: "all" });
+            if (textEl && imageEl) {
+                gsap.set([textEl, imageEl], { clearProps: "all" });
+            }
         };
     }, [current]);
 
     return (
         <section className="flex flex-col items-center justify-center w-full h-full bg-white">
             <div className="flex flex-col-reverse md:flex-row px-4 sm:px-8 md:px-20 py-14 bg-[#e5e9fb] xl:rounded-4xl items-center justify-center w-full max-w-6xl mx-auto gap-6 sm:gap-10 md:gap-12">
-                {/* Content */}
+                {/* Left: Text & Countdown */}
                 <div
                     ref={textRef}
                     className="w-full md:w-1/2 flex flex-col justify-center items-center md:items-start gap-4"
@@ -100,33 +117,23 @@ const Offers: React.FC<BookAdvertisementProps> = ({
                         {description}
                     </p>
 
-                    {/* Countdown Timer */}
+                    {/* Countdown */}
                     <div className="w-full flex items-center justify-center md:justify-start gap-6 mt-2">
                         {!timeLeft.expired ? (
-                            <>
-                                <div className="flex flex-col items-center">
-                                    <p className="text-xl font-bold text-blue-700">{timeLeft.days}</p>
-                                    <p className="text-xs text-gray-600">DAYS</p>
+                            ["days", "hours", "minutes", "seconds"].map((unit) => (
+                                <div key={unit} className="flex flex-col items-center">
+                                    <p className="text-xl font-bold text-blue-700">
+                                        {timeLeft[unit as keyof TimeLeft]}
+                                    </p>
+                                    <p className="text-xs text-gray-600">{unit.toUpperCase().slice(0, 3)}</p>
                                 </div>
-                                <div className="flex flex-col items-center">
-                                    <p className="text-xl font-bold text-blue-700">{timeLeft.hours}</p>
-                                    <p className="text-xs text-gray-600">HOURS</p>
-                                </div>
-                                <div className="flex flex-col items-center">
-                                    <p className="text-xl font-bold text-blue-700">{timeLeft.minutes}</p>
-                                    <p className="text-xs text-gray-600">MIN</p>
-                                </div>
-                                <div className="flex flex-col items-center">
-                                    <p className="text-xl font-bold text-blue-700">{timeLeft.seconds}</p>
-                                    <p className="text-xs text-gray-600">SEC</p>
-                                </div>
-                            </>
+                            ))
                         ) : (
                             <p className="text-red-600 font-semibold text-lg">EXPIRED</p>
                         )}
                     </div>
 
-                    {/* Indicator Dots */}
+                    {/* Dot Indicator */}
                     <div className="flex gap-2 mt-4">
                         {Array.from({ length: total }).map((_, index) => (
                             <div
@@ -142,15 +149,18 @@ const Offers: React.FC<BookAdvertisementProps> = ({
                                         className={`h-[10px] w-[10px] rounded-full ${
                                             index === current ? "bg-[#0000ff]" : "bg-gray-400/30"
                                         }`}
-                                    ></div>
+                                    />
                                 </div>
                             </div>
                         ))}
                     </div>
                 </div>
 
-                {/* Image */}
-                <div ref={imageRef} className="w-full md:w-1/2 flex justify-center items-center">
+                {/* Right: Image */}
+                <div
+                    ref={imageRef}
+                    className="w-full md:w-1/2 flex justify-center items-center"
+                >
                     <Image
                         src={image}
                         alt={title}

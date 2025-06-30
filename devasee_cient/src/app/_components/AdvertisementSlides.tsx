@@ -7,8 +7,8 @@ import ContactBar from "@/app/_components/ContactBar";
 import adImage1 from "@/assets/advertisement image/devasee-p1.png";
 import adImage2 from "@/assets/advertisement image/devasee-p2.png";
 import adImage3 from "@/assets/advertisement image/devasee-p3.png";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowLeft, faArrowRight } from "@fortawesome/free-solid-svg-icons";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faArrowLeft, faArrowRight} from "@fortawesome/free-solid-svg-icons";
 
 export function AdvertisementSlides() {
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -17,22 +17,19 @@ export function AdvertisementSlides() {
         {
             id: 1,
             title: "Devasee Bookshop",
-            description:
-                "Devasee Bookshop offers a wide collection of books across various genres including education, fiction, and children’s literature. It’s a trusted destination for readers and students seeking quality books in Sri Lanka.",
+            description: "Devasee Bookshop offers a wide collection of books across various genres including education, fiction, and children’s literature. It’s a trusted destination for readers and students seeking quality books in Sri Lanka.",
             image: adImage1,
         },
         {
             id: 2,
             title: "Personalized Printing",
-            description:
-                "Personalized printing adds a custom touch to items like gifts, apparel, and stationery. It enhances uniqueness, making products more meaningful for personal use, branding, or special occasions.",
+            description: "Personalized printing adds a custom touch to items like gifts, apparel, and stationery. It enhances uniqueness, making products more meaningful for personal use, branding, or special occasions.",
             image: adImage2,
         },
         {
             id: 3,
             title: "Student Stationery Deals",
-            description:
-                "Student stationery deals offer affordable bundles of essential school supplies like pens, notebooks, highlighters, and folders. These budget-friendly packs are perfect for students preparing for a new term.",
+            description: "Student stationery deals offer affordable bundles of essential school supplies like pens, notebooks, highlighters, and folders. These budget-friendly packs are perfect for students preparing for a new term.",
             image: adImage3,
         },
     ];
@@ -51,7 +48,7 @@ export function AdvertisementSlides() {
     }, []);
 
     return (
-        <div className="w-screen h-screen overflow-hidden overflow-x-hidden bg-white"> {/* ✅ FIX: added overflow-x-hidden */}
+        <div className="w-screen h-screen overflow-hidden bg-white">
             <ContactBar />
             <MainNavBar />
             <div className="w-full h-full relative">
@@ -61,11 +58,10 @@ export function AdvertisementSlides() {
                     description={demoAds[currentIndex].description}
                     image={demoAds[currentIndex].image.src}
                     total={demoAds.length}
-                    current={currentIndex}
-                />
+                    current={currentIndex}></Advertisement>
                 {/* Left Arrow */}
                 <div
-                    className="absolute hidden lg:flex left-8 top-1/2 transform -translate-y-1/2 z-10 w-12 h-12 items-center justify-center cursor-pointer"
+                    className="absolute hidden lg:flex left-8 top-1/2 transform -translate-y-1/2 z-10 w-12 h-12  items-center justify-center cursor-pointer"
                     onClick={goToPreviousAd}
                 >
                     <div className="w-10 h-10 bg-white rounded-full border border-[#0000ff] flex items-center justify-center shadow-md">
