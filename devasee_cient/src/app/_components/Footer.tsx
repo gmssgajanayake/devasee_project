@@ -35,16 +35,16 @@ export default function Footer() {
                             </p>
 
                             <div className="flex gap-4">
-                                <a href="#" className="text-blue-600 hover:text-blue-800 transition-colors">
+                                <a href="#" className="text-[#0000ff] hover:text-blue-800 transition-colors">
                                     <FontAwesomeIcon icon={faFacebook} className="text-xl md:text-2xl" />
                                 </a>
-                                <a href="#" className="text-blue-600 hover:text-blue-800 transition-colors">
+                                <a href="#" className="text-[#0000ff] hover:text-blue-800 transition-colors">
                                     <FontAwesomeIcon icon={faLinkedinIn} className="text-xl md:text-2xl" />
                                 </a>
-                                <a href="#" className="text-blue-600 hover:text-blue-800 transition-colors">
+                                <a href="#" className="text-[#0000ff] hover:text-blue-800 transition-colors">
                                     <FontAwesomeIcon icon={faXTwitter} className="text-xl md:text-2xl" />
                                 </a>
-                                <a href="#" className="text-blue-600 hover:text-blue-800 transition-colors">
+                                <a href="#" className="text-[#0000ff] hover:text-blue-800 transition-colors">
                                     <FontAwesomeIcon icon={faYoutube} className="text-xl md:text-2xl" />
                                 </a>
                             </div>
