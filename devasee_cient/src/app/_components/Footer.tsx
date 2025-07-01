@@ -1,91 +1,114 @@
 import Link from "next/link";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-    faFacebookF,
-    faLinkedinIn,
-    faXTwitter,
-    faYoutube,
-} from "@fortawesome/free-brands-svg-icons";
+import Image from "next/image";
+import logo from "@/assets/devasee logo.png";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faFacebook, faLinkedinIn, faXTwitter, faYoutube} from "@fortawesome/free-brands-svg-icons";
 
 export default function Footer() {
     return (
-        <footer className="bg-white border-t text-blue-950 w-full">
-            <div className="max-w-7xl mx-auto px-6 py-10 flex flex-col md:flex-row gap-10 md:gap-0 justify-between items-start">
-                {/* Left Section */}
-                <div className="flex-1 min-w-[250px] flex flex-col items-start gap-4">
-                    {/* Logo */}
-                    <div>
-                        {/* <img
-                            src="/logo.png"
-                            alt="Devasee Logo"
-                            className="w-36 h-auto mb-3"
-                        />*/}
+        <footer className="bg-white overflow-hidden h-auto w-screen flex justify-between items-center flex-col">
+            <div className="w-full hidden md:flex p-10  justify-start items-start">
+                <div className={" w-1/3 p-14  gap-8 flex flex-col justify-center items-start"}>
+                    <Link href="/">
+                        <Image
+                            src={logo}
+                            alt={"logo"}
+                            priority
+                            className="h-10 w-10 lg:w-16 lg:h-16"
+                        />
+                    </Link>
+
+                    <p className={"text-[#2b216d]  text-sm md:text-lg"}>Devasee&nbsp;—&nbsp;Trusted bookshop and printing services for every need.</p>
+
+                    <div className="w-full flex items-center justify-between">
+                        <FontAwesomeIcon icon={faFacebook} className={"text-xl lg:text-3xl text-[#0000ff]"}/>
+                        <FontAwesomeIcon icon={faLinkedinIn} className={"text-xl lg:text-3xl text-[#0000ff]"}/>
+                        <FontAwesomeIcon icon={faXTwitter} className={"text-xl lg:text-3xl text-[#0000ff]"}/>
+                        <FontAwesomeIcon icon={faYoutube} className={"text-xl lg:text-3xl text-[#0000ff]"}/>
+
                     </div>
-                    {/* Description */}
-                    <p className="text-sm text-gray-700 mb-2">
-                        Devasee is a leading bookshop and professional printing service based in Sri Lanka, delivering high-quality products and innovative print solutions.
-                    </p>
-                    {/* Social Media Icons */}
-                    <div className="flex gap-5 mt-1">
-                        <Link
-                            href="https://www.facebook.com/devaseepvtltd/"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            aria-label="Facebook"
-                            className="text-blue-600 hover:text-blue-800"
-                        >
-                            <FontAwesomeIcon icon={faFacebookF} className="w-5 h-5" />
-                        </Link>
-                        <Link
-                            href="https://www.linkedin.com/company/devasee"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            aria-label="LinkedIn"
-                            className="text-blue-800 hover:text-blue-600"
-                        >
-                            <FontAwesomeIcon icon={faLinkedinIn} className="w-5 h-5" />
-                        </Link>
-                        <Link
-                            href="https://x.com/Devaseelk"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            aria-label="X (Twitter)"
-                            className="text-black hover:text-blue-500"
-                        >
-                            <FontAwesomeIcon icon={faXTwitter} className="w-5 h-5" />
-                        </Link>
-                        <Link
-                            href="https://www.youtube.com/@devasee"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            aria-label="YouTube"
-                            className="text-red-600 hover:text-red-700"
-                        >
-                            <FontAwesomeIcon icon={faYoutube} className="w-5 h-5" />
-                        </Link>
+
+                </div>
+                <div className={"w-1/3 lg:w-1/4 p-14  gap-8 flex flex-col justify-center items-start"}>
+                    <p className="font-bold text-lg md:text-xl text-[#2b216d]">Pages</p>
+                    <div className="w-full flex flex-col gap-2 justify-center items-start">
+                        <Link href="/about" className="text-sm md:text-lg text-[#2b216d]  hover:underline">Home</Link>
+                        <Link href="/about" className=" text-sm md:text-lg text-[#2b216d]  hover:underline">About&nbsp;Us</Link>
+                        <Link href="/products" className="text-sm md:text-lg text-[#2b216d]  hover:underline">Products</Link>
+                        <Link href="/services" className= "text-sm md:text-lg  text-[#2b216d]  hover:underline">Printing&nbsp;Services</Link>
+                        <Link href="/contact" className="text-sm md:text-lg text-[#2b216d]  hover:underline">Contact&nbsp;Us</Link>
                     </div>
                 </div>
-                {/* Right Section */}
-                <div className="flex-1 min-w-[180px] flex flex-col items-start mt-8 md:mt-0">
-                    <h3 className="text-lg font-semibold mb-4">Company</h3>
-                    <ul className="flex flex-col gap-3 text-sm">
-                        <li>
-                            <Link href="/" className="hover:text-blue-700 transition">Home</Link>
-                        </li>
-                        <li>
-                            <Link href="/about" className="hover:text-blue-700 transition">About Us</Link>
-                        </li>
-                        <li>
-                            <Link href="/books" className="hover:text-blue-700 transition">Books</Link>
-                        </li>
-                        <li>
-                            <Link href="/printing" className="hover:text-blue-700 transition">Printing</Link>
-                        </li>
-                        <li>
-                            <Link href="/contact" className="hover:text-blue-700 transition">Contact Us</Link>
-                        </li>
-                    </ul>
+                <div className={"w-1/3 p-12 gap-8 flex flex-col justify-center items-start"}>
+                    <p className="font-bold text-lg md:text-xl ml-8 text-[#2b216d]">Importent&nbsp;Links</p>
+                    <div className="w-full flex ml-8 flex-col gap-2 justify-center items-start">
+                        <Link href="/about" className="text-sm md:text-lg text-[#2b216d]  hover:underline">Privacy&nbsp;Policy</Link>
+                        <Link href="/about" className= "text-sm md:text-lg text-[#2b216d]  hover:underline">FAQs</Link>
+                        <Link href="/products" className=" text-sm md:text-lg text-[#2b216d]  hover:underline">Terms&nbsp;of&nbsp;Service</Link>
+                    </div>
+                    <div className={"gap-4 flex flex-col"}>
+                        <div className={"flex gap-20"}>
+                            <div className="w-3 h-3 bg-[#f8bfb8]"></div>
+                            <div className="w-3 h-3 bg-[#fae0b1]"></div>
+                        </div>
+                        <div className={"ml-10 flex gap-20"}>
+                            <div className="w-3 h-3 bg-[#fae0b1]"></div>
+                            <div className="w-3 h-3 bg-[#f8bfb8]"></div>
+                        </div>
+                    </div>
+
                 </div>
+                <div className={"gap-4 hidden  pt-48 lg:flex flex-col pr-10"}>
+                    <div className={"flex gap-20"}>
+                        <div className="w-3 h-3 bg-[#a2a2a2]"></div>
+                        <div className="w-3 h-3 bg-[#cfc9ff]"></div>
+                    </div>
+                    <div className={"ml-10 flex gap-20"}>
+                        <div className="w-3 h-3 bg-[#cfc9ff]"></div>
+                        <div className="w-3 h-3 bg-[#a2a2a2]"></div>
+                    </div>
+                </div>
+            </div>
+            <div className={"md:hidden flex justify-center w-full items-start p-8 "}>
+                <div className="w-1/3 flex flex-col p-2 gap-4 ">
+                    <Link href="/">
+                        <Image
+                            src={logo}
+                            alt={"logo"}
+                            priority
+                            className="h-10 w-10 lg:w-16 lg:h-16"
+                        />
+                    </Link>
+                    <p className={"text-[#2b216d]  text-[12px] md:text-lg"}>Devasee&nbsp;—&nbsp;Trusted bookshop and printing services for every need.</p>
+                    <div className="w-full flex items-center justify-between">
+                        <FontAwesomeIcon icon={faFacebook} className={"  text-[#0000ff]"}/>
+                        <FontAwesomeIcon icon={faLinkedinIn} className={" text-[#0000ff]"}/>
+                        <FontAwesomeIcon icon={faXTwitter} className={"  text-[#0000ff]"}/>
+                        <FontAwesomeIcon icon={faYoutube} className={" text-[#0000ff]"}/>
+                    </div>
+                </div>
+                <div className="w-1/3 p-2 pl-8 flex flex-col gap-2 ">
+                    <p className="font-bold text-sm md:text-xl text-[#2b216d]">Pages</p>
+                    <div className="w-full flex flex-col gap-2 justify-center items-start">
+                        <Link href="/about" className="text-xs md:text-lg text-[#2b216d]  hover:underline">Home</Link>
+                        <Link href="/about" className=" text-xs md:text-lg text-[#2b216d]  hover:underline">About&nbsp;Us</Link>
+                        <Link href="/products" className="text-xs md:text-lg text-[#2b216d]  hover:underline">Products</Link>
+                        <Link href="/services" className= "text-xs md:text-lg  text-[#2b216d]  hover:underline">Printing&nbsp;Services</Link>
+                        <Link href="/contact" className="text-xs md:text-lg text-[#2b216d]  hover:underline">Contact&nbsp;Us</Link>
+                    </div>
+                </div>
+                <div className="w-1/3 p-2 flex flex-col h-full gap-2 ">
+                    <p className="font-bold text-sm md:text-xl ml-8 text-[#2b216d]">Importent Links</p>
+                    <div className="w-full flex ml-8 flex-col gap-2 justify-center items-start">
+                        <Link href="/about" className="text-xs md:text-lg text-[#2b216d]  hover:underline">Privacy&nbsp;Policy</Link>
+                        <Link href="/about" className= "text-xs md:text-lg text-[#2b216d]  hover:underline">FAQs</Link>
+                        <Link href="/products" className=" text-xs md:text-lg text-[#2b216d]  hover:underline">Terms&nbsp;of Service</Link>
+                    </div>
+                </div>
+            </div>
+            <div className="bg-[#0000ff] w-screen flex items-center justify-between px-4  md:px-20 py-3">
+                <p className="text-white text-xs md:text-sm tracking-wide">&copy; 2025 DEVASEE. All Rights Reserved.</p>
+                <p className="font-bold text-white text-xs md:text-sm ">Privacy | Terms of Service</p>
             </div>
         </footer>
     );

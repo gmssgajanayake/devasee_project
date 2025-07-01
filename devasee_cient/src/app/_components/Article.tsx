@@ -68,7 +68,7 @@ export default function Article() {
 
 
     return (
-        <div className="bg-[#f9f7ff] overflow-hidden flex flex-col w-full px-4 py-12 my-14">
+        <div className="bg-[#f9f7ff] overflow-hidden flex flex-col w-full px-4 py-12 mt-14">
             <p className="text-xs tracking-widest text-center text-gray-800/50">
                 READ OUR ARTICLES
             </p>
@@ -113,7 +113,7 @@ export default function Article() {
 
             <div className="w-full flex justify-center items-center mt-10">
                 <button className="text-xs tracking-wider text-gray-700 border border-gray-400 hover:bg-[#2b216d] hover:text-white transition px-6 py-3 cursor-pointer">
-                    READ MORE ARTICLES
+                    READ MORE ARTICLES &#8594;
                 </button>
             </div>
         </div>
