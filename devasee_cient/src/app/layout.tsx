@@ -50,7 +50,7 @@ export default function RootLayout({
     return (
         <html lang="en">
         <Head/>
-        <body className={`${inter.variable} font-sans antialiased bg-white`}>
+        <body className={`${inter.variable} w-screen overflow-x-hidden font-sans antialiased bg-white`}>
         {children}
         <Footer/>
         </body>
