@@ -68,7 +68,7 @@ export default function Article() {
 
 
     return (
-        <div className="bg-[#f9f7ff] flex flex-col w-full px-4 py-12 my-14">
+        <div className="bg-[#f9f7ff] overflow-hidden flex flex-col w-full px-4 py-12 my-14">
             <p className="text-xs tracking-widest text-center text-gray-800/50">
                 READ OUR ARTICLES
             </p>

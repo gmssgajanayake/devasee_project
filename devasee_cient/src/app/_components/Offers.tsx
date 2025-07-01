@@ -103,7 +103,7 @@ const Offers: React.FC<BookAdvertisementProps> = ({
     }, [current]);
 
     return (
-        <section className="flex flex-col items-center justify-center w-full h-full bg-white">
+        <section className="flex overflow-hidden flex-col items-center justify-center w-full h-full bg-white">
             <div className="flex flex-col-reverse md:flex-row px-4 sm:px-8 md:px-20 py-14 bg-[#e5e9fb] xl:rounded-4xl items-center justify-center w-full max-w-6xl mx-auto gap-6 sm:gap-10 md:gap-12">
                 {/* Left: Text & Countdown */}
                 <div

@@ -49,7 +49,7 @@ export default function BooksAdvertisement({
 
     return (
         <section
-            className="overflow-x-hidden  py-8 px-4 md:px-10 mt-16 flex-col flex items-center justify-center text-center w-full h-full bg-[#f2f3f7]" // ✅ FIXED
+            className="overflow-x-hidden overflow-hidden  py-8 px-4 md:px-10 mt-16 flex-col flex items-center justify-center text-center w-full h-full bg-[#f2f3f7]" // ✅ FIXED
         >
             <div
                 ref={textRef}

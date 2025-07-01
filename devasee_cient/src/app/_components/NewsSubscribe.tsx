@@ -3,7 +3,7 @@ import {faEnvelope} from "@fortawesome/free-solid-svg-icons";
 
 export default function NewsSubscribe() {
     return (
-        <div>
+        <div className={"overflow-hidden"}>
             <div className="bg-[#e4e8fa] mt-14 relative lg:flex flex-col hidden h-100  ">
                 <div className={" w-12 ml-4 flex flex-col absolute top-0 items-center justify-between h-32"}>
                     <div className={" flex items-center w-full justify-between"}>

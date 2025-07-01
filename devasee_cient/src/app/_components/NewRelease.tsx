@@ -69,7 +69,7 @@ export default function NewRelease() {
     }, [totalPages]);
 
     return (
-        <div ref={sectionRef} className="relative w-full overflow-x-hidden bg-[#e8ebff] py-20"> {/* ✅ overflow-x-hidden added */}
+        <div ref={sectionRef} className="relative w-full overflow-hidden overflow-x-hidden bg-[#e8ebff] py-20"> {/* ✅ overflow-x-hidden added */}
             {/* Title */}
             <p className="text-xs tracking-widest text-center text-gray-800/50">
                 SOME QUALITY ITEMS

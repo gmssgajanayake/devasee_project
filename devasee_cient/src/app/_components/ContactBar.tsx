@@ -17,7 +17,7 @@ interface ContactBarProps {
 
 export default function ContactBar({ iconSize = "w-3 h-3" }: ContactBarProps) {
     return (
-        <div className="w-full fixed top-0 z-100 flex justify-center sm:justify-between bg-[#0000FF] lg:px-8 px-6 py-1.5">
+        <div className="w-full overflow-hidden fixed top-0 z-100 flex justify-center sm:justify-between bg-[#0000FF] lg:px-8 px-6 py-1.5">
 
         {/* Phone */}
             <div className="flex items-center">
