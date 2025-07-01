@@ -79,7 +79,7 @@ export default function TopCategories() {
     return (
         <div
             ref={containerRef}
-            className="flex flex-col items-start justify-start w-screen h-auto bg-white"
+            className="flex overflow-hidden flex-col items-start justify-start w-screen h-auto bg-white"
         >
             <div className="flex justify-start px-4 md:px-8 items-center gap-2 mb-5 mt-5 md:mt-10 w-full">
                 <div className="h-0.5 border border-[#0000ff] rounded-full w-10 bg-[#0000ff]" />

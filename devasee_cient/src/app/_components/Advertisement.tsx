@@ -43,7 +43,7 @@ export default function Advertisement({
 
     return (
         <section
-            className="p-10 mt-16 flex items-center justify-center text-center w-full h-full bg-gradient-to-b md:bg-gradient-to-r from-[#e8ebff] to-white"
+            className="p-10 mt-16 flex overflow-hidden items-center justify-center text-center w-full h-full bg-gradient-to-b md:bg-gradient-to-r from-[#e8ebff] to-white"
         >
             <div
                 className="flex flex-col gap-6 md:flex-row items-center justify-between w-full max-w-6xl mx-auto"
