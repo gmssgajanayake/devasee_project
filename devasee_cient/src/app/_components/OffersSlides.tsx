@@ -1,12 +1,10 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { StaticImageData } from "next/image";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-import MainNavBar from "@/app/_components/MainNavBar";
-import ContactBar from "@/app/_components/ContactBar";
 import book1 from "@/assets/offer img.png";
 import Offers from "@/app/_components/Offers";
 
@@ -51,14 +49,14 @@ export default function OffersSlides() {
         },
     ];
 
-    const goToNextAd = () => {
+    const goToNextAd = useCallback(() => {
         setCurrentIndex((prevIndex) => (prevIndex + 1) % demoAds.length);
-    };
+    }, [demoAds.length]);
 
     useEffect(() => {
         const interval = setInterval(goToNextAd, 4500);
         return () => clearInterval(interval);
-    }, []);
+    }, [goToNextAd]); // ✅ Fixed React warning
 
     useEffect(() => {
         if (!sectionRef.current) return;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Advertisement from "@/app/_components/Advertisement";
 import adImage1 from "@/assets/advertisement image/devasee-p1.png";
 import adImage2 from "@/assets/advertisement image/devasee-p2.png";
@@ -41,14 +41,15 @@ export function AdvertisementSlides() {
         );
     };
 
-    const goToNextAd = () => {
+    // useCallback ensures the function identity remains stable
+    const goToNextAd = useCallback(() => {
         setCurrentIndex((prevIndex) => (prevIndex + 1) % demoAds.length);
-    };
+    }, [demoAds.length]);
 
     useEffect(() => {
         const interval = setInterval(goToNextAd, 3000);
         return () => clearInterval(interval);
-    }, []);
+    }, [goToNextAd]); // ✅ Properly include goToNextAd in the dependency array
 
     return (
         <div className="w-screen h-screen overflow-hidden bg-white">

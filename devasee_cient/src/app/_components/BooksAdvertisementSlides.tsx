@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import MainNavBar from "@/app/_components/MainNavBar";
 import ContactBar from "@/app/_components/ContactBar";
 import book1 from "@/assets/items image/img_4.png";
@@ -16,7 +16,7 @@ gsap.registerPlugin(ScrollTrigger);
 
 export default function BooksAdvertisementSlides() {
     const [currentIndex, setCurrentIndex] = useState(0);
-    const adRef = useRef<HTMLDivElement>(null); // Ref for animation
+    const adRef = useRef<HTMLDivElement>(null);
 
     const demoAds = [
         {
@@ -51,17 +51,17 @@ export default function BooksAdvertisementSlides() {
         );
     };
 
-    const goToNextAd = () => {
+    // ✅ Memoize to fix warning
+    const goToNextAd = useCallback(() => {
         setCurrentIndex((prevIndex) => (prevIndex + 1) % demoAds.length);
-    };
+    }, [demoAds.length]);
 
-    // Auto-slide
+    // ✅ useCallback dependency fix
     useEffect(() => {
         const interval = setInterval(goToNextAd, 3000);
         return () => clearInterval(interval);
-    }, []);
+    }, [goToNextAd]);
 
-    // ScrollTrigger animation
     useEffect(() => {
         if (adRef.current) {
             gsap.from(adRef.current, {
@@ -71,7 +71,7 @@ export default function BooksAdvertisementSlides() {
                 ease: "power3.out",
                 scrollTrigger: {
                     trigger: adRef.current,
-                    start: "top 80%", // when top of element hits 80% of viewport
+                    start: "top 80%",
                     toggleActions: "play none none none",
                 },
             });
@@ -82,6 +82,7 @@ export default function BooksAdvertisementSlides() {
         <div className="w-full mb-14 overflow-x-hidden bg-white">
             <ContactBar />
             <MainNavBar />
+
             <div ref={adRef} className="w-full h-auto relative">
                 <BooksAdvertisement
                     key={demoAds[currentIndex].id}
@@ -92,6 +93,7 @@ export default function BooksAdvertisementSlides() {
                     current={currentIndex}
                     price={demoAds[currentIndex].price}
                 />
+
                 {/* Left Arrow */}
                 <div
                     className="absolute hidden lg:flex left-8 top-1/2 transform -translate-y-1/2 z-10 w-12 h-12 items-center justify-center cursor-pointer"
@@ -101,6 +103,7 @@ export default function BooksAdvertisementSlides() {
                         <FontAwesomeIcon icon={faArrowLeft} className="text-[#0000ff]" />
                     </div>
                 </div>
+
                 {/* Right Arrow */}
                 <div
                     className="absolute hidden lg:flex right-8 top-1/2 transform -translate-y-1/2 z-10 w-12 h-12 items-center justify-center cursor-pointer"
