@@ -3,8 +3,6 @@ import {Inter} from "next/font/google";
 import "./globals.css";
 import Head from "@/app/head";
 import Footer from "@/app/_components/Footer";
-import ContactBar from "@/app/_components/ContactBar";
-import MainNavBar from "@/app/_components/MainNavBar";
 
 const inter = Inter({
     subsets: ["latin"],
@@ -51,12 +49,10 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en">
-        <Head />
+        <Head/>
         <body className={`${inter.variable} w-screen overflow-x-hidden font-sans antialiased bg-white`}>
-        <ContactBar />
-        <MainNavBar />
         {children}
-        <Footer />
+        <Footer/>
         </body>
         </html>
     );
