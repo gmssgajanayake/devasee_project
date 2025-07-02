@@ -1,9 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import MainNavBar from "@/app/_components/MainNavBar";
+import { useEffect, useState, useCallback } from "react";
 import Advertisement from "@/app/_components/Advertisement";
-import ContactBar from "@/app/_components/ContactBar";
 import adImage1 from "@/assets/advertisement image/devasee-p1.png";
 import adImage2 from "@/assets/advertisement image/devasee-p2.png";
 import adImage3 from "@/assets/advertisement image/devasee-p3.png";
@@ -43,19 +41,18 @@ export function AdvertisementSlides() {
         );
     };
 
-    const goToNextAd = () => {
+    // useCallback ensures the function identity remains stable
+    const goToNextAd = useCallback(() => {
         setCurrentIndex((prevIndex) => (prevIndex + 1) % demoAds.length);
-    };
+    }, [demoAds.length]);
 
     useEffect(() => {
         const interval = setInterval(goToNextAd, 3000);
         return () => clearInterval(interval);
-    }, []);
+    }, [goToNextAd]); // ✅ Properly include goToNextAd in the dependency array
 
     return (
         <div className="w-screen h-screen overflow-hidden bg-white">
-            <ContactBar />
-            <MainNavBar />
             <div className="w-full h-full relative">
                 <Advertisement
                     title={demoAds[currentIndex].title}

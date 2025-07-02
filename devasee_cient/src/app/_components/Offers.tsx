@@ -2,7 +2,10 @@
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Image from "next/image";
+
+gsap.registerPlugin(ScrollTrigger);
 
 interface BookAdvertisementProps {
     title: string;
@@ -61,9 +64,7 @@ const Offers: React.FC<BookAdvertisementProps> = ({
             }
 
             const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-            const hours = Math.floor(
-                (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
-            );
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
             const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
@@ -75,35 +76,63 @@ const Offers: React.FC<BookAdvertisementProps> = ({
         return () => clearInterval(interval);
     }, [endDate]);
 
-    // GSAP animation with proper cleanup handling refs safely
+    // GSAP ScrollTrigger animation
     useLayoutEffect(() => {
-        const textEl = textRef.current;
-        const imageEl = imageRef.current;
+        const ctx = gsap.context(() => {
+            const tl = gsap.timeline({
+                scrollTrigger: {
+                    trigger: ".offer-container",
+                    start: "top 80%",
+                    end: "bottom 60%",
+                    toggleActions: "play none none reverse",
+                },
+            });
 
-        const tl = gsap.timeline();
-
-        if (textEl && imageEl) {
             tl.fromTo(
-                textEl,
-                { autoAlpha: 0, x: -50 },
-                { autoAlpha: 1, x: 0, duration: 0.6, ease: "power2.out" }
+                textRef.current,
+                { x: -100, autoAlpha: 0 },
+                {
+                    x: 0,
+                    autoAlpha: 1,
+                    duration: 1,
+                    ease: "power3.out",
+                }
             ).fromTo(
-                imageEl,
-                { autoAlpha: 0, x: 50 },
-                { autoAlpha: 1, x: 0, duration: 0.6, ease: "power2.out" },
-                "<"
+                imageRef.current,
+                { x: 100, autoAlpha: 0 },
+                {
+                    x: 0,
+                    autoAlpha: 1,
+                    duration: 1,
+                    ease: "power3.out",
+                },
+                "<" // simultaneous
             );
-        }
 
-        return () => {
-            if (textEl && imageEl) {
-                gsap.set([textEl, imageEl], { clearProps: "all" });
-            }
-        };
+            // Animate dots
+            gsap.fromTo(
+                ".offer-dot",
+                { scale: 0, autoAlpha: 0 },
+                {
+                    scale: 1,
+                    autoAlpha: 1,
+                    duration: 0.5,
+                    stagger: 0.1,
+                    ease: "back.out(1.7)",
+                    scrollTrigger: {
+                        trigger: ".offer-container",
+                        start: "top 80%",
+                        toggleActions: "play none none reverse",
+                    },
+                }
+            );
+        });
+
+        return () => ctx.revert();
     }, [current]);
 
     return (
-        <section className="flex overflow-hidden flex-col items-center justify-center w-full h-full bg-white">
+        <section className="offer-container flex overflow-hidden flex-col items-center justify-center w-full h-full bg-white">
             <div className="flex flex-col-reverse md:flex-row px-4 sm:px-8 md:px-20 py-14 bg-[#e5e9fb] xl:rounded-4xl items-center justify-center w-full max-w-6xl mx-auto gap-6 sm:gap-10 md:gap-12">
                 {/* Left: Text & Countdown */}
                 <div
@@ -125,7 +154,9 @@ const Offers: React.FC<BookAdvertisementProps> = ({
                                     <p className="text-xl font-bold text-blue-700">
                                         {timeLeft[unit as keyof TimeLeft]}
                                     </p>
-                                    <p className="text-xs text-gray-600">{unit.toUpperCase().slice(0, 3)}</p>
+                                    <p className="text-xs text-gray-600">
+                                        {unit.toUpperCase().slice(0, 3)}
+                                    </p>
                                 </div>
                             ))
                         ) : (
@@ -138,7 +169,7 @@ const Offers: React.FC<BookAdvertisementProps> = ({
                         {Array.from({ length: total }).map((_, index) => (
                             <div
                                 key={index}
-                                className="w-[30px] h-[30px] flex justify-center items-center"
+                                className="w-[30px] h-[30px] flex justify-center items-center offer-dot"
                             >
                                 <div
                                     className={`h-[30px] w-[30px] rounded-full flex items-center justify-center ${
