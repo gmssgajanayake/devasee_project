@@ -1,11 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { StaticImageData } from "next/image";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
 import MainNavBar from "@/app/_components/MainNavBar";
 import ContactBar from "@/app/_components/ContactBar";
 import book1 from "@/assets/offer img.png";
 import Offers from "@/app/_components/Offers";
+
+gsap.registerPlugin(ScrollTrigger);
 
 interface OfferAd {
     id: number;
@@ -17,6 +22,7 @@ interface OfferAd {
 
 export default function OffersSlides() {
     const [currentIndex, setCurrentIndex] = useState(0);
+    const sectionRef = useRef<HTMLDivElement>(null);
 
     const demoAds: OfferAd[] = [
         {
@@ -50,16 +56,34 @@ export default function OffersSlides() {
     };
 
     useEffect(() => {
-        const interval = setInterval(goToNextAd, 4500); // 4.5s auto-scroll
+        const interval = setInterval(goToNextAd, 4500);
         return () => clearInterval(interval);
+    }, []);
+
+    useEffect(() => {
+        if (!sectionRef.current) return;
+
+        gsap.fromTo(
+            sectionRef.current,
+            { scale: 0.9, opacity: 0 },
+            {
+                scale: 1,
+                opacity: 1,
+                duration: 1.2,
+                ease: "power2.out",
+                scrollTrigger: {
+                    trigger: sectionRef.current,
+                    start: "top 80%",
+                    toggleActions: "play none none none",
+                },
+            }
+        );
     }, []);
 
     const currentAd = demoAds[currentIndex];
 
     return (
-        <div className="w-screen h-auto overflow-hidden bg-white">
-            <ContactBar />
-            <MainNavBar />
+        <div className="w-screen h-auto overflow-hidden bg-white" ref={sectionRef}>
             <div className="w-full h-auto relative">
                 <Offers
                     key={currentAd.id}

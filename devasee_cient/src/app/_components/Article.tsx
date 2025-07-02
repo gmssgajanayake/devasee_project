@@ -40,32 +40,73 @@ export default function Article() {
     }, []);
 
     useEffect(() => {
-        articleRefs.current.forEach((el) => {
-            if (!el) return;
+        const mm = gsap.matchMedia();
 
-            gsap.fromTo(
-                el,
-                { opacity: 0, y: 60, scale: 0.95 },
-                {
-                    opacity: 1,
-                    y: 0,
-                    scale: 1,
-                    duration: 0.8,
-                    ease: "power3.out",
-                    scrollTrigger: {
-                        trigger: el,
-                        start: "top 90%",
-                        toggleActions: "play none none reverse",
-                    },
-                }
-            );
-        });
+        mm.add(
+            {
+                // Desktop media query (min-width: 768px)
+                isDesktop: "(min-width: 768px)",
+                // Mobile media query (max-width: 767px)
+                isMobile: "(max-width: 767px)",
+            },
+            (context) => {
+                const { isDesktop, isMobile } = context.conditions;
+
+                articleRefs.current.forEach((el, index) => {
+                    if (!el) return;
+
+                    if (isDesktop) {
+                        // Bottom to top animation on desktop
+                        gsap.fromTo(
+                            el,
+                            { opacity: 0, y: 60, scale: 0.95 },
+                            {
+                                opacity: 1,
+                                y: 0,
+                                scale: 1,
+                                duration: 1,
+                                ease: "power3.out",
+                                scrollTrigger: {
+                                    trigger: el,
+                                    start: "top 90%",
+                                    toggleActions: "play none none reverse",
+                                },
+                            }
+                        );
+                    } else if (isMobile) {
+                        // Left/right horizontal slide on mobile
+                        const fromX = index % 2 === 0 ? 100 : -100;
+
+                        gsap.fromTo(
+                            el,
+                            { opacity: 0, y: 0, x: fromX, scale: 0.95 },
+                            {
+                                opacity: 1,
+                                y: 0,
+                                x: 0,
+                                scale: 1,
+                                duration: 1,
+                                ease: "power3.out",
+                                scrollTrigger: {
+                                    trigger: el,
+                                    start: "top 90%",
+                                    toggleActions: "play none none reverse",
+                                },
+                            }
+                        );
+                    }
+                });
+
+                return () => {
+                    ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
+                };
+            }
+        );
 
         return () => {
-            ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
+            mm.revert();
         };
     }, []);
-
 
     return (
         <div className="bg-[#f9f7ff] overflow-hidden flex flex-col w-full px-4 py-12 mt-14">
@@ -73,7 +114,7 @@ export default function Article() {
                 READ OUR ARTICLES
             </p>
 
-            <div className="flex items-center justify-center  w-full px-8 my-6">
+            <div className="flex items-center justify-center w-full px-8 my-6">
                 <hr className="w-full text-gray-300/80" />
                 <h2 className="text-3xl tracking-wide md:text-4xl mx-4 font-medium text-[#2b216d] whitespace-nowrap">
                     Latest&nbsp;Articles
@@ -91,14 +132,12 @@ export default function Article() {
                         <Image
                             src={article.image}
                             alt={`Article ${index + 1}`}
-                            className="w-full h-auto "
+                            className="w-full h-auto"
                         />
                         <p className="mt-2 tracking-wider text-gray-800/40 text-xs">
                             {article.date}
                         </p>
-                        <p className="text-xl text-gray-700 font-light">
-                            {article.title}
-                        </p>
+                        <p className="text-xl text-gray-700 font-light">{article.title}</p>
                         <div className="bg-gray-300/50 w-full h-[1px] my-2" />
                         <div className="flex justify-end">
                             <div className="flex gap-3 text-[#2b216d]">

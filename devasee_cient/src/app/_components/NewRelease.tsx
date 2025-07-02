@@ -39,11 +39,12 @@ export default function NewRelease() {
         const section = sectionRef.current;
         if (!container || !section) return;
 
+        // Horizontal Scroll Animation
         const totalScrollWidth = container.scrollWidth;
         const viewportWidth = section.offsetWidth;
         const scrollDistance = totalScrollWidth - viewportWidth + 40;
 
-        const tween = gsap.to(container, {
+        const horizontalTween = gsap.to(container, {
             x: () => `-${scrollDistance}px`,
             ease: "none",
             scrollTrigger: {
@@ -62,14 +63,35 @@ export default function NewRelease() {
             },
         });
 
+        // Fade + Rise Animation for entire section (only once)
+        const revealTween = gsap.fromTo(
+            section,
+            { opacity: 0, y: 100 },
+            {
+                opacity: 1,
+                y: 0,
+                duration: 1.2,
+                ease: "power3.out",
+                scrollTrigger: {
+                    trigger: section,
+                    start: "top 80%",
+                    toggleActions: "play none none none",
+                },
+            }
+        );
+
         return () => {
-            tween.kill();
+            horizontalTween.kill();
+            revealTween.kill();
             ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
         };
     }, [totalPages]);
 
     return (
-        <div ref={sectionRef} className="relative w-full overflow-hidden overflow-x-hidden bg-[#e8ebff] py-20"> {/* ✅ overflow-x-hidden added */}
+        <div
+            ref={sectionRef}
+            className="relative w-full overflow-hidden overflow-x-hidden bg-[#e8ebff] py-20 opacity-0 translate-y-24"
+        >
             {/* Title */}
             <p className="text-xs tracking-widest text-center text-gray-800/50">
                 SOME QUALITY ITEMS
@@ -87,7 +109,7 @@ export default function NewRelease() {
                 <div
                     ref={scrollContainerRef}
                     className="flex gap-10 px-10 no-scrollbar"
-                    style={{ minWidth: `${books.length * 250}px` }} // no overflow due to outer containment
+                    style={{ minWidth: `${books.length * 250}px` }}
                 >
                     {books.map((book, index) => (
                         <ItemCard

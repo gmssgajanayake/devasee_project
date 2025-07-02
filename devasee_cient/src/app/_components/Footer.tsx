@@ -12,9 +12,9 @@ import {
 
 export default function Footer() {
     return (
-        <footer className="bg-white w-full">
+        <footer className="bg-white relative w-full">
             {/* Main Footer Content */}
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="max-w-7xl mx-auto px-4  sm:px-6 md:py-6 lg:px-8">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 py-12">
                     {/* Logo and Description */}
                     <div className="col-span-1 md:col-span-2 lg:col-span-1">
@@ -52,7 +52,7 @@ export default function Footer() {
                     </div>
 
                     {/* Pages Links */}
-                    <div>
+                    <div className={"lg:ml-24"}>
                         <h3 className="font-bold text-indigo-900 text-lg md:text-xl mb-4">Pages</h3>
                         <ul className="space-y-2">
                             <li>
@@ -89,7 +89,7 @@ export default function Footer() {
                         </ul>
 
                         {/* Decorative dots - visible on medium screens and up */}
-                        <div className="hidden md:block mt-8">
+                        <div className="hidden absolute right-80 md:block mt-8">
                             <div className="flex gap-8">
                                 <div className="flex flex-col gap-4">
                                     <div className="flex gap-8">
@@ -106,7 +106,7 @@ export default function Footer() {
                     </div>
 
                     {/* Decorative dots - only for large screens */}
-                    <div className="hidden lg:flex justify-end pt-20">
+                    <div className="hidden absolute right-30 lg:flex justify-end pt-20">
                         <div className="flex flex-col gap-4">
                             <div className="flex gap-8">
                                 <div className="w-3 h-3 bg-gray-400 "></div>
@@ -128,8 +128,9 @@ export default function Footer() {
                         <p className="text-white text-xs sm:text-sm text-center md:text-left">
                             © 2025 DEVASEE. All Rights Reserved.
                         </p>
-                        <div className="flex gap-4">
-                            <Link href="/privacy" className="text-white text-xs sm:text-sm font-bold hover:underline">Privacy</Link>
+                        <div className="flex gap-4 justify-center items-center">
+                            <Link href="/privacy" className="text-white text-xs sm:text-sm font-bold hover:underline">Privacy </Link>
+                            <span className={"text-white hidden md:flex"}>|</span>
                             <Link href="/terms" className="text-white text-xs sm:text-sm font-bold hover:underline">Terms of Service</Link>
                         </div>
                     </div>

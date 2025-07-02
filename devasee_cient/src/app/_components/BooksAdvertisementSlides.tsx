@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import MainNavBar from "@/app/_components/MainNavBar";
 import ContactBar from "@/app/_components/ContactBar";
 import book1 from "@/assets/items image/img_4.png";
@@ -9,9 +9,14 @@ import book3 from "@/assets/items image/img_2.png";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft, faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import BooksAdvertisement from "@/app/_components/BooksAdvertisement";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+gsap.registerPlugin(ScrollTrigger);
 
 export default function BooksAdvertisementSlides() {
     const [currentIndex, setCurrentIndex] = useState(0);
+    const adRef = useRef<HTMLDivElement>(null); // Ref for animation
 
     const demoAds = [
         {
@@ -50,16 +55,34 @@ export default function BooksAdvertisementSlides() {
         setCurrentIndex((prevIndex) => (prevIndex + 1) % demoAds.length);
     };
 
+    // Auto-slide
     useEffect(() => {
         const interval = setInterval(goToNextAd, 3000);
         return () => clearInterval(interval);
     }, []);
 
+    // ScrollTrigger animation
+    useEffect(() => {
+        if (adRef.current) {
+            gsap.from(adRef.current, {
+                y: 100,
+                opacity: 0,
+                duration: 1.2,
+                ease: "power3.out",
+                scrollTrigger: {
+                    trigger: adRef.current,
+                    start: "top 80%", // when top of element hits 80% of viewport
+                    toggleActions: "play none none none",
+                },
+            });
+        }
+    }, []);
+
     return (
-        <div className="w-full mb-14 overflow-x-hidden overflow-hidden bg-white"> {/* ✅ FIXED */}
+        <div className="w-full mb-14 overflow-x-hidden bg-white">
             <ContactBar />
             <MainNavBar />
-            <div className="w-full h-auto relative">
+            <div ref={adRef} className="w-full h-auto relative">
                 <BooksAdvertisement
                     key={demoAds[currentIndex].id}
                     title={demoAds[currentIndex].title}

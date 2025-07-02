@@ -3,6 +3,8 @@ import {Inter} from "next/font/google";
 import "./globals.css";
 import Head from "@/app/head";
 import Footer from "@/app/_components/Footer";
+import MainNavBar from "@/app/_components/MainNavBar";
+import ContactBar from "@/app/_components/ContactBar";
 
 const inter = Inter({
     subsets: ["latin"],
@@ -51,6 +53,8 @@ export default function RootLayout({
         <html lang="en">
         <Head/>
         <body className={`${inter.variable} font-sans antialiased bg-white`}>
+        <ContactBar/>
+        <MainNavBar/>
         {children}
         <Footer/>
         </body>
