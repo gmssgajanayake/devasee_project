@@ -40,71 +40,41 @@ export default function Article() {
     }, []);
 
     useEffect(() => {
-        const mm = gsap.matchMedia();
+        const isMobile = window.matchMedia("(max-width: 767px)").matches;
 
-        mm.add(
-            {
-                // Desktop media query (min-width: 768px)
-                isDesktop: "(min-width: 768px)",
-                // Mobile media query (max-width: 767px)
-                isMobile: "(max-width: 767px)",
-            },
-            (context) => {
-                const { isDesktop, isMobile } = context.conditions;
+        articleRefs.current.forEach((el, index) => {
+            if (!el) return;
 
-                articleRefs.current.forEach((el, index) => {
-                    if (!el) return;
+            // Determine animation direction
+            const animationSettings = isMobile
+                ? { x: index % 2 === 0 ? 100 : -100, y: 0 }
+                : { x: 0, y: 60 };
 
-                    if (isDesktop) {
-                        // Bottom to top animation on desktop
-                        gsap.fromTo(
-                            el,
-                            { opacity: 0, y: 60, scale: 0.95 },
-                            {
-                                opacity: 1,
-                                y: 0,
-                                scale: 1,
-                                duration: 1,
-                                ease: "power3.out",
-                                scrollTrigger: {
-                                    trigger: el,
-                                    start: "top 90%",
-                                    toggleActions: "play none none reverse",
-                                },
-                            }
-                        );
-                    } else if (isMobile) {
-                        // Left/right horizontal slide on mobile
-                        const fromX = index % 2 === 0 ? 100 : -100;
-
-                        gsap.fromTo(
-                            el,
-                            { opacity: 0, y: 0, x: fromX, scale: 0.95 },
-                            {
-                                opacity: 1,
-                                y: 0,
-                                x: 0,
-                                scale: 1,
-                                duration: 1,
-                                ease: "power3.out",
-                                scrollTrigger: {
-                                    trigger: el,
-                                    start: "top 90%",
-                                    toggleActions: "play none none reverse",
-                                },
-                            }
-                        );
-                    }
-                });
-
-                return () => {
-                    ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
-                };
-            }
-        );
+            gsap.fromTo(
+                el,
+                {
+                    opacity: 0,
+                    scale: 0.95,
+                    ...animationSettings,
+                },
+                {
+                    opacity: 1,
+                    scale: 1,
+                    x: 0,
+                    y: 0,
+                    duration: 1,
+                    ease: "power3.out",
+                    scrollTrigger: {
+                        trigger: el,
+                        start: "top 90%",
+                        toggleActions: "play none none reverse",
+                    },
+                }
+            );
+        });
 
         return () => {
-            mm.revert();
+            ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
         };
     }, []);
 
