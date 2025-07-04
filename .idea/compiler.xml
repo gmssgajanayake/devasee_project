@@ -10,19 +10,45 @@
       <directory url="file://$PROJECT_DIR$/devasee_server/delivery/src/main/resources/archetype-resources" includeSubdirectories="true" />
       <directory url="file://$PROJECT_DIR$/devasee_server/analytics/src/main/resources/archetype-resources" includeSubdirectories="true" />
       <directory url="file://$PROJECT_DIR$/devasee_server/users/src/main/resources/archetype-resources" includeSubdirectories="true" />
+      <directory url="file://$PROJECT_DIR$/devasee_server/apigateway/src/main/resources/archetype-resources" includeSubdirectories="true" />
+      <directory url="file://$PROJECT_DIR$/devasee_server/eureka/src/main/resources/archetype-resources" includeSubdirectories="true" />
     </excludeFromCompile>
     <annotationProcessing>
       <profile default="true" name="Default" enabled="true" />
+      <profile name="Annotation profile for Archetype - devasee_server" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.38/lombok-1.18.38.jar" />
+        </processorPath>
+        <module name="analytics" />
+        <module name="apigateway" />
+        <module name="delivery" />
+        <module name="product" />
+        <module name="auth" />
+        <module name="eureka" />
+        <module name="orders" />
+        <module name="inventory" />
+        <module name="users" />
+      </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="analytics" target="17" />
-      <module name="auth" target="17" />
-      <module name="delivery" target="17" />
-      <module name="inventory" target="17" />
-      <module name="orders" target="17" />
-      <module name="product" target="17" />
       <module name="ProductService" target="17" />
-      <module name="users" target="17" />
     </bytecodeTargetLevel>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="analytics" options="-parameters" />
+      <module name="apigateway" options="-parameters" />
+      <module name="auth" options="-parameters" />
+      <module name="delivery" options="-parameters" />
+      <module name="devasee_server" options="-parameters" />
+      <module name="eureka" options="-parameters" />
+      <module name="inventory" options="-parameters" />
+      <module name="orders" options="-parameters" />
+      <module name="product" options="-parameters" />
+      <module name="users" options="-parameters" />
+    </option>
   </component>
 </project>
