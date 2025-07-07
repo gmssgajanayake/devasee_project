@@ -1,5 +1,4 @@
 "use client";
-import ContactBar from "@/app/_components/ContactBar";
 import logo from "@/assets/devasee.png";
 import Image from "next/image";
 import Link from "next/link";

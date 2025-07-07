@@ -1,8 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
-import MainNavBar from "@/app/_components/MainNavBar";
-import ContactBar from "@/app/_components/ContactBar";
 import book1 from "@/assets/items image/img_4.png";
 import book2 from "@/assets/items image/img_3.png";
 import book3 from "@/assets/items image/img_2.png";
