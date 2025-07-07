@@ -80,8 +80,7 @@ export default function BooksAdvertisementSlides() {
 
     return (
         <div className="w-full mb-14 overflow-x-hidden bg-white">
-            <ContactBar />
-            <MainNavBar />
+
 
             <div ref={adRef} className="w-full h-auto relative">
                 <BooksAdvertisement
