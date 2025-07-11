@@ -47,14 +47,16 @@ export default function Page() {
     }, []);
 
     useEffect(() => {
-        if (showMobileFilter && mobileFilterRef.current) {
-            gsap.fromTo(
-                mobileFilterRef.current,
-                { x: "-100%" },
-                { x: "0%", duration: 0.5, ease: "power3.out" }
-            );
+        if (showMobileFilter || showSortModal) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'auto';
         }
-    }, [showMobileFilter]);
+
+        return () => {
+            document.body.style.overflow = 'auto';
+        };
+    }, [showMobileFilter, showSortModal]);
 
     const filteredBooks = allBooks.filter((book) => {
         const inPriceRange = book.price >= priceRange[0] && book.price <= priceRange[1];

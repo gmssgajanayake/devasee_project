@@ -21,6 +21,7 @@ export default function Footer() {
                         <div className="flex flex-col gap-6">
                             <Link href="/" className="w-fit">
                                 <div className="relative h-16 w-16">
+
                                     <Image
                                         src={logo}
                                         alt="Devasee Logo"
