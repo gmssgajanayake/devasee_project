@@ -2,7 +2,6 @@ import type {Metadata} from "next";
 import {Inter} from "next/font/google";
 import "./globals.css";
 import Head from "@/app/head";
-import Footer from "@/app/_components/Footer";
 import ContactBar from "@/app/_components/ContactBar";
 import MainNavBar from "@/app/_components/MainNavBar";
 import ProgressBar from "@/app/_components/ProgressBar";
