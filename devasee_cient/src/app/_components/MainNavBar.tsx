@@ -3,12 +3,11 @@
 import logo from "@/assets/devasee logo.png";
 import Image from "next/image";
 import Link from "next/link";
-import { faUser, faClipboard, faHeart } from "@fortawesome/free-regular-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { AlignJustify, X } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import {faUser, faClipboard, faHeart} from "@fortawesome/free-regular-svg-icons";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {AlignJustify, X} from "lucide-react";
+import {useEffect, useRef, useState} from "react";
 import gsap from "gsap";
-import {SignedIn, SignedOut,  UserButton} from "@clerk/nextjs";
 
 export default function MainNavBar() {
     const textRef = useRef<HTMLHeadingElement>(null);
@@ -21,8 +20,8 @@ export default function MainNavBar() {
         if (textRef.current) {
             gsap.fromTo(
                 textRef.current,
-                { y: -50, opacity: 0 },
-                { y: 0, opacity: 1, duration: 1, ease: "power3.out" }
+                {y: -50, opacity: 0},
+                {y: 0, opacity: 1, duration: 1, ease: "power3.out"}
             );
         }
 
@@ -42,8 +41,8 @@ export default function MainNavBar() {
                 menuRef.current.style.display = "block";
                 gsap.fromTo(
                     menuRef.current,
-                    { y: -30, opacity: 0 },
-                    { y: 0, opacity: 1, duration: 0.3, ease: "power3.out" }
+                    {y: -30, opacity: 0},
+                    {y: 0, opacity: 1, duration: 0.3, ease: "power3.out"}
                 );
                 setIsMobileMenuOpen(true);
                 body.classList.add("overflow-hidden");
@@ -99,18 +98,16 @@ export default function MainNavBar() {
                     <Link href="/contact" className={linkStyle}>CONTACT US</Link>
                 </div>
                 <div className="hidden lg:flex items-center justify-center gap-4">
-                    <SignedOut>
-                       <Link href="/sign-in" className="text-sm font-semibold text-gray-600 dark:text-gray-800 hover:text-[#0000FF]">
-                            <FontAwesomeIcon className="w-3.5 h-3.5 cursor-pointer text-gray-600" icon={faUser} />
-                       </Link>
-                    </SignedOut>
-                    <SignedIn>
-                        <UserButton />
-                    </SignedIn>
+
+                    <Link href="/sign-in"
+                          className="text-sm font-semibold text-gray-600 dark:text-gray-800 hover:text-[#0000FF]">
+                        <FontAwesomeIcon className="w-3.5 h-3.5 cursor-pointer text-gray-600" icon={faUser}/>
+                    </Link>
+
                     <span>|</span>
-                    <FontAwesomeIcon className="w-3 h-3 cursor-pointer text-gray-600" icon={faClipboard} />
+                    <FontAwesomeIcon className="w-3 h-3 cursor-pointer text-gray-600" icon={faClipboard}/>
                     <span>|</span>
-                    <FontAwesomeIcon className="w-4 h-4 cursor-pointer text-gray-600" icon={faHeart} />
+                    <FontAwesomeIcon className="w-4 h-4 cursor-pointer text-gray-600" icon={faHeart}/>
 
                 </div>
                 {/* Mobile menu open and close */}
@@ -140,22 +137,28 @@ export default function MainNavBar() {
                 className={`lg:hidden fixed bg-white/30 backdrop-blur-md top-[72px] left-0 right-0 z-40 ${
                     isMobileMenuOpen ? "block" : "hidden"
                 }`}
-                style={{ height: "calc(100vh - 72px)" }}
+                style={{height: "calc(100vh - 72px)"}}
             >
-                <div className="relative z-50 flex flex-col justify-center items-center gap-8 p-4 h-full overflow-y-auto">
-                    <Link href="/" onClick={toggleMobileMenu} className="text-gray-600 text-xl font-semibold relative after:absolute after:left-0 after:bottom-0 after:w-0 after:h-[2px] after:bg-[#0000FF] after:transition-all after:duration-300 hover:after:w-full hover:text-[#0000FF]">
+                <div
+                    className="relative z-50 flex flex-col justify-center items-center gap-8 p-4 h-full overflow-y-auto">
+                    <Link href="/" onClick={toggleMobileMenu}
+                          className="text-gray-600 text-xl font-semibold relative after:absolute after:left-0 after:bottom-0 after:w-0 after:h-[2px] after:bg-[#0000FF] after:transition-all after:duration-300 hover:after:w-full hover:text-[#0000FF]">
                         HOME
                     </Link>
-                    <Link href="/about" onClick={toggleMobileMenu} className="text-gray-600 text-xl font-semibold relative after:absolute after:left-0 after:bottom-0 after:w-0 after:h-[2px] after:bg-[#0000FF] after:transition-all after:duration-300 hover:after:w-full hover:text-[#0000FF]">
+                    <Link href="/about" onClick={toggleMobileMenu}
+                          className="text-gray-600 text-xl font-semibold relative after:absolute after:left-0 after:bottom-0 after:w-0 after:h-[2px] after:bg-[#0000FF] after:transition-all after:duration-300 hover:after:w-full hover:text-[#0000FF]">
                         ABOUT US
                     </Link>
-                    <Link href="/products" onClick={toggleMobileMenu} className="text-gray-600 text-xl font-semibold relative after:absolute after:left-0 after:bottom-0 after:w-0 after:h-[2px] after:bg-[#0000FF] after:transition-all after:duration-300 hover:after:w-full hover:text-[#0000FF]">
+                    <Link href="/products" onClick={toggleMobileMenu}
+                          className="text-gray-600 text-xl font-semibold relative after:absolute after:left-0 after:bottom-0 after:w-0 after:h-[2px] after:bg-[#0000FF] after:transition-all after:duration-300 hover:after:w-full hover:text-[#0000FF]">
                         BOOKS
                     </Link>
-                    <Link href="/services" onClick={toggleMobileMenu} className="text-gray-600 text-xl font-semibold relative after:absolute after:left-0 after:bottom-0 after:w-0 after:h-[2px] after:bg-[#0000FF] after:transition-all after:duration-300 hover:after:w-full hover:text-[#0000FF]">
+                    <Link href="/services" onClick={toggleMobileMenu}
+                          className="text-gray-600 text-xl font-semibold relative after:absolute after:left-0 after:bottom-0 after:w-0 after:h-[2px] after:bg-[#0000FF] after:transition-all after:duration-300 hover:after:w-full hover:text-[#0000FF]">
                         PRINTING SERVICES
                     </Link>
-                    <Link href="/contact" onClick={toggleMobileMenu} className="text-gray-600 text-xl font-semibold relative after:absolute after:left-0 after:bottom-0 after:w-0 after:h-[2px] after:bg-[#0000FF] after:transition-all after:duration-300 hover:after:w-full hover:text-[#0000FF]">
+                    <Link href="/contact" onClick={toggleMobileMenu}
+                          className="text-gray-600 text-xl font-semibold relative after:absolute after:left-0 after:bottom-0 after:w-0 after:h-[2px] after:bg-[#0000FF] after:transition-all after:duration-300 hover:after:w-full hover:text-[#0000FF]">
                         CONTACT US
                     </Link>
                 </div>
