@@ -6,6 +6,7 @@ import Footer from "@/app/_components/Footer";
 import ContactBar from "@/app/_components/ContactBar";
 import MainNavBar from "@/app/_components/MainNavBar";
 import ProgressBar from "@/app/_components/ProgressBar";
+import {ClerkProvider} from "@clerk/nextjs";
 
 
 const inter = Inter({
@@ -52,15 +53,16 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="en">
-        <Head/>
-        <body className={`${inter.variable}  w-screen overflow-x-hidden font-sans antialiased !bg-white`}>
-        <ContactBar />
-        <MainNavBar />
-        <ProgressBar />
-        {children}
-        <Footer/>
-        </body>
-        </html>
+        <ClerkProvider>
+            <html lang="en">
+            <Head/>
+            <body className={`${inter.variable}  w-screen overflow-x-hidden font-sans antialiased !bg-white`}>
+            <ContactBar/>
+            <MainNavBar/>
+            <ProgressBar/>
+            {children}
+            </body>
+            </html>
+        </ClerkProvider>
     );
 }

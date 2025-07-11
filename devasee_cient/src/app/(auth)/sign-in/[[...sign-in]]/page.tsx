@@ -1,7 +1,9 @@
-import Maintenance from "@/components/Maintenance";
+import {SignIn} from '@clerk/nextjs'
 
-export default function SignInPage () {
+export default function Page() {
     return (
-        <Maintenance/>
+        <div className="flex items-center justify-center mt-40 mb-10">
+            <SignIn/>
+        </div>
     );
 }

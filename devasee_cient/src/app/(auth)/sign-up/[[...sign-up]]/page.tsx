@@ -1,7 +1,9 @@
-import Maintenance from "@/components/Maintenance";
+import { SignUp} from '@clerk/nextjs'
 
-export default function SignUpPage () {
+export default function Page() {
     return (
-        <Maintenance/>
+        <div className="flex items-center justify-center mt-40 mb-10">
+            <SignUp/>
+        </div>
     );
 }
