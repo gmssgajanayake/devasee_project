@@ -8,6 +8,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {AlignJustify, X} from "lucide-react";
 import {useEffect, useRef, useState} from "react";
 import gsap from "gsap";
+import {SignedIn, SignedOut, UserButton} from "@clerk/nextjs";
 
 export default function MainNavBar() {
     const textRef = useRef<HTMLHeadingElement>(null);
@@ -98,11 +99,15 @@ export default function MainNavBar() {
                     <Link href="/contact" className={linkStyle}>CONTACT US</Link>
                 </div>
                 <div className="hidden lg:flex items-center justify-center gap-4">
-
-                    <Link href="/sign-in"
-                          className="text-sm font-semibold text-gray-600 dark:text-gray-800 hover:text-[#0000FF]">
-                        <FontAwesomeIcon className="w-3.5 h-3.5 cursor-pointer text-gray-600" icon={faUser}/>
-                    </Link>
+                    <SignedOut>
+                        <Link href="/sign-in"
+                              className="text-lg font-semibold text-gray-600 dark:text-gray-800 hover:text-[#0000FF]">
+                            <FontAwesomeIcon className="w-3.5 h-3.5 cursor-pointer text-gray-600" icon={faUser}/>
+                        </Link>
+                    </SignedOut>
+                    <SignedIn>
+                        <UserButton />
+                    </SignedIn>
 
                     <span>|</span>
                     <FontAwesomeIcon className="w-3 h-3 cursor-pointer text-gray-600" icon={faClipboard}/>
