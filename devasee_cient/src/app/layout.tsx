@@ -5,6 +5,7 @@ import Head from "@/app/head";
 import ContactBar from "@/app/_components/ContactBar";
 import MainNavBar from "@/app/_components/MainNavBar";
 import ProgressBar from "@/app/_components/ProgressBar";
+import {ClerkProvider} from "@clerk/nextjs";
 
 
 const inter = Inter({
@@ -51,16 +52,26 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-
-        <html lang="en">
-        <Head/>
-        <body className={`${inter.variable}  w-screen overflow-x-hidden font-sans antialiased !bg-white`}>
-        <ContactBar/>
-        <MainNavBar/>
-        <ProgressBar/>
-        {children}
-        </body>
-        </html>
-        
+        <ClerkProvider appearance={
+            {
+                variables: {
+                    colorPrimary: "#0000ff", // Tailwind's blue-800
+                    colorText: "#1F2937", // Tailwind's gray-800
+                    colorBackground: "#ffffff", // White background
+                    fontFamily: inter.style.fontFamily,
+                    // Use Inter font
+                },
+            }
+        }>
+            <html lang="en">
+            <Head/>
+            <body className={`${inter.variable}  w-screen overflow-x-hidden font-sans antialiased !bg-white`}>
+            <ContactBar/>
+            <MainNavBar/>
+            <ProgressBar/>
+            {children}
+            </body>
+            </html>
+        </ClerkProvider>
     );
 }
