@@ -6,6 +6,7 @@ import ContactBar from "@/app/_components/ContactBar";
 import MainNavBar from "@/app/_components/MainNavBar";
 import ProgressBar from "@/app/_components/ProgressBar";
 import {ClerkProvider} from "@clerk/nextjs";
+import Footer from "@/app/_components/Footer";
 
 
 const inter = Inter({
@@ -70,6 +71,7 @@ export default function RootLayout({
             <MainNavBar/>
             <ProgressBar/>
             {children}
+            <Footer/>
             </body>
             </html>
         </ClerkProvider>
