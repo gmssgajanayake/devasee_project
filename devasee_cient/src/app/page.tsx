@@ -5,7 +5,6 @@ import BooksAdvertisementSlides from "@/app/_components/BooksAdvertisementSlides
 import OffersSlides from "@/app/_components/OffersSlides";
 import NewsSubscribe from "@/app/_components/NewsSubscribe";
 import Article from "@/app/_components/Article";
-import Footer from "@/app/_components/Footer";
 // import Maintenance from "@/components/Maintenance";
 
 export default function Home() {
@@ -19,7 +18,7 @@ export default function Home() {
           <OffersSlides/>
           <NewsSubscribe/>
           <Article/>
-          <Footer/>
+
       </div>
   );
 }

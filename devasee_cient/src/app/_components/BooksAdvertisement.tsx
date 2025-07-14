@@ -82,9 +82,9 @@ export default function BooksAdvertisement({
                     <p className="text-xs tracking-widest text-center text-gray-800/50">
                         SOME QUALITY ITEMS
                     </p>
-                    <h2 className="text-2xl lg:text-3xl text-center md:text-left font-bold text-[#2b216d]">
+                    <h3 className="text-2xl lg:text-3xl text-center md:text-left font-bold text-[#2b216d]">
                         {title}
-                    </h2>
+                    </h3>
                     <p className="text-sm md:text-left text-center text-gray-800/50">
                         {description}
                     </p>
