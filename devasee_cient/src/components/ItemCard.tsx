@@ -52,7 +52,7 @@ export default function ItemCard({
             </div>
 
             <div className="text-center mb-8">
-                <h2 className="text-lg font-semibold text-gray-800">{title}</h2>
+                <h3 className="text-lg font-semibold text-gray-800">{title}</h3>
                 <p className="text-sm text-gray-600">{author}</p>
                 <p className="text-lg font-bold text-[#0000FF] mt-2">{formatPriceLKR(price)}</p>
             </div>
