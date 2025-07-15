@@ -143,6 +143,7 @@ export default function MainNavBar() {
                     isMobileMenuOpen ? "block" : "hidden"
                 }`}
                 style={{height: "calc(100vh - 72px)"}}
+
             >
                <div className="w-full relative h-full flex flex-col justify-between items-center">
                    <div className="h-20 w-full flex mt-6 px-4 justify-end items-center  bg-[#0000ff]">
@@ -157,9 +158,9 @@ export default function MainNavBar() {
                                <UserButton />
                            </SignedIn>
 
-                           <span>|</span>
+                           <span className={"text-white"}>|</span>
                            <FontAwesomeIcon onClick={toggleMobileMenu} className="w-3 h-3 cursor-pointer text-white" icon={faClipboard}/>
-                           <span>|</span>
+                           <span className={"text-white"}>|</span>
                            <FontAwesomeIcon onClick={toggleMobileMenu} className="w-4 h-4 cursor-pointer text-white" icon={faHeart}/>
 
                        </div>
