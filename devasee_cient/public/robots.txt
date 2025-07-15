@@ -7,3 +7,4 @@ Host: https://www.devasee.lk
 
 # Sitemaps
 Sitemap: https://www.devasee.lk/sitemap.xml
+Sitemap: https://www.devasee.lk/sitemap-0.xml
