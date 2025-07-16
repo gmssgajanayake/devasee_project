@@ -139,9 +139,9 @@ const Offers: React.FC<BookAdvertisementProps> = ({
                     ref={textRef}
                     className="w-full md:w-1/2 flex flex-col justify-center items-center md:items-start gap-4"
                 >
-                    <h2 className="text-xl lg:text-2xl text-center md:text-left font-bold text-[#2b216d]">
+                    <h3 className="text-xl lg:text-2xl text-center md:text-left font-bold text-[#2b216d]">
                         {title}
-                    </h2>
+                    </h3>
                     <p className="text-sm sm:text-base text-center md:text-left text-gray-800/50">
                         {description}
                     </p>

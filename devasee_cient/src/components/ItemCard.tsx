@@ -9,18 +9,14 @@ interface ItemCardProps {
 }
 
 export function formatPriceLKR(price: number): string {
-    const rounded = Math.ceil(price); // Always round up
-    const formatted = new Intl.NumberFormat("en-LK", {
+    const rounded = Math.ceil(price);
+    return new Intl.NumberFormat("en-LK", {
         style: "currency",
         currency: "LKR",
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
     }).format(rounded);
-
-    return formatted;
 }
-
-
 
 export default function ItemCard({
                                      imageUrl,
@@ -30,7 +26,7 @@ export default function ItemCard({
                                  }: ItemCardProps) {
     return (
         <div className="flex items-center justify-center flex-col gap-6">
-            <div className="group w-56 h-72 relative flex justify-center items-center bg-white shadow-md overflow-hidden">
+            <div className="group w-42 h-64 sm:w-56 sm:h-72 relative flex justify-center items-center bg-white shadow-md overflow-hidden">
                 <Image
                     src={imageUrl}
                     alt="product"
@@ -39,9 +35,16 @@ export default function ItemCard({
                     className="absolute w-full h-full z-10 object-contain"
                 />
                 <div className="w-full h-full p-4 bg-white relative flex-col flex justify-end items-center">
-                    {/* Hover button */}
+                    {/* Button: Always visible on small screens, appears on hover for large screens */}
                     <button
-                        className="absolute w-48 cursor-pointer bg-[#0000FF] z-40 justify-center items-center mb-14 tracking-widest text-white text-[12px] py-3 hover:bg-blue-700 transition duration-200 hidden group-hover:flex"
+                        className={`
+                            absolute w-48 cursor-pointer bg-[#0000FF] z-40
+                            justify-center items-center mb-14 tracking-widest text-white text-[12px] py-3
+                            transition duration-200
+                            hover:bg-blue-700
+                            flex lg:hidden
+                            group-hover:flex lg:group-hover:flex
+                        `}
                     >
                         ADD TO CART
                     </button>
@@ -49,7 +52,7 @@ export default function ItemCard({
             </div>
 
             <div className="text-center mb-8">
-                <h2 className="text-lg font-semibold text-gray-800">{title}</h2>
+                <h3 className="text-lg font-semibold text-gray-800">{title}</h3>
                 <p className="text-sm text-gray-600">{author}</p>
                 <p className="text-lg font-bold text-[#0000FF] mt-2">{formatPriceLKR(price)}</p>
             </div>

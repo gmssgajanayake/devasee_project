@@ -18,6 +18,7 @@ export default function Home() {
           <OffersSlides/>
           <NewsSubscribe/>
           <Article/>
+
       </div>
   );
 }

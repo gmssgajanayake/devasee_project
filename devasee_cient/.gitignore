@@ -44,3 +44,6 @@ pnpm-debug.log*
 # yarn.lock
 # package-lock.json
 # pnpm-lock.yaml
+
+# clerk configuration (can include secrets)
+/.clerk/

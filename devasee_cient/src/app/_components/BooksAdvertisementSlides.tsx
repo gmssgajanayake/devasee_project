@@ -1,8 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
-import MainNavBar from "@/app/_components/MainNavBar";
-import ContactBar from "@/app/_components/ContactBar";
 import book1 from "@/assets/items image/img_4.png";
 import book2 from "@/assets/items image/img_3.png";
 import book3 from "@/assets/items image/img_2.png";
@@ -80,8 +78,7 @@ export default function BooksAdvertisementSlides() {
 
     return (
         <div className="w-full mb-14 overflow-x-hidden bg-white">
-            <ContactBar />
-            <MainNavBar />
+
 
             <div ref={adRef} className="w-full h-auto relative">
                 <BooksAdvertisement
