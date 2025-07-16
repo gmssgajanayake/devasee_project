@@ -1,12 +1,10 @@
 package com.devasee.product.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.UuidGenerator;
 
 import java.time.LocalDateTime;
 
@@ -16,9 +14,12 @@ import java.time.LocalDateTime;
 @Data
 public class Book {
     @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
-//    @Column(nullable = false,length = 255)
+    @GeneratedValue()
+    @UuidGenerator
+    @Column(updatable = false, nullable = false, length = 36)
+    private String id;
+    // @Column(nullable = false,length = 255)
+    private String title;
     private String author;
     private String publisher;
     private String category;
