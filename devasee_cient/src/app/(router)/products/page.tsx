@@ -1,4 +1,5 @@
 "use client";
+
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import SubNavBar from "@/app/(router)/_components/SubNavBar";
@@ -14,8 +15,14 @@ import book6 from "@/assets/items image/img_2.png";
 import book7 from "@/assets/items image/img_3.png";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowUpWideShort, faSliders, faXmark } from "@fortawesome/free-solid-svg-icons";
+import {
+    faArrowUpWideShort,
+    faSliders,
+    faXmark,
+    faSearch,
+} from "@fortawesome/free-solid-svg-icons";
 
+// Dummy book data
 const allBooks = Array.from({ length: 35 }, (_, i) => ({
     image: [book1, book2, book3, book4, book5, book6, book7][i % 7],
     title: `Book ${i + 1}`,
@@ -32,7 +39,7 @@ export default function Page() {
     const [sortBy, setSortBy] = useState<"title" | "author" | "price">("title");
     const [showMobileFilter, setShowMobileFilter] = useState(false);
     const [showSortModal, setShowSortModal] = useState(false);
-    const mobileFilterRef = useRef<HTMLDivElement>(null);
+    const [searchQuery, setSearchQuery] = useState("");
     const filterRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -48,44 +55,73 @@ export default function Page() {
 
     useEffect(() => {
         if (showMobileFilter || showSortModal) {
-            document.body.style.overflow = 'hidden';
+            document.body.style.overflow = "hidden";
         } else {
-            document.body.style.overflow = 'auto';
+            document.body.style.overflow = "auto";
         }
-
         return () => {
-            document.body.style.overflow = 'auto';
+            document.body.style.overflow = "auto";
         };
     }, [showMobileFilter, showSortModal]);
 
-    const filteredBooks = allBooks.filter((book) => {
-        const inPriceRange = book.price >= priceRange[0] && book.price <= priceRange[1];
-        const matchesType = selectedTypes.length === 0 || (book.type && selectedTypes.includes(book.type));
-        const matchesBrand = selectedBrands.length === 0 || (book.brand && selectedBrands.includes(book.brand));
-        return inPriceRange && matchesType && matchesBrand;
-    });
+    const filteredBooks = allBooks
+        .filter((book) => {
+            const inPriceRange = book.price >= priceRange[0] && book.price <= priceRange[1];
+            const matchesType =
+                selectedTypes.length === 0 || selectedTypes.includes(book.type);
+            const matchesBrand =
+                selectedBrands.length === 0 || selectedBrands.includes(book.brand);
+            const matchesSearch =
+                book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                book.author.toLowerCase().includes(searchQuery.toLowerCase());
+            return inPriceRange && matchesType && matchesBrand && matchesSearch;
+        })
+        .sort((a, b) => {
+            if (sortBy === "title") return a.title.localeCompare(b.title);
+            if (sortBy === "author") return a.author.localeCompare(b.author);
+            return a.price - b.price;
+        });
 
     return (
         <div className="w-full">
             <SubNavBar path="PRODUCTS" />
 
+            {/* Search Bar */}
+            <div className="w-full px-4 py-3 flex justify-center items-center bg-gray-100">
+                <div className="relative w-full max-w-xl">
+                    <input
+                        type="text"
+                        placeholder="Search books..."
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none "
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                    <FontAwesomeIcon
+                        icon={faSearch}
+                        className="absolute cursor-pointer right-4 top-1/2 transform -translate-y-1/2 text-gray-400"
+                    />
+                </div>
+            </div>
+
+            {/* Mobile Filter and Sort */}
             <div className="w-full lg:hidden flex justify-center items-center">
                 <div
                     onClick={() => setShowMobileFilter(true)}
                     className="w-1/2 flex cursor-pointer justify-center items-center border-r border-gray-400/30 bg-gray-100/50 gap-3 px-4 py-3"
                 >
-                    <FontAwesomeIcon className="rotate-90 dark:text-[#2b216d]" icon={faSliders} />
-                    <p className="font-bold dark:text-[#2b216d] text-[#2b216d]">FILTER</p>
+                    <FontAwesomeIcon className="rotate-90 text-[#2b216d]" icon={faSliders} />
+                    <p className="font-bold text-[#2b216d]">FILTER</p>
                 </div>
                 <div
                     onClick={() => setShowSortModal(true)}
                     className="w-1/2 flex gap-3 cursor-pointer justify-center items-center bg-gray-100/50 px-4 py-3"
                 >
-                    <FontAwesomeIcon className="rotate-180 dark:text-[#2b216d]" icon={faArrowUpWideShort} />
+                    <FontAwesomeIcon className="rotate-180 text-[#2b216d]" icon={faArrowUpWideShort} />
                     <p className="font-bold text-[#2b216d]">SORT</p>
                 </div>
             </div>
 
+            {/* Filter + Book Grid */}
             <div ref={filterRef} className="flex w-full h-[calc(100vh-80px)]">
                 <div className="w-[280px] lg:flex hidden shrink-0 h-full overflow-y-auto">
                     <FilterBar
@@ -97,28 +133,20 @@ export default function Page() {
                         setSelectedBrands={setSelectedBrands}
                     />
                 </div>
-
                 <div className="flex-1 overflow-y-auto h-full">
-                    {/* Pass sortBy and setSortBy to Container */}
-                    <Container
-                        books={filteredBooks}
-                        sortBy={sortBy}
-                        setSortBy={setSortBy}
-                    />
+                    <Container books={filteredBooks} sortBy={sortBy} setSortBy={setSortBy} />
                 </div>
             </div>
 
+            {/* Mobile Filter Modal */}
             {showMobileFilter && (
                 <div className="fixed inset-0 z-50 bg-black/40 flex lg:hidden">
-                    <div
-                        ref={mobileFilterRef}
-                        className="bg-white w-[60%] h-full pt-16  shadow-lg relative overflow-y-auto"
-                    >
+                    <div className="bg-white w-[60%] h-full pt-16 shadow-lg relative overflow-y-auto">
                         <div className="flex justify-between items-center px-4 mb-4">
                             <h2 className="font-bold text-lg text-[#2b216d]">Filters</h2>
                             <FontAwesomeIcon
                                 icon={faXmark}
-                                className="text-2xl dark:text-[#2b216d] cursor-pointer text-[#2b216d]"
+                                className="text-2xl text-[#2b216d] cursor-pointer"
                                 onClick={() => setShowMobileFilter(false)}
                             />
                         </div>
@@ -135,6 +163,7 @@ export default function Page() {
                 </div>
             )}
 
+            {/* Sort Modal */}
             {showSortModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 lg:hidden">
                     <div className="bg-white w-[60%] max-w-sm rounded-xl shadow-xl p-6 relative">
@@ -142,44 +171,31 @@ export default function Page() {
                             <h2 className="font-bold text-lg text-[#2b216d]">Sort Options</h2>
                             <FontAwesomeIcon
                                 icon={faXmark}
-                                className="text-2xl dark:text-[#2b216d] text-[#2b216d] cursor-pointer"
+                                className="text-2xl text-[#2b216d] cursor-pointer"
                                 onClick={() => setShowSortModal(false)}
                             />
                         </div>
                         <div className="space-y-3">
-                            <button
-                                className={`w-full   font-bold  text-left p-2 rounded ${
-                                    sortBy === "title" ? "bg-blue-100  text-blue-600" : "dark:text-[#2b216d] text-[#2b216d]"
-                                }`}
-                                onClick={() => {
-                                    setSortBy("title");
-                                    setShowSortModal(false);
-                                }}
-                            >
-                                Alphabetically, A-Z
-                            </button>
-                            <button
-                                className={`w-full font-bold  text-left p-2 rounded ${
-                                    sortBy === "author" ? "bg-blue-100 text-blue-600" : "dark:text-[#2b216d] text-[#2b216d]"
-                                }`}
-                                onClick={() => {
-                                    setSortBy("author");
-                                    setShowSortModal(false);
-                                }}
-                            >
-                                Author
-                            </button>
-                            <button
-                                className={`w-full  font-bold  text-left p-2 rounded ${
-                                    sortBy === "price" ? "bg-blue-100 text-blue-600" : "dark:text-[#2b216d] text-[#2b216d]"
-                                }`}
-                                onClick={() => {
-                                    setSortBy("price");
-                                    setShowSortModal(false);
-                                }}
-                            >
-                                Price: Low to High
-                            </button>
+                            {["title", "author", "price"].map((option) => (
+                                <button
+                                    key={option}
+                                    className={`w-full font-bold text-left p-2 rounded ${
+                                        sortBy === option
+                                            ? "bg-blue-100 text-blue-600"
+                                            : "text-[#2b216d]"
+                                    }`}
+                                    onClick={() => {
+                                        setSortBy(option as "title" | "author" | "price");
+                                        setShowSortModal(false);
+                                    }}
+                                >
+                                    {option === "title"
+                                        ? "Alphabetically, A-Z"
+                                        : option === "author"
+                                            ? "Author"
+                                            : "Price: Low to High"}
+                                </button>
+                            ))}
                         </div>
                     </div>
                 </div>
