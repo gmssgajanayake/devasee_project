@@ -87,12 +87,12 @@ export default function Page() {
             <SubNavBar path="PRODUCTS" />
 
             {/* Search Bar */}
-            <div className="w-full px-4 py-3 flex justify-center items-center bg-gray-100">
+            <div className="w-full px-4 py-3 flex justify-center items-center ">
                 <div className="relative w-full max-w-xl">
                     <input
                         type="text"
                         placeholder="Search books..."
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none "
+                        className="w-full px-4 text-gray-700 py-3 border border-gray-300 rounded-lg focus:outline-none "
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
