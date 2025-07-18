@@ -9,6 +9,7 @@ import {AlignJustify, X} from "lucide-react";
 import {useEffect, useRef, useState} from "react";
 import gsap from "gsap";
 import {SignedIn, SignedOut, UserButton} from "@clerk/nextjs";
+import { useCart } from "@/app/context/CartContext";
 
 export default function MainNavBar() {
     const textRef = useRef<HTMLHeadingElement>(null);
@@ -16,6 +17,7 @@ export default function MainNavBar() {
     const navRef = useRef<HTMLElement>(null);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
+    const { cartItems } = useCart();
 
     useEffect(() => {
         if (textRef.current) {
@@ -110,7 +112,28 @@ export default function MainNavBar() {
                     </SignedIn>
 
                     <span>|</span>
-                    <FontAwesomeIcon className="w-3 h-3 cursor-pointer text-gray-600" icon={faClipboard}/>
+
+                    <div className="relative">
+                        <Link
+                            href="/cart"
+                            className="flex items-center gap-2 text-gray-600 transition-colors"
+                        >
+
+                            <FontAwesomeIcon
+                                className="w-5 h-5 cursor-pointer"
+                                icon={faClipboard}
+                            />
+
+
+                            {cartItems.length > 0 && (
+                                <span className="absolute -top-2 -right-2.5 bg-blue-600 text-white text-[10px] font-bold px-1 py-0.5 rounded-full leading-none">
+        {cartItems.length}
+      </span>
+                            )}
+                        </Link>
+                    </div>
+
+
                     <span>|</span>
                     <FontAwesomeIcon className="w-4 h-4 cursor-pointer text-gray-600" icon={faHeart}/>
 

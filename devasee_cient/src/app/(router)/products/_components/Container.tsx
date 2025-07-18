@@ -10,19 +10,21 @@ interface Book {
     title: string;
     author: string;
     price: number;
-    type?: string;
-    brand?: string;
+    type: string;
+    brand: string;
 }
 
 interface ContainerProps {
     books: Book[];
     sortBy: "title" | "author" | "price";
     setSortBy: (value: "title" | "author" | "price") => void;
+    addToCart: (book: Book) => void;
 }
+
 
 const ITEMS_PER_PAGE = 20;
 
-export default function Container({ books, sortBy, setSortBy }: ContainerProps) {
+export default function Container({ books, sortBy, setSortBy, addToCart}: ContainerProps) {
     const [currentPage, setCurrentPage] = useState(1);
     const [sortedBooks, setSortedBooks] = useState<Book[]>([]);
 
@@ -63,6 +65,7 @@ export default function Container({ books, sortBy, setSortBy }: ContainerProps) 
                             title={book.title}
                             author={book.author}
                             price={book.price}
+                            onAddToCart={() => addToCart(book)}
                         />
                     </div>
                 ))}

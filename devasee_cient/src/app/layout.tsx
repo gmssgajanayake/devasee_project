@@ -8,6 +8,7 @@ import ProgressBar from "@/app/_components/ProgressBar";
 import {ClerkProvider} from "@clerk/nextjs";
 import Footer from "@/app/_components/Footer";
 import React from "react";
+import {CartProvider} from "@/app/context/CartContext";
 
 
 const inter = Inter({
@@ -57,11 +58,13 @@ export default function RootLayout({
             <html lang="en">
             <Head/>
             <body className={`${inter.variable}  w-screen overflow-x-hidden font-sans antialiased !bg-white`}>
+            <CartProvider>
             <ContactBar/>
             <MainNavBar/>
             <ProgressBar/>
             {children}
             <Footer/>
+            </CartProvider>
             </body>
             </html>
         </ClerkProvider>
