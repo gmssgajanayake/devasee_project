@@ -23,17 +23,8 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 import { useCart } from "@/app/context/CartContext";
-import { StaticImageData } from "next/image";
+import { Book } from "@/types/types";
 
-interface Book {
-    id: string;
-    image: StaticImageData;
-    title: string;
-    author: string;
-    price: number;
-    type: string;
-    brand: string;
-}
 
 const allBooks: Book[] = Array.from({ length: 35 }, (_, i) => ({
     id: `book-${i + 1}`,
@@ -43,7 +34,10 @@ const allBooks: Book[] = Array.from({ length: 35 }, (_, i) => ({
     price: 1000 + (i % 7) * 100,
     type: i % 2 === 0 ? "Books" : "Stationery",
     brand: i % 3 === 0 ? "Devasee" : "Other",
+    stock: 10 + (i % 5),
+    quantity: 1,
 }));
+
 
 export default function Page() {
     const [priceRange, setPriceRange] = useState<[number, number]>([0, 5000]);

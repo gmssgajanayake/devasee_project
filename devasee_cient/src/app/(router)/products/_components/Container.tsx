@@ -2,26 +2,16 @@
 
 import { useState, useEffect } from "react";
 import ItemCard from "@/components/ItemCard";
-import { StaticImageData } from "next/image";
+import { Book } from "@/types/types";
 import SortOptions from "@/app/(router)/products/_components/SortOptions";
-
-interface Book {
-    id: string;
-    image: StaticImageData;
-    title: string;
-    author: string;
-    price: number;
-    type: string;
-    brand: string;
-}
 
 interface ContainerProps {
     books: Book[];
     sortBy: "title" | "author" | "price";
     setSortBy: (value: "title" | "author" | "price") => void;
     addToCart: (book: Book) => void;
-    removeFromCart: (id: string) => void; // Changed to accept ID
-    cartItems: { id: string }[]; // Simplified to only require IDs
+    removeFromCart: (id: string) => void;
+    cartItems: Book[];
 }
 
 const ITEMS_PER_PAGE = 20;
@@ -52,7 +42,10 @@ export default function Container({
 
     const totalPages = Math.ceil(sortedBooks.length / ITEMS_PER_PAGE);
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-    const currentBooks = sortedBooks.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+    const currentBooks = sortedBooks.slice(
+        startIndex,
+        startIndex + ITEMS_PER_PAGE
+    );
 
     const goToPage = (page: number) => {
         if (page >= 1 && page <= totalPages) {
@@ -77,7 +70,7 @@ export default function Container({
                             author={book.author}
                             price={book.price}
                             onAddToCart={() => addToCart(book)}
-                            onRemoveFromCart={() => removeFromCart(book.id)} // Pass ID
+                            onRemoveFromCart={() => removeFromCart(book.id)}
                             isInCart={cartItems.some((item) => item.id === book.id)}
                         />
                     </div>

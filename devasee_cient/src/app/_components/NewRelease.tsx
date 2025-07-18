@@ -5,11 +5,10 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import ItemCard from "@/components/ItemCard";
 import { useCart } from "@/app/context/CartContext";
-import { StaticImageData } from "next/image";
-
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
+import { Book } from "@/types/types";
 
 // Import images
 import book1 from "@/assets/items image/img.png";
@@ -22,17 +21,7 @@ import book7 from "@/assets/items image/img_3.png";
 
 gsap.registerPlugin(ScrollTrigger);
 
-interface Book {
-    id: string;
-    image: StaticImageData;
-    title: string;
-    author: string;
-    price: number;
-    type: string;
-    brand: string;
-}
-
-// Dummy books data
+// Dummy data
 const allBooks: Book[] = Array.from({ length: 13 }, (_, i) => ({
     id: `book-${i + 1}`,
     image: [book1, book2, book3, book4, book5, book6, book7][i % 7],
@@ -41,6 +30,8 @@ const allBooks: Book[] = Array.from({ length: 13 }, (_, i) => ({
     price: 1000 + (i % 7) * 100,
     type: i % 2 === 0 ? "Books" : "Stationery",
     brand: i % 3 === 0 ? "Devasee" : "Other",
+    stock: 5 + (i % 5),      // Random stock between 5–9
+    quantity: 1              // Default quantity when added
 }));
 
 const ITEMS_PER_PAGE = 12;
@@ -49,7 +40,7 @@ export default function NewRelease() {
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const sectionRef = useRef<HTMLDivElement>(null);
     const [activePage, setActivePage] = useState(0);
-    const [currentPage] = useState(1); // Static for now unless you add pagination
+    const [currentPage] = useState(1);
 
     const totalPages = Math.ceil(allBooks.length / ITEMS_PER_PAGE);
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -79,8 +70,8 @@ export default function NewRelease() {
                     const progress = self.progress;
                     const currentPage = Math.round(progress * (totalPages - 1));
                     setActivePage(currentPage);
-                },
-            },
+                }
+            }
         });
 
         const revealTween = gsap.fromTo(
@@ -94,8 +85,8 @@ export default function NewRelease() {
                 scrollTrigger: {
                     trigger: section,
                     start: "top 80%",
-                    toggleActions: "play none none none",
-                },
+                    toggleActions: "play none none none"
+                }
             }
         );
 
@@ -109,12 +100,12 @@ export default function NewRelease() {
     return (
         <div
             ref={sectionRef}
-            className="relative w-full overflow-hidden overflow-x-hidden bg-[#e8ebff] py-20 opacity-0 translate-y-24"
+            className="relative w-full overflow-hidden bg-[#e8ebff] py-20 opacity-0 translate-y-24"
         >
-            {/* Title */}
             <p className="text-xs tracking-widest text-center text-gray-800/50">
                 SOME QUALITY ITEMS
             </p>
+
             <div className="flex items-center justify-center w-full px-8 my-6">
                 <hr className="w-full text-gray-300/80" />
                 <h2 className="text-3xl md:text-4xl mx-4 font-bold text-[#2b216d]">
@@ -123,37 +114,34 @@ export default function NewRelease() {
                 <hr className="w-full text-gray-300/80" />
             </div>
 
-            {/* Scrollable content */}
-            <div className="pt-8 w-full  overflow-hidden">
+            <div className="pt-8 w-full overflow-hidden">
                 <div
                     ref={scrollContainerRef}
-                    className="flex px-4 gap-4 no-scrollbar" // smaller padding + spacing control
+                    className="flex px-4 gap-4 no-scrollbar"
                     style={{ minWidth: `${allBooks.length * 250}px` }}
                 >
                     {currentBooks.map((book) => (
                         <div key={book.id} className="min-w-[250px]">
                             <ItemCard
-                                isHovered={false}
                                 image={book.image}
                                 title={book.title}
                                 author={book.author}
                                 price={book.price}
+                                stock={book.stock}
                                 onAddToCart={() => addToCart(book)}
                                 onRemoveFromCart={() => removeFromCart(book.id)}
                                 isInCart={cartItems.some((item) => item.id === book.id)}
+                                isHovered={false}  // <-- Add this line
                             />
                         </div>
                     ))}
                 </div>
-
             </div>
 
             <hr className="w-full text-gray-300/80" />
 
-            {/* Page Dots and CTA */}
             <div className="flex justify-center md:justify-end items-center px-4 mt-6">
                 <div className="w-full md:w-1/2 flex items-center justify-between">
-                    {/* Dots */}
                     <div className="flex gap-4">
                         {Array.from({ length: totalPages }).map((_, index) => (
                             <div
@@ -171,7 +159,6 @@ export default function NewRelease() {
                         ))}
                     </div>
 
-                    {/* View All CTA */}
                     <div>
                         <Link
                             href="/products"

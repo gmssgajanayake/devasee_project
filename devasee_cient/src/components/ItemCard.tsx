@@ -6,6 +6,7 @@ interface ItemCardProps {
     title: string;
     author: string;
     price: number;
+    stock?: number;
     onAddToCart?: () => void;
     onRemoveFromCart?: () => void;
     isInCart?: boolean;
