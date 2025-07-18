@@ -3,7 +3,20 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
     async redirects() {
         return [
-            // Redirect non-trailing slash to trailing slash (if needed)
+
+            {
+                source: "/:path*",
+                has: [
+                    {
+                        type: "host",
+                        value: "devasee.lk",
+                    },
+                ],
+                destination: "https://www.devasee.lk/:path*",
+                permanent: true,
+            },
+
+
             {
                 source: "/contact/",
                 destination: "/contact",
@@ -24,13 +37,6 @@ const nextConfig: NextConfig = {
                 destination: "/services",
                 permanent: true,
             },
-
-            // Optional: redirect old URLs or fix casing
-            // {
-            //   source: "/Contact",
-            //   destination: "/contact",
-            //   permanent: true,
-            // },
         ];
     },
 };

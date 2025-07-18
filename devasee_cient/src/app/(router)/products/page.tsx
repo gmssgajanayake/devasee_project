@@ -15,12 +15,15 @@ import book6 from "@/assets/items image/img_2.png";
 import book7 from "@/assets/items image/img_3.png";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
+
 import {
     faArrowUpWideShort,
     faSliders,
     faXmark,
     faSearch,
 } from "@fortawesome/free-solid-svg-icons";
+import {useCart} from "@/app/context/CartContext";
 
 // Dummy book data
 const allBooks = Array.from({ length: 35 }, (_, i) => ({
@@ -41,6 +44,9 @@ export default function Page() {
     const [showSortModal, setShowSortModal] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
     const filterRef = useRef<HTMLDivElement>(null);
+
+    const { addToCart } = useCart()
+
 
     useEffect(() => {
         if (filterRef.current) {
@@ -134,7 +140,12 @@ export default function Page() {
                     />
                 </div>
                 <div className="flex-1 overflow-y-auto h-full">
-                    <Container books={filteredBooks} sortBy={sortBy} setSortBy={setSortBy} />
+                    <Container
+                        books={filteredBooks}
+                        sortBy={sortBy}
+                        setSortBy={setSortBy}
+                        addToCart={addToCart}
+                    />
                 </div>
             </div>
 

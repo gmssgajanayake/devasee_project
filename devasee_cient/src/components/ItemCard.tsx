@@ -6,6 +6,7 @@ interface ItemCardProps {
     title: string;
     author: string;
     price: number;
+    onAddToCart?: () => void;
 }
 
 export function formatPriceLKR(price: number): string {
@@ -23,6 +24,7 @@ export default function ItemCard({
                                      title,
                                      author,
                                      price,
+                                     onAddToCart,
                                  }: ItemCardProps) {
     return (
         <div className="flex items-center justify-center flex-col gap-6">
@@ -35,8 +37,8 @@ export default function ItemCard({
                     className="absolute w-full h-full z-10 object-contain"
                 />
                 <div className="w-full h-full p-4 bg-white relative flex-col flex justify-end items-center">
-                    {/* Button: Always visible on small screens, appears on hover for large screens */}
                     <button
+                        onClick={onAddToCart}
                         className={`
                             absolute w-48 cursor-pointer bg-[#0000FF] z-40
                             justify-center items-center mb-14 tracking-widest text-white text-[12px] py-3
@@ -54,7 +56,9 @@ export default function ItemCard({
             <div className="text-center mb-8">
                 <h3 className="text-lg font-semibold text-gray-800">{title}</h3>
                 <p className="text-sm text-gray-600">{author}</p>
-                <p className="text-lg font-bold text-[#0000FF] mt-2">{formatPriceLKR(price)}</p>
+                <p className="text-lg font-bold text-[#0000FF] mt-2">
+                    {formatPriceLKR(price)}
+                </p>
             </div>
         </div>
     );
