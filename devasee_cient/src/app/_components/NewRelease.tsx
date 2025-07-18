@@ -4,45 +4,65 @@ import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import ItemCard from "@/components/ItemCard";
+import { useCart } from "@/app/context/CartContext";
+import { StaticImageData } from "next/image";
 
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
+import Link from "next/link";
+
+// Import images
 import book1 from "@/assets/items image/img.png";
 import book2 from "@/assets/items image/img_1.png";
 import book3 from "@/assets/items image/img_2.png";
 import book4 from "@/assets/items image/img_3.png";
 import book5 from "@/assets/items image/img_1.png";
 import book6 from "@/assets/items image/img_2.png";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
-import Link from "next/link";
+import book7 from "@/assets/items image/img_3.png";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const books = [
-    { image: book1, title: "Learn React", author: "John Doe", price: 1299.0 },
-    { image: book2, title: "Advanced React", author: "Jane Doe", price: 1399.0 },
-    { image: book3, title: "React Native", author: "Alex Smith", price: 1349.0 },
-    { image: book4, title: "React Hooks", author: "Sara Lee", price: 1249.0 },
-    { image: book5, title: "React + TypeScript", author: "Chris Ray", price: 1329.0 },
-    { image: book6, title: "React Testing", author: "Emma Stone", price: 1289.0 },
-];
+interface Book {
+    id: string;
+    image: StaticImageData;
+    title: string;
+    author: string;
+    price: number;
+    type: string;
+    brand: string;
+}
+
+// Dummy books data
+const allBooks: Book[] = Array.from({ length: 13 }, (_, i) => ({
+    id: `book-${i + 1}`,
+    image: [book1, book2, book3, book4, book5, book6, book7][i % 7],
+    title: `Book ${i + 1}`,
+    author: `Author ${i + 1}`,
+    price: 1000 + (i % 7) * 100,
+    type: i % 2 === 0 ? "Books" : "Stationery",
+    brand: i % 3 === 0 ? "Devasee" : "Other",
+}));
+
+const ITEMS_PER_PAGE = 12;
 
 export default function NewRelease() {
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const sectionRef = useRef<HTMLDivElement>(null);
     const [activePage, setActivePage] = useState(0);
+    const [currentPage] = useState(1); // Static for now unless you add pagination
 
-    const itemsPerPage = 3;
-    const totalPages = Math.ceil(books.length / itemsPerPage);
+    const totalPages = Math.ceil(allBooks.length / ITEMS_PER_PAGE);
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const currentBooks = allBooks.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
+    const { addToCart, removeFromCart, cartItems } = useCart();
 
     useEffect(() => {
         const container = scrollContainerRef.current;
         const section = sectionRef.current;
         if (!container || !section) return;
 
-        // Horizontal Scroll Animation
-        const totalScrollWidth = container.scrollWidth;
-        const viewportWidth = section.offsetWidth;
-        const scrollDistance = totalScrollWidth - viewportWidth + 40;
+        const scrollDistance = container.scrollWidth - section.offsetWidth + 40;
 
         const horizontalTween = gsap.to(container, {
             x: () => `-${scrollDistance}px`,
@@ -63,7 +83,6 @@ export default function NewRelease() {
             },
         });
 
-        // Fade + Rise Animation for entire section (only once)
         const revealTween = gsap.fromTo(
             section,
             { opacity: 0, y: 100 },
@@ -105,23 +124,28 @@ export default function NewRelease() {
             </div>
 
             {/* Scrollable content */}
-            <div className="pt-8 w-full overflow-hidden">
+            <div className="pt-8 w-full  overflow-hidden">
                 <div
                     ref={scrollContainerRef}
-                    className="flex gap-10 px-10 no-scrollbar"
-                    style={{ minWidth: `${books.length * 250}px` }}
+                    className="flex px-4 gap-4 no-scrollbar" // smaller padding + spacing control
+                    style={{ minWidth: `${allBooks.length * 250}px` }}
                 >
-                    {books.map((book, index) => (
-                        <ItemCard
-                            key={index}
-                            isHovered={false}
-                            imageUrl={book.image.src}
-                            title={book.title}
-                            author={book.author}
-                            price={book.price}
-                        />
+                    {currentBooks.map((book) => (
+                        <div key={book.id} className="min-w-[250px]">
+                            <ItemCard
+                                isHovered={false}
+                                image={book.image}
+                                title={book.title}
+                                author={book.author}
+                                price={book.price}
+                                onAddToCart={() => addToCart(book)}
+                                onRemoveFromCart={() => removeFromCart(book.id)}
+                                isInCart={cartItems.some((item) => item.id === book.id)}
+                            />
+                        </div>
                     ))}
                 </div>
+
             </div>
 
             <hr className="w-full text-gray-300/80" />
@@ -150,7 +174,7 @@ export default function NewRelease() {
                     {/* View All CTA */}
                     <div>
                         <Link
-                            href={"products"}
+                            href="/products"
                             className="text-[#0000ff] cursor-pointer font-bold text-sm"
                         >
                             View All Products

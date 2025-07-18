@@ -15,18 +15,28 @@ import book6 from "@/assets/items image/img_2.png";
 import book7 from "@/assets/items image/img_3.png";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-
-
 import {
     faArrowUpWideShort,
     faSliders,
     faXmark,
     faSearch,
 } from "@fortawesome/free-solid-svg-icons";
-import {useCart} from "@/app/context/CartContext";
 
-// Dummy book data
-const allBooks = Array.from({ length: 35 }, (_, i) => ({
+import { useCart } from "@/app/context/CartContext";
+import { StaticImageData } from "next/image";
+
+interface Book {
+    id: string;
+    image: StaticImageData;
+    title: string;
+    author: string;
+    price: number;
+    type: string;
+    brand: string;
+}
+
+const allBooks: Book[] = Array.from({ length: 35 }, (_, i) => ({
+    id: `book-${i + 1}`,
     image: [book1, book2, book3, book4, book5, book6, book7][i % 7],
     title: `Book ${i + 1}`,
     author: `Author ${i + 1}`,
@@ -45,8 +55,7 @@ export default function Page() {
     const [searchQuery, setSearchQuery] = useState("");
     const filterRef = useRef<HTMLDivElement>(null);
 
-    const { addToCart } = useCart()
-
+    const { addToCart, removeFromCart, cartItems } = useCart();
 
     useEffect(() => {
         if (filterRef.current) {
@@ -56,7 +65,9 @@ export default function Page() {
                 { y: 0, opacity: 1, duration: 0.8, ease: "power3.out" }
             );
         }
-        window.scrollTo({ top: 0, behavior: "auto" });
+        if (typeof window !== "undefined") {
+            window.scrollTo({ top: 0, behavior: "auto" });
+        }
     }, []);
 
     useEffect(() => {
@@ -73,10 +84,8 @@ export default function Page() {
     const filteredBooks = allBooks
         .filter((book) => {
             const inPriceRange = book.price >= priceRange[0] && book.price <= priceRange[1];
-            const matchesType =
-                selectedTypes.length === 0 || selectedTypes.includes(book.type);
-            const matchesBrand =
-                selectedBrands.length === 0 || selectedBrands.includes(book.brand);
+            const matchesType = selectedTypes.length === 0 || selectedTypes.includes(book.type);
+            const matchesBrand = selectedBrands.length === 0 || selectedBrands.includes(book.brand);
             const matchesSearch =
                 book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 book.author.toLowerCase().includes(searchQuery.toLowerCase());
@@ -145,6 +154,8 @@ export default function Page() {
                         sortBy={sortBy}
                         setSortBy={setSortBy}
                         addToCart={addToCart}
+                        cartItems={cartItems}
+                        removeFromCart={removeFromCart}
                     />
                 </div>
             </div>
@@ -191,9 +202,7 @@ export default function Page() {
                                 <button
                                     key={option}
                                     className={`w-full font-bold text-left p-2 rounded ${
-                                        sortBy === option
-                                            ? "bg-blue-100 text-blue-600"
-                                            : "text-[#2b216d]"
+                                        sortBy === option ? "bg-blue-100 text-blue-600" : "text-[#2b216d]"
                                     }`}
                                     onClick={() => {
                                         setSortBy(option as "title" | "author" | "price");
