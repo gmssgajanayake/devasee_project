@@ -90,26 +90,42 @@ export default function MainNavBar() {
         }
     };
 
-    // Cart dropdown hover animation
+    // Dropdown animation for cart items
     useEffect(() => {
         if (!dropdownRef.current || !hoverRef.current) return;
 
-        const tl = gsap.timeline({paused: true});
-        tl.fromTo(
-            dropdownRef.current,
-            {opacity: 0, y: -10},
-            {opacity: 1, y: 0, duration: 0.3, ease: "power3.out"}
-        );
+        const dropdown = dropdownRef.current;
+        const hoverArea = hoverRef.current;
 
-        const hoverElem = hoverRef.current;
-        hoverElem.addEventListener("mouseenter", () => tl.play());
-        hoverElem.addEventListener("mouseleave", () => tl.reverse());
+        gsap.set(dropdown, {
+            opacity: 0,
+            y: -10,
+            pointerEvents: "none",
+            display: "none"
+        });
+
+        const tl = gsap.timeline({ paused: true });
+        tl.to(dropdown, {
+            opacity: 1,
+            y: 0,
+            pointerEvents: "auto",
+            display: "block",
+            duration: 0.3,
+            ease: "power3.out"
+        });
+
+        const handleEnter = () => tl.play();
+        const handleLeave = () => tl.reverse();
+
+        hoverArea.addEventListener("mouseenter", handleEnter);
+        hoverArea.addEventListener("mouseleave", handleLeave);
 
         return () => {
-            hoverElem.removeEventListener("mouseenter", () => tl.play());
-            hoverElem.removeEventListener("mouseleave", () => tl.reverse());
+            hoverArea.removeEventListener("mouseenter", handleEnter);
+            hoverArea.removeEventListener("mouseleave", handleLeave);
         };
-    }, []);
+    }, [cartItems]);
+
 
     const linkStyle =
         "text-sm font-semibold overflow-hidden tracking-wide text-gray-600 dark:text-gray-800 transition-colors duration-200 hover:text-[#0000FF] relative after:absolute after:left-0 after:bottom-0 after:w-0 after:h-[2px] after:bg-[#0000FF] after:transition-all after:duration-300 hover:after:w-full";
@@ -161,12 +177,11 @@ export default function MainNavBar() {
                             href="/products/checkout"
                             className="flex items-center gap-2 text-gray-600"
                         >
-                            <FontAwesomeIcon icon={faClipboard} className="w-5 h-5"/>
+                            <FontAwesomeIcon icon={faClipboard} className="w-5 h-5" />
                             {cartItems.length > 0 && (
-                                <span
-                                    className="absolute -top-2 -right-2.5 bg-blue-600 text-white text-[10px] font-bold px-1 py-0.5 rounded-full leading-none">
-                {cartItems.length}
-            </span>
+                                <span className="absolute -top-2 -right-2.5 bg-blue-600 text-white text-[10px] font-bold px-1 py-0.5 rounded-full leading-none">
+                  {cartItems.length}
+                </span>
                             )}
                         </Link>
 
@@ -176,6 +191,7 @@ export default function MainNavBar() {
                             <div
                                 ref={dropdownRef}
                                 className="absolute right-0 mt-2 w-72 bg-white shadow-xl rounded-lg p-4 z-50"
+                                style={{ display: 'none' }} 
                             >
                                 <h4 className="text-sm font-semibold mb-2 text-gray-700">
                                     Your Cart ({cartItems.length})
