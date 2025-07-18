@@ -184,14 +184,13 @@ export default function MainNavBar() {
                 </span>
                             )}
                         </Link>
-
-
+                        
                         {/* Hoverable Cart */}
                         {cartItems.length > 0 && (
                             <div
                                 ref={dropdownRef}
                                 className="absolute right-0 mt-2 w-72 bg-white shadow-xl rounded-lg p-4 z-50"
-                                style={{ display: 'none' }} 
+                                style={{ display: 'none' }}
                             >
                                 <h4 className="text-sm font-semibold mb-2 text-gray-700">
                                     Your Cart ({cartItems.length})
