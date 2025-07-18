@@ -3,13 +3,14 @@
 import logo from "@/assets/devasee logo.png";
 import Image from "next/image";
 import Link from "next/link";
-import {faUser, faClipboard, faHeart} from "@fortawesome/free-regular-svg-icons";
+import {faUser, faClipboard} from "@fortawesome/free-regular-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {AlignJustify, X} from "lucide-react";
 import {useEffect, useRef, useState} from "react";
 import gsap from "gsap";
 import {SignedIn, SignedOut, UserButton} from "@clerk/nextjs";
 import {useCart} from "@/app/context/CartContext";
+
 
 export default function MainNavBar() {
     const textRef = useRef<HTMLHeadingElement>(null);
@@ -184,7 +185,7 @@ export default function MainNavBar() {
                 </span>
                             )}
                         </Link>
-                        
+
                         {/* Hoverable Cart */}
                         {cartItems.length > 0 && (
                             <div
@@ -241,11 +242,6 @@ export default function MainNavBar() {
                             </div>
                         )}
                     </div>
-
-
-                    <span>|</span>
-                    <FontAwesomeIcon className="w-4 h-4 cursor-pointer text-gray-600" icon={faHeart}/>
-
                 </div>
                 {/* Mobile menu open and close */}
                 <div className="flex lg:hidden items-center">
@@ -292,8 +288,8 @@ export default function MainNavBar() {
 
             >
                 <div className="w-full relative h-full flex flex-col justify-between items-center">
-                    <div className="h-20 w-full flex mt-6 px-4 justify-end items-center  bg-[#0000ff]">
-                        <div className="flex items-center justify-center gap-4">
+                    <div className="h-20 w-full flex mt-6 px-6 justify-end items-center  bg-[#0000ff]">
+                        <div className="flex items-center justify-center gap-3">
                             <SignedOut>
                                 <Link href="/sign-in" onClick={toggleMobileMenu}
                                       className="text-lg font-semibold text-white dark:text-white hover:text-[#0000FF]">
@@ -304,7 +300,7 @@ export default function MainNavBar() {
                                 <UserButton/>
                             </SignedIn>
 
-                            <span className={"text-white"}>|</span>
+                            <span className={"text-white font-light"}>|</span>
                             <div className="relative">
                                 <Link onClick={toggleMobileMenu}
                                       href="/products/checkout"
@@ -325,9 +321,6 @@ export default function MainNavBar() {
                                     )}
                                 </Link>
                             </div>
-                            <span className={"text-white"}>|</span>
-                            <FontAwesomeIcon onClick={toggleMobileMenu} className="w-4 h-4 cursor-pointer text-white"
-                                             icon={faHeart}/>
 
                         </div>
                     </div>
