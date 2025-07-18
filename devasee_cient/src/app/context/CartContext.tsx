@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { StaticImageData } from "next/image";
 
 type Book = {
+    id: string; // Added ID property
     image: StaticImageData;
     title: string;
     author: string;
@@ -15,7 +16,7 @@ type Book = {
 interface CartContextType {
     cartItems: Book[];
     addToCart: (book: Book) => void;
-    removeFromCart: (title: string) => void;
+    removeFromCart: (id: string) => void; // Changed to use ID
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -23,7 +24,6 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     const [cartItems, setCartItems] = useState<Book[]>([]);
 
-    // ✅ Load cart from localStorage once on initial mount
     useEffect(() => {
         const storedCart = localStorage.getItem("devasee-cart");
         if (storedCart) {
@@ -32,23 +32,23 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
                 setCartItems(parsedCart);
             } catch (error) {
                 console.error("Failed to parse stored cart:", error);
+                localStorage.removeItem("devasee-cart");
             }
         }
     }, []);
 
-    // ✅ Save cart to localStorage whenever it changes
     useEffect(() => {
         localStorage.setItem("devasee-cart", JSON.stringify(cartItems));
     }, [cartItems]);
 
     const addToCart = (book: Book) => {
         setCartItems((prev) =>
-            prev.some((item) => item.title === book.title) ? prev : [...prev, book]
+            prev.some((item) => item.id === book.id) ? prev : [...prev, book]
         );
     };
 
-    const removeFromCart = (title: string) => {
-        setCartItems((prev) => prev.filter((item) => item.title !== title));
+    const removeFromCart = (id: string) => {
+        setCartItems((prev) => prev.filter((item) => item.id !== id));
     };
 
     return (

@@ -1,12 +1,14 @@
-import Image from "next/image";
+import Image, { StaticImageData } from "next/image";
 
 interface ItemCardProps {
     isHovered: boolean;
-    imageUrl: string;
+    image: StaticImageData;
     title: string;
     author: string;
     price: number;
     onAddToCart?: () => void;
+    onRemoveFromCart?: () => void;
+    isInCart?: boolean;
 }
 
 export function formatPriceLKR(price: number): string {
@@ -20,35 +22,32 @@ export function formatPriceLKR(price: number): string {
 }
 
 export default function ItemCard({
-                                     imageUrl,
+                                     image,
                                      title,
                                      author,
                                      price,
                                      onAddToCart,
+                                     onRemoveFromCart,
+                                     isInCart = false,
                                  }: ItemCardProps) {
     return (
-        <div className="flex items-center justify-center flex-col gap-6">
+        <div className="flex items-center  justify-center flex-col gap-6">
             <div className="group w-42 h-64 sm:w-56 sm:h-72 relative flex justify-center items-center bg-white shadow-md overflow-hidden">
                 <Image
-                    src={imageUrl}
-                    alt="product"
-                    width={224}
-                    height={288}
+                    src={image}
+                    alt={title}
                     className="absolute w-full h-full z-10 object-contain"
                 />
                 <div className="w-full h-full p-4 bg-white relative flex-col flex justify-end items-center">
                     <button
-                        onClick={onAddToCart}
+                        onClick={isInCart ? onRemoveFromCart : onAddToCart}
                         className={`
-                            absolute w-48 cursor-pointer bg-[#0000FF] z-40
-                            justify-center items-center mb-14 tracking-widest text-white text-[12px] py-3
-                            transition duration-200
-                            hover:bg-blue-700
-                            flex lg:hidden
-                            group-hover:flex lg:group-hover:flex
-                        `}
+              absolute w-48 z-40 justify-center cursor-pointer items-center mb-14 tracking-widest 
+              text-white text-[12px] py-3 transition duration-200 flex lg:hidden group-hover:flex
+              ${isInCart ? "bg-gray-400" : "bg-[#0000FF] hover:bg-blue-700"}
+            `}
                     >
-                        ADD TO CART
+                        {isInCart ? "REMOVE FROM CART" : "ADD TO CART"}
                     </button>
                 </div>
             </div>
