@@ -2,6 +2,7 @@
 
 import { useCart } from "@/app/context/CartContext";
 import SubNavBar from "@/app/(router)/_components/SubNavBar";
+import Link from "next/link";
 
 export default function Page() {
     const { cartItems, updateItemQuantity, removeFromCart } = useCart();
@@ -10,10 +11,7 @@ export default function Page() {
         <div>
             <SubNavBar path={"PRODUCTS\u00A0\u00A0/\u00A0\u00A0CHECKOUT"} />
 
-            <div className="w-screen min-h-screen flex flex-col items-center justify-start gap-6 py-8 px-4">
-
-
-                <h1 className="text-3xl font-bold">Your Cart</h1>
+            <div className="w-screen h-auto bg-blue-50 flex flex-col items-center justify-center gap-6 py-8 px-4">
 
                 {cartItems.length > 0 ? (
                     <div className="w-full max-w-3xl space-y-6">
@@ -65,7 +63,26 @@ export default function Page() {
                         ))}
                     </div>
                 ) : (
-                    <p className="text-gray-500 text-lg">No items in the cart</p>
+                    <>
+
+                        <h1 className="text-2xl sm:text-3xl font-bold text-gray-700">Your Cart is Empty</h1>
+                        <p className="text-gray-500 text-lg">No items in the cart</p>
+                        <Link
+                            href="/products"
+                            className="group relative inline-flex items-center gap-1 text-[#0000ff] text-lg font-semibold transition-all duration-300 hover:text-blue-600"
+                        >
+                            <span className="relative z-10 text-sm sm:text-lg">Explore our products</span>
+                            <span
+                                className="transform transition-transform duration-300 group-hover:translate-x-1"
+                            >
+    &rarr;
+  </span>
+                            <span
+                                className="absolute bottom-0 left-0 h-[2px] w-full scale-x-0 bg-[#0000ff] transition-transform duration-300 group-hover:scale-x-100"
+                            />
+                        </Link>
+
+                    </>
                 )}
             </div>
         </div>

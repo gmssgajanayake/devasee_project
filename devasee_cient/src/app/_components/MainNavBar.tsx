@@ -3,13 +3,13 @@
 import logo from "@/assets/devasee logo.png";
 import Image from "next/image";
 import Link from "next/link";
-import { faUser, faClipboard } from "@fortawesome/free-regular-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { AlignJustify, X } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import {faUser, faClipboard} from "@fortawesome/free-regular-svg-icons";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {AlignJustify, X} from "lucide-react";
+import {useEffect, useRef, useState} from "react";
 import gsap from "gsap";
-import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
-import { useCart } from "@/app/context/CartContext";
+import {SignedIn, SignedOut, UserButton} from "@clerk/nextjs";
+import {useCart} from "@/app/context/CartContext";
 
 
 export default function MainNavBar() {
@@ -22,7 +22,7 @@ export default function MainNavBar() {
     const [isScrolled, setIsScrolled] = useState(false);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-    const { cartItems, updateItemQuantity, removeFromCart } = useCart();
+    const {cartItems, updateItemQuantity, removeFromCart} = useCart();
 
     // Track how many hover areas are currently hovered (clipboard icon or dropdown)
     const hoverCount = useRef(0);
@@ -31,8 +31,8 @@ export default function MainNavBar() {
         if (textRef.current) {
             gsap.fromTo(
                 textRef.current,
-                { y: -50, opacity: 0 },
-                { y: 0, opacity: 1, duration: 1, ease: "power3.out" }
+                {y: -50, opacity: 0},
+                {y: 0, opacity: 1, duration: 1, ease: "power3.out"}
             );
         }
 
@@ -50,8 +50,8 @@ export default function MainNavBar() {
             menuRef.current.style.display = "block";
             gsap.fromTo(
                 menuRef.current,
-                { y: -30, opacity: 0 },
-                { y: 0, opacity: 1, duration: 0.3, ease: "power3.out" }
+                {y: -30, opacity: 0},
+                {y: 0, opacity: 1, duration: 0.3, ease: "power3.out"}
             );
             setIsMobileMenuOpen(true);
             body.classList.add("overflow-hidden");
@@ -116,7 +116,6 @@ export default function MainNavBar() {
     };
 
 
-
     const linkStyle =
         "text-sm font-semibold overflow-hidden tracking-wide text-gray-600 dark:text-gray-800 transition-colors duration-200 hover:text-[#0000FF] relative after:absolute after:left-0 after:bottom-0 after:w-0 after:h-[2px] after:bg-[#0000FF] after:transition-all after:duration-300 hover:after:w-full";
 
@@ -171,7 +170,7 @@ export default function MainNavBar() {
                         </Link>
                     </SignedOut>
                     <SignedIn>
-                        <UserButton />
+                        <UserButton/>
                     </SignedIn>
 
                     <span>|</span>
@@ -185,9 +184,10 @@ export default function MainNavBar() {
                             href="/products/checkout"
                             className="flex items-center gap-2 text-gray-600"
                         >
-                            <FontAwesomeIcon icon={faClipboard} className="w-5 h-5" />
+                            <FontAwesomeIcon icon={faClipboard} className="w-5 h-5"/>
                             {cartItems.length > 0 && (
-                                <span className="absolute -top-2 -right-2.5 bg-blue-600 text-white text-[10px] font-bold px-1 py-0.5 rounded-full leading-none">
+                                <span
+                                    className="absolute -top-2 -right-2.5 bg-blue-600 text-white text-[10px] font-bold px-1 py-0.5 rounded-full leading-none">
                   {cartItems.length}
                 </span>
                             )}
@@ -200,7 +200,7 @@ export default function MainNavBar() {
                                 onMouseEnter={handleMouseEnter}
                                 onMouseLeave={handleMouseLeave}
                                 className="absolute  right-0 mt-2 w-86 bg-white shadow-xl rounded-lg p-4 z-50"
-                                style={{ opacity: 0, pointerEvents: "none", display: "none" }}
+                                style={{opacity: 0, pointerEvents: "none", display: "none"}}
                             >
                                 <h4 className="text-sm font-semibold mb-2 text-gray-700">
                                     Your Cart ({cartItems.length})
@@ -208,9 +208,11 @@ export default function MainNavBar() {
                                 <div className="">
                                     <div className="space-y-2 max-h-64  overflow-y-auto pr-1">
                                         {cartItems.map((item) => (
-                                            <div key={item.id} className="text-sm justify-between flex items-center gap-4 border-b border-gray-400/20 pb-2">
+                                            <div key={item.id}
+                                                 className="text-sm justify-between flex items-center gap-4 border-b border-gray-400/20 pb-2">
                                                 <div className="flex items-center gap-2">
-                                                    <Image src={item.image} className={'w-10 h-auto'} alt={"Item image"}/>
+                                                    <Image src={item.image} className={'w-10 h-auto'}
+                                                           alt={"Item image"}/>
                                                     <div className="">
                                                         <p className="font-medium">{item.title}</p>
                                                         <p className="text-gray-500 text-xs mb-1">
@@ -232,7 +234,8 @@ export default function MainNavBar() {
                                                         >
                                                             −
                                                         </button>
-                                                        <span className="w-4 text-center text-gray-600">{item.quantity}</span>
+                                                        <span
+                                                            className="w-4 text-center text-gray-600">{item.quantity}</span>
                                                         <button
                                                             onClick={() =>
                                                                 item.quantity < item.stock &&
@@ -262,10 +265,19 @@ export default function MainNavBar() {
 
                                 <Link
                                     href="/products/checkout"
-                                    className="block text-center mt-4 text-[#0000ff] font-semibold text-sm  hover:underline"
+                                    className="group relative mt-4 block text-center text-sm font-semibold text-[#0000ff] transition-all duration-300 hover:text-blue-600"
                                 >
-                                    Go to Checkout →
+                                    <span className="relative z-10">Go to Checkout</span>
+                                    <span className="ml-1 inline-block transition-transform duration-300 group-hover:translate-x-1">
+    →
+  </span>
+                                    <span
+                                        className="absolute left-1/2 bottom-0 h-[1.5px] w-0 -translate-x-1/2 transform bg-[#0000ff] transition-all duration-300 group-hover:w-[45%]"
+                                    />
                                 </Link>
+
+
+
                             </div>
                         )}
                     </div>
@@ -311,7 +323,7 @@ export default function MainNavBar() {
                 className={`lg:hidden fixed bg-white/50 backdrop-blur-md top-[72px] left-0 right-0 z-40 ${
                     isMobileMenuOpen ? "block" : "hidden"
                 }`}
-                style={{ height: "calc(100vh - 72px)" }}
+                style={{height: "calc(100vh - 72px)"}}
             >
                 <div className="w-full relative h-full flex flex-col justify-between items-center">
                     <div className="h-20 w-full flex mt-6 px-6 justify-end items-center  bg-[#0000ff]">
@@ -329,7 +341,7 @@ export default function MainNavBar() {
                                 </Link>
                             </SignedOut>
                             <SignedIn>
-                                <UserButton />
+                                <UserButton/>
                             </SignedIn>
 
                             <span className={"text-white font-light"}>|</span>
@@ -340,10 +352,11 @@ export default function MainNavBar() {
                                     href="/products/checkout"
                                     className="flex items-center gap-2 text-white transition-colors"
                                 >
-                                    <FontAwesomeIcon className="w-5 h-5 cursor-pointer" icon={faClipboard} />
+                                    <FontAwesomeIcon className="w-5 h-5 cursor-pointer" icon={faClipboard}/>
 
                                     {cartItems.length > 0 && (
-                                        <span className="absolute -top-2 -right-2.5 bg-blue-50 text-blue-600 text-[10px] font-bold px-1 py-0.5 rounded-full leading-none">
+                                        <span
+                                            className="absolute -top-2 -right-2.5 bg-blue-50 text-blue-600 text-[10px] font-bold px-1 py-0.5 rounded-full leading-none">
                       {cartItems.length}
                     </span>
                                     )}
@@ -351,39 +364,40 @@ export default function MainNavBar() {
                             </div>
                         </div>
                     </div>
-                    <div className="relative z-50 flex flex-col justify-center items-center gap-8 px-4 pb-12 h-full overflow-y-auto">
+                    <div
+                        className="relative z-50 flex flex-col justify-center items-center gap-8 px-4 pb-12 h-full overflow-y-auto">
                         <Link
                             href="/"
                             onClick={toggleMobileMenu}
-                            className="text-gray-600 text-xl font-semibold relative after:absolute after:left-0 after:bottom-0 after:w-0 after:h-[2px] after:bg-[#0000FF] after:transition-all after:duration-300 hover:after:w-full hover:text-[#0000FF]"
+                            className="text-gray-600 text-lg font-semibold relative after:absolute after:left-0 after:bottom-0 after:w-0 after:h-[2px] after:bg-[#0000FF] after:transition-all after:duration-300 hover:after:w-full hover:text-[#0000FF]"
                         >
                             HOME
                         </Link>
                         <Link
                             href="/about"
                             onClick={toggleMobileMenu}
-                            className="text-gray-600 text-xl font-semibold relative after:absolute after:left-0 after:bottom-0 after:w-0 after:h-[2px] after:bg-[#0000FF] after:transition-all after:duration-300 hover:after:w-full hover:text-[#0000FF]"
+                            className="text-gray-600 text-lg font-semibold relative after:absolute after:left-0 after:bottom-0 after:w-0 after:h-[2px] after:bg-[#0000FF] after:transition-all after:duration-300 hover:after:w-full hover:text-[#0000FF]"
                         >
                             ABOUT US
                         </Link>
                         <Link
                             href="/products"
                             onClick={toggleMobileMenu}
-                            className="text-gray-600 text-xl font-semibold relative after:absolute after:left-0 after:bottom-0 after:w-0 after:h-[2px] after:bg-[#0000FF] after:transition-all after:duration-300 hover:after:w-full hover:text-[#0000FF]"
+                            className="text-gray-600 text-lg font-semibold relative after:absolute after:left-0 after:bottom-0 after:w-0 after:h-[2px] after:bg-[#0000FF] after:transition-all after:duration-300 hover:after:w-full hover:text-[#0000FF]"
                         >
                             BOOKS
                         </Link>
                         <Link
                             href="/services"
                             onClick={toggleMobileMenu}
-                            className="text-gray-600 text-xl font-semibold relative after:absolute after:left-0 after:bottom-0 after:w-0 after:h-[2px] after:bg-[#0000FF] after:transition-all after:duration-300 hover:after:w-full hover:text-[#0000FF]"
+                            className="text-gray-600 text-lg font-semibold relative after:absolute after:left-0 after:bottom-0 after:w-0 after:h-[2px] after:bg-[#0000FF] after:transition-all after:duration-300 hover:after:w-full hover:text-[#0000FF]"
                         >
                             PRINTING SERVICES
                         </Link>
                         <Link
                             href="/contact"
                             onClick={toggleMobileMenu}
-                            className="text-gray-600 text-xl font-semibold relative after:absolute after:left-0 after:bottom-0 after:w-0 after:h-[2px] after:bg-[#0000FF] after:transition-all after:duration-300 hover:after:w-full hover:text-[#0000FF]"
+                            className="text-gray-600 text-lg font-semibold relative after:absolute after:left-0 after:bottom-0 after:w-0 after:h-[2px] after:bg-[#0000FF] after:transition-all after:duration-300 hover:after:w-full hover:text-[#0000FF]"
                         >
                             CONTACT US
                         </Link>
