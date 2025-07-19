@@ -11,6 +11,7 @@ import gsap from "gsap";
 import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 import { useCart } from "@/app/context/CartContext";
 
+
 export default function MainNavBar() {
     const textRef = useRef<HTMLHeadingElement>(null);
     const menuRef = useRef<HTMLDivElement>(null);
@@ -114,6 +115,8 @@ export default function MainNavBar() {
         }, 150);
     };
 
+
+
     const linkStyle =
         "text-sm font-semibold overflow-hidden tracking-wide text-gray-600 dark:text-gray-800 transition-colors duration-200 hover:text-[#0000FF] relative after:absolute after:left-0 after:bottom-0 after:w-0 after:h-[2px] after:bg-[#0000FF] after:transition-all after:duration-300 hover:after:w-full";
 
@@ -196,52 +199,70 @@ export default function MainNavBar() {
                                 ref={dropdownRef}
                                 onMouseEnter={handleMouseEnter}
                                 onMouseLeave={handleMouseLeave}
-                                className="absolute right-0 mt-2 w-72 bg-white shadow-xl rounded-lg p-4 z-50"
+                                className="absolute  right-0 mt-2 w-86 bg-white shadow-xl rounded-lg p-4 z-50"
                                 style={{ opacity: 0, pointerEvents: "none", display: "none" }}
                             >
                                 <h4 className="text-sm font-semibold mb-2 text-gray-700">
                                     Your Cart ({cartItems.length})
                                 </h4>
-                                <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
-                                    {cartItems.map((item) => (
-                                        <div key={item.id} className="text-sm border-b pb-2">
-                                            <p className="font-medium">{item.title}</p>
-                                            <p className="text-gray-500 text-xs mb-1">Rs. {item.price}</p>
-                                            <div className="flex items-center justify-between gap-2 text-xs">
-                                                <div className="flex items-center gap-1">
+                                <div className="">
+                                    <div className="space-y-2 max-h-64  overflow-y-auto pr-1">
+                                        {cartItems.map((item) => (
+                                            <div key={item.id} className="text-sm justify-between flex items-center gap-4 border-b border-gray-400/20 pb-2">
+                                                <div className="flex items-center gap-2">
+                                                    <Image src={item.image} className={'w-10 h-auto'} alt={"Item image"}/>
+                                                    <div className="">
+                                                        <p className="font-medium">{item.title}</p>
+                                                        <p className="text-gray-500 text-xs mb-1">
+                                                            {new Intl.NumberFormat("en-LK", {
+                                                                style: "currency",
+                                                                currency: "LKR",
+                                                                minimumFractionDigits: 2,
+                                                            }).format(item.price)}
+                                                        </p>
+
+                                                    </div>
+                                                    <div className="flex items-center bg-gray-100  gap-1 ">
+                                                        <button
+                                                            onClick={() =>
+                                                                item.quantity > 1 &&
+                                                                updateItemQuantity(item.id, item.quantity - 1)
+                                                            }
+                                                            className="px-2 py-3  bg-gray-300 text-white cursor-pointer  hover:bg-gray-400"
+                                                        >
+                                                            −
+                                                        </button>
+                                                        <span className="w-4 text-center text-gray-600">{item.quantity}</span>
+                                                        <button
+                                                            onClick={() =>
+                                                                item.quantity < item.stock &&
+                                                                updateItemQuantity(item.id, item.quantity + 1)
+                                                            }
+                                                            className="px-2 py-3 bg-gray-300 text-white cursor-pointer hover:bg-gray-400"
+                                                        >
+                                                            +
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+                                                <div className="flex items-center justify-between gap-2 text-xs">
                                                     <button
-                                                        onClick={() =>
-                                                            item.quantity > 1 &&
-                                                            updateItemQuantity(item.id, item.quantity - 1)
-                                                        }
-                                                        className="px-1.5 bg-gray-200 rounded hover:bg-gray-300"
+                                                        onClick={() => removeFromCart(item.id)}
+                                                        className="text-white bg-gray-600 border border-gray-600 px-3 py-3 text-xs cursor-pointer tracking-widest
+               hover:text-gray-600 hover:bg-white transition-all duration-300 ease-in-out transform hover:scale-105"
                                                     >
-                                                        −
-                                                    </button>
-                                                    <span className="w-5 text-center">{item.quantity}</span>
-                                                    <button
-                                                        onClick={() =>
-                                                            item.quantity < item.stock &&
-                                                            updateItemQuantity(item.id, item.quantity + 1)
-                                                        }
-                                                        className="px-1.5 bg-gray-200 rounded hover:bg-gray-300"
-                                                    >
-                                                        +
+                                                        REMOVE
                                                     </button>
                                                 </div>
-                                                <button
-                                                    onClick={() => removeFromCart(item.id)}
-                                                    className="text-red-500 hover:underline"
-                                                >
-                                                    Remove
-                                                </button>
+
                                             </div>
-                                        </div>
-                                    ))}
+                                        ))}
+                                    </div>
                                 </div>
+
                                 <Link
                                     href="/products/checkout"
-                                    className="block text-center mt-4 text-blue-600 text-sm font-medium hover:underline"
+                                    className="block text-center mt-4 text-[#0000ff] font-semibold text-sm  hover:underline"
                                 >
                                     Go to Checkout →
                                 </Link>
@@ -312,6 +333,7 @@ export default function MainNavBar() {
                             </SignedIn>
 
                             <span className={"text-white font-light"}>|</span>
+
                             <div className="relative">
                                 <Link
                                     onClick={toggleMobileMenu}
@@ -321,7 +343,7 @@ export default function MainNavBar() {
                                     <FontAwesomeIcon className="w-5 h-5 cursor-pointer" icon={faClipboard} />
 
                                     {cartItems.length > 0 && (
-                                        <span className="absolute -top-2 -right-2.5 bg-blue-100 text-blue-600 text-[10px] font-bold px-1 py-0.5 rounded-full leading-none">
+                                        <span className="absolute -top-2 -right-2.5 bg-blue-50 text-blue-600 text-[10px] font-bold px-1 py-0.5 rounded-full leading-none">
                       {cartItems.length}
                     </span>
                                     )}
