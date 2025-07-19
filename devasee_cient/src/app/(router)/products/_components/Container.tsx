@@ -77,7 +77,7 @@ export default function Container({
                 ))}
             </div>
 
-            {/* Pagination */}
+
             <div className="flex justify-center items-center gap-3 flex-wrap mt-10">
                 <button
                     onClick={() => goToPage(currentPage - 1)}
