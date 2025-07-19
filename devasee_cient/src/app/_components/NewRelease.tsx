@@ -117,12 +117,17 @@ export default function NewRelease() {
             <div className="pt-8 w-full overflow-hidden">
                 <div
                     ref={scrollContainerRef}
-                    className="flex px-4 gap-4 no-scrollbar"
-                    style={{ minWidth: `${allBooks.length * 250}px` }}
+                    className="flex px-4 gap-6 sm:gap-3 md:gap-4 no-scrollbar"
+                    style={{ minWidth: `${allBooks.length * 180}px` }}
+
                 >
-                    {currentBooks.map((book) => (
-                        <div key={book.id} className="min-w-[250px]">
-                            <ItemCard
+                {currentBooks.map((book) => (
+                    <div
+                        key={book.id}
+                        className="min-w-[180px] sm:min-w-[200px] md:min-w-[250px]"
+                    >
+
+                    <ItemCard
                                 image={book.image}
                                 title={book.title}
                                 author={book.author}
