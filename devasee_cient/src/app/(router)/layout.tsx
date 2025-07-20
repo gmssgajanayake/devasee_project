@@ -6,6 +6,7 @@ export default function RouterLayout({
     children: React.ReactNode;
 }) {
     return (
+
         <div>
             <div className={"w-screen"}>{children}</div>
         </div>
