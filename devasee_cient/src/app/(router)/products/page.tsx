@@ -135,7 +135,7 @@ export default function Page() {
 
                 {/* Filter + Book Grid */}
                 <div ref={filterRef} className="flex w-full h-[calc(100vh-80px)]">
-                    <div className="w-[280px] lg:flex hidden shrink-0 h-full overflow-y-auto">
+                    <div className="w-[280px] lg:flex hidden shrink-0 h-full overflow-y-auto hide-scrollbar">
                         <FilterBar
                             priceRange={priceRange}
                             setPriceRange={setPriceRange}
@@ -145,7 +145,7 @@ export default function Page() {
                             setSelectedBrands={setSelectedBrands}
                         />
                     </div>
-                    <div className="flex-1 overflow-y-auto h-full">
+                    <div className="flex-1 overflow-y-auto h-full hide-scrollbar">
                         <Container
                             books={filteredBooks}
                             sortBy={sortBy}

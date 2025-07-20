@@ -251,7 +251,7 @@ export default function MainNavBar() {
                                                 <div className="flex items-center justify-between gap-2 text-xs">
                                                     <button
                                                         onClick={() => removeFromCart(item.id)}
-                                                        className="text-white bg-gray-600 border border-gray-600 px-3 py-3 text-xs cursor-pointer tracking-widest
+                                                        className="text-white bg-gray-600 border border-gray-600 px-3 py-3 text-[10px] cursor-pointer tracking-widest
                hover:text-gray-600 hover:bg-white transition-all duration-300 ease-in-out transform hover:scale-105"
                                                     >
                                                         REMOVE
