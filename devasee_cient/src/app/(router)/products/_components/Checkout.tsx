@@ -172,7 +172,7 @@ export default function Checkout() {
                                             <div className="flex items-center justify-between gap-2 text-xs">
                                                 <button
                                                     onClick={() => removeFromCart(item.id)}
-                                                    className="text-blue-50 bg-gray-400 border border-gray-400 px-6 sm:px-8 py-3 sm:py-4 cursor-pointer tracking-widest hover:text-gray-600 hover:bg-blue-50 transition-all duration-300 ease-in-out"
+                                                    className="text-blue-50 bg-gray-600 border border-gray-600 px-6 sm:px-8 py-3 sm:py-4 cursor-pointer tracking-widest hover:text-gray-600 hover:bg-blue-50 transition-all duration-300 ease-in-out"
                                                 >
                                                     REMOVE
                                                 </button>
