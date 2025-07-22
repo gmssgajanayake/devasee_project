@@ -5,9 +5,9 @@ import com.devasee.product.dto.DeleteBookDTO;
 import com.devasee.product.dto.RetrieveBookDTO;
 import com.devasee.product.entity.Book;
 import com.devasee.product.repo.BookRepo;
-import com.devasee.product.response.BookAlreadyExistsException;
-import com.devasee.product.response.BookNotFoundException;
-import com.devasee.product.response.ServiceUnavailableException;
+import com.devasee.product.exception.ProductAlreadyExistsException;
+import com.devasee.product.exception.ProductNotFoundException;
+import com.devasee.product.exception.ServiceUnavailableException;
 import jakarta.transaction.Transactional;
 import org.hibernate.exception.DataException;
 import org.modelmapper.ModelMapper;
@@ -42,7 +42,7 @@ public class BookServices {
 
     public RetrieveBookDTO getBookById(String bookId) {
         Book book = bookRepo.findById(bookId).orElseThrow(
-                ()-> new BookNotFoundException("Book not found with ID: " + bookId));
+                ()-> new ProductNotFoundException("Book not found with ID: " + bookId));
 
         // if error occur above error will return otherwise below returned
         return modelMapper.map(book, RetrieveBookDTO.class);
@@ -52,7 +52,7 @@ public class BookServices {
         List<Book> bookList = bookRepo.findByAuthor(author);
 
         if (bookList.isEmpty()) {
-            throw new BookNotFoundException("No books found for author: " + author);
+            throw new ProductNotFoundException("No books found for author: " + author);
         }
         return modelMapper.map(bookList, new TypeToken<List<RetrieveBookDTO>>() {
         }.getType());
@@ -61,7 +61,7 @@ public class BookServices {
     public CreateBookDTO saveBook(CreateBookDTO bookDTO) {
 
         if(bookRepo.existsByIsbn(bookDTO.getIsbn())){
-            throw new BookAlreadyExistsException("Book with ISBN : " + bookDTO.getIsbn() + " already exists");
+            throw new ProductAlreadyExistsException("Book with ISBN : " + bookDTO.getIsbn() + " already exists");
         }
         bookRepo.save(modelMapper.map(bookDTO, Book.class));
         return bookDTO;
@@ -70,7 +70,7 @@ public class BookServices {
     public RetrieveBookDTO updateBook(RetrieveBookDTO bookDTO) {
 
         Book existingBook = bookRepo.findById(bookDTO.getId()).orElseThrow(
-                ()-> new BookNotFoundException("Book not found"));
+                ()-> new ProductNotFoundException("Book not found"));
         Book updatedBook = modelMapper.map(bookDTO, Book.class);
         updatedBook.setId(existingBook.getId());
         Book savedBook = bookRepo.save(updatedBook);
@@ -80,7 +80,7 @@ public class BookServices {
 
     public DeleteBookDTO deleteBook(String id) {
         Book book = bookRepo.findById(id).orElseThrow(
-                ()-> new BookNotFoundException("Book not found")
+                ()-> new ProductNotFoundException("Book not found")
         );
         bookRepo.deleteById(id);
 

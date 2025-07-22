@@ -1,4 +1,4 @@
-package com.devasee.product.response;
+package com.devasee.product.exception;
 
 public class MethodArgumentTypeMismatchException extends RuntimeException{
     public MethodArgumentTypeMismatchException(String message){

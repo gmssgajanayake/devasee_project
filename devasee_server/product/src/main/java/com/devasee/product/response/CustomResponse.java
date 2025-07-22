@@ -11,6 +11,4 @@ public class CustomResponse<T> {
     private boolean success;
     private String message;
     private T data;
-
-
 }

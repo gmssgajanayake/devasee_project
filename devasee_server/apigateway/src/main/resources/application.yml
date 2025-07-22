@@ -1,6 +1,6 @@
 spring:
   application:
-    name: apigatgeway
+    name: apigateway
   cloud:
     gateway:
       server:
@@ -16,6 +16,30 @@ spring:
               predicates:
                 - Path=/api/v1/promo/**
 
+            - id: analytics
+              uri: lb://analytics
+              predicates:
+                - Path=/api/v1/analytics/**
+
+            - id: delivery
+              uri: lb://delivery
+              predicates:
+                - Path=/api/v1/delivery/**
+
+            - id: inventory
+              uri: lb://inventory
+              predicates:
+                - Path=/api/v1/inventory/**
+
+            - id: orders
+              uri: lb://orders
+              predicates:
+                - Path=/api/v1/orders/**
+
+            - id: users
+              uri: lb://users
+              predicates:
+                - Path=/api/v1/users/**
 
 eureka:
   client:

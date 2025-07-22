@@ -3,7 +3,6 @@ package com.devasee.product.controller;
 import com.devasee.product.dto.CreateBookDTO;
 import com.devasee.product.dto.DeleteBookDTO;
 import com.devasee.product.dto.RetrieveBookDTO;
-import com.devasee.product.entity.Book;
 import com.devasee.product.response.CustomResponse;
 import com.devasee.product.services.BookServices;
 import org.springframework.web.bind.annotation.*;
