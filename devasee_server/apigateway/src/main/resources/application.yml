@@ -15,6 +15,18 @@ spring:
               uri: lb://promo
               predicates:
                 - Path=/api/v1/promo/**
+
+            - id: orders
+              uri: lb://orders
+              predicates:
+                - Path=/api/v1/orders/**
+
+            - id: inventory
+              uri: lb://inventory
+              predicates:
+               - Path=/api/v1/inventory/**
+
+
 eureka:
   client:
     service-url:
