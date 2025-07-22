@@ -11,7 +11,7 @@ import java.util.List;
 
 @CrossOrigin
 @RestController
-@RequestMapping(value = "api/v1/user/customer")
+@RequestMapping(value = "api/v1/users/customer")
 public class CustomerController {
 
     @Autowired

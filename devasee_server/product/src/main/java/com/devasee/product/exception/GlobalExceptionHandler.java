@@ -1,5 +1,6 @@
-package com.devasee.product.response;
+package com.devasee.product.exception;
 
+import com.devasee.product.response.CustomResponse;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,9 +21,9 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    // When a BookNotFoundException is thrown anywhere in the app, this method will handle it.
-    @ExceptionHandler(BookNotFoundException.class)
-    public ResponseEntity<CustomResponse<Object>> handleBookNotFound(BookNotFoundException ex) {
+    // When a ProductNotFoundException is thrown anywhere in the app, this method will handle it.
+    @ExceptionHandler(ProductNotFoundException.class)
+    public ResponseEntity<CustomResponse<Object>> handleProductNotFound(ProductNotFoundException ex) {
         CustomResponse<Object> response = new CustomResponse<>(false, ex.getMessage(), null);
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND); // 404
     }
@@ -34,9 +35,9 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    // Handle book already exist error when saving
-    @ExceptionHandler(BookAlreadyExistsException.class)
-    public ResponseEntity<CustomResponse<Object>> handleBookAlreadyExist(BookAlreadyExistsException ex){
+    // Handle Product already exist error when saving
+    @ExceptionHandler(ProductAlreadyExistsException.class)
+    public ResponseEntity<CustomResponse<Object>> handleProductAlreadyExist(ProductAlreadyExistsException ex){
         CustomResponse<Object> response = new CustomResponse<>(false, ex.getMessage(), null);
         return new ResponseEntity<>(response, HttpStatus.CONFLICT); // 409
     }
