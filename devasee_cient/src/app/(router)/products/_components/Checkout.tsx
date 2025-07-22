@@ -10,6 +10,7 @@ import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronLeft, faSpinner } from "@fortawesome/free-solid-svg-icons";
 
+
 export default function Checkout() {
     const { cartItems, updateItemQuantity, removeFromCart, clearCart } = useCart();
     const { isSignedIn, user } = useUser();
