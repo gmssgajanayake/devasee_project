@@ -18,6 +18,10 @@ spring:
               uri: lb://inventory
               predicates:
                 - Path=/api/v1/inventory/**
+            - id: promo
+              uri: lb://promo
+              predicates:
+                - Path=/api/v1/promo/**
 eureka:
   client:
     service-url:

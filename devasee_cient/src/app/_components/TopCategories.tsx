@@ -104,9 +104,9 @@ export default function TopCategories() {
                             priority={index === 0}
                             className="w-full h-48 lg:h-64 object-contain"
                         />
-                        <h2 className="text-xl text-center font-bold text-[#2b216d]">
+                        <h3 className="text-xl text-center font-bold text-[#2b216d]">
                             {category.title}
-                        </h2>
+                        </h3>
                     </div>
                 ))}
             </div>

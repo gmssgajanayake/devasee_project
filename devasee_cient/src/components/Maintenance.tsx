@@ -1,5 +1,4 @@
 "use client";
-import ContactBar from "@/app/_components/ContactBar";
 import logo from "@/assets/devasee.png";
 import Image from "next/image";
 import Link from "next/link";
@@ -23,7 +22,6 @@ export default function Maintenance() {
 
     return (
         <div  className={"w-full h-screen flex flex-col justify-center bg-blue-50"}>
-            <ContactBar/>
             <div ref={textRef} className={"h-full  flex flex-col items-center gap-5 justify-center"}>
                 <Image
                     src={logo}

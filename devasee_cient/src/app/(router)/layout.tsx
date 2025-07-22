@@ -1,5 +1,3 @@
-//import SubNavBar from "@/app/(router)/_components/SubNavBar";
-
 import React from "react";
 
 export default function RouterLayout({
@@ -8,8 +6,8 @@ export default function RouterLayout({
     children: React.ReactNode;
 }) {
     return (
+
         <div>
-            {/*<SubNavBar/>*/}
             <div className={"w-screen"}>{children}</div>
         </div>
     );

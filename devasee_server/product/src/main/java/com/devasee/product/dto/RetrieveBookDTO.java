@@ -5,11 +5,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-
-public class BookDTO {
-    private int id;
+@NoArgsConstructor
+public class RetrieveBookDTO {
+    private String id;
+    private String title;
     private String author;
     private String publisher;
     private String category;

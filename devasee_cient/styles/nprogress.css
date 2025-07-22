@@ -1,0 +1,20 @@
+/* styles/nprogress.css */
+#nprogress {
+    pointer-events: none;
+}
+
+#nprogress .bar {
+    background: #0000ff; /* Change color if you want */
+    position: fixed;
+    z-index: 1031;
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 3px;
+}
+
+/* Optional: spinner */
+#nprogress .spinner {
+    display: none;
+}

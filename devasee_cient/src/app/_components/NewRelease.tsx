@@ -4,45 +4,56 @@ import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import ItemCard from "@/components/ItemCard";
+import { useCart } from "@/app/context/CartContext";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
+import Link from "next/link";
+import { Book } from "@/types/types";
 
+// Import images
 import book1 from "@/assets/items image/img.png";
 import book2 from "@/assets/items image/img_1.png";
 import book3 from "@/assets/items image/img_2.png";
 import book4 from "@/assets/items image/img_3.png";
 import book5 from "@/assets/items image/img_1.png";
 import book6 from "@/assets/items image/img_2.png";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
-import Link from "next/link";
+import book7 from "@/assets/items image/img_3.png";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const books = [
-    { image: book1, title: "Learn React", author: "John Doe", price: 1299.0 },
-    { image: book2, title: "Advanced React", author: "Jane Doe", price: 1399.0 },
-    { image: book3, title: "React Native", author: "Alex Smith", price: 1349.0 },
-    { image: book4, title: "React Hooks", author: "Sara Lee", price: 1249.0 },
-    { image: book5, title: "React + TypeScript", author: "Chris Ray", price: 1329.0 },
-    { image: book6, title: "React Testing", author: "Emma Stone", price: 1289.0 },
-];
+// Dummy data
+const allBooks: Book[] = Array.from({ length: 13 }, (_, i) => ({
+    id: `book-${i + 1}`,
+    image: [book1, book2, book3, book4, book5, book6, book7][i % 7],
+    title: `Book ${i + 1}`,
+    author: `Author ${i + 1}`,
+    price: 1000 + (i % 7) * 100,
+    type: i % 2 === 0 ? "Books" : "Stationery",
+    brand: i % 3 === 0 ? "Devasee" : "Other",
+    stock: 5 + (i % 5),      // Random stock between 5–9
+    quantity: 1              // Default quantity when added
+}));
+
+const ITEMS_PER_PAGE = 12;
 
 export default function NewRelease() {
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const sectionRef = useRef<HTMLDivElement>(null);
     const [activePage, setActivePage] = useState(0);
+    const [currentPage] = useState(1);
 
-    const itemsPerPage = 3;
-    const totalPages = Math.ceil(books.length / itemsPerPage);
+    const totalPages = Math.ceil(allBooks.length / ITEMS_PER_PAGE);
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const currentBooks = allBooks.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
+    const { addToCart, removeFromCart, cartItems } = useCart();
 
     useEffect(() => {
         const container = scrollContainerRef.current;
         const section = sectionRef.current;
         if (!container || !section) return;
 
-        // Horizontal Scroll Animation
-        const totalScrollWidth = container.scrollWidth;
-        const viewportWidth = section.offsetWidth;
-        const scrollDistance = totalScrollWidth - viewportWidth + 40;
+        const scrollDistance = container.scrollWidth - section.offsetWidth + 40;
 
         const horizontalTween = gsap.to(container, {
             x: () => `-${scrollDistance}px`,
@@ -59,11 +70,10 @@ export default function NewRelease() {
                     const progress = self.progress;
                     const currentPage = Math.round(progress * (totalPages - 1));
                     setActivePage(currentPage);
-                },
-            },
+                }
+            }
         });
 
-        // Fade + Rise Animation for entire section (only once)
         const revealTween = gsap.fromTo(
             section,
             { opacity: 0, y: 100 },
@@ -75,8 +85,8 @@ export default function NewRelease() {
                 scrollTrigger: {
                     trigger: section,
                     start: "top 80%",
-                    toggleActions: "play none none none",
-                },
+                    toggleActions: "play none none none"
+                }
             }
         );
 
@@ -90,12 +100,12 @@ export default function NewRelease() {
     return (
         <div
             ref={sectionRef}
-            className="relative w-full overflow-hidden overflow-x-hidden bg-[#e8ebff] py-20 opacity-0 translate-y-24"
+            className="relative w-full overflow-hidden bg-[#e8ebff] py-20 opacity-0 translate-y-24"
         >
-            {/* Title */}
             <p className="text-xs tracking-widest text-center text-gray-800/50">
                 SOME QUALITY ITEMS
             </p>
+
             <div className="flex items-center justify-center w-full px-8 my-6">
                 <hr className="w-full text-gray-300/80" />
                 <h2 className="text-3xl md:text-4xl mx-4 font-bold text-[#2b216d]">
@@ -104,32 +114,39 @@ export default function NewRelease() {
                 <hr className="w-full text-gray-300/80" />
             </div>
 
-            {/* Scrollable content */}
             <div className="pt-8 w-full overflow-hidden">
                 <div
                     ref={scrollContainerRef}
-                    className="flex gap-10 px-10 no-scrollbar"
-                    style={{ minWidth: `${books.length * 250}px` }}
+                    className="flex px-4 gap-6 sm:gap-3 md:gap-4 no-scrollbar"
+                    style={{ minWidth: `${allBooks.length * 180}px` }}
+
                 >
-                    {books.map((book, index) => (
-                        <ItemCard
-                            key={index}
-                            isHovered={false}
-                            imageUrl={book.image.src}
-                            title={book.title}
-                            author={book.author}
-                            price={book.price}
-                        />
+                {currentBooks.map((book) => (
+                    <div
+                        key={book.id}
+                        className="min-w-[180px] sm:min-w-[200px] md:min-w-[250px]"
+                    >
+
+                    <ItemCard
+                                image={book.image}
+                                title={book.title}
+                                author={book.author}
+                                price={book.price}
+                                stock={book.stock}
+                                onAddToCart={() => addToCart(book)}
+                                onRemoveFromCart={() => removeFromCart(book.id)}
+                                isInCart={cartItems.some((item) => item.id === book.id)}
+                                isHovered={false}  // <-- Add this line
+                            />
+                        </div>
                     ))}
                 </div>
             </div>
 
             <hr className="w-full text-gray-300/80" />
 
-            {/* Page Dots and CTA */}
             <div className="flex justify-center md:justify-end items-center px-4 mt-6">
                 <div className="w-full md:w-1/2 flex items-center justify-between">
-                    {/* Dots */}
                     <div className="flex gap-4">
                         {Array.from({ length: totalPages }).map((_, index) => (
                             <div
@@ -147,10 +164,9 @@ export default function NewRelease() {
                         ))}
                     </div>
 
-                    {/* View All CTA */}
                     <div>
                         <Link
-                            href={"products"}
+                            href="/products"
                             className="text-[#0000ff] cursor-pointer font-bold text-sm"
                         >
                             View All Products

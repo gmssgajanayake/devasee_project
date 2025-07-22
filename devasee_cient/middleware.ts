@@ -1,18 +1,22 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
-export function middleware(request: NextRequest) {
-    const isLoggedIn = Boolean(request.cookies.get('auth-token'));
+const isPublicRoute = createRouteMatcher([
+    "/sign-in(.*)",
+    "/sign-up(.*)",
+    "/favicon.ico",
+]);
 
-    const isProtectedRoute = request.nextUrl.pathname.startsWith('/(router)');
-
-    if (!isLoggedIn && isProtectedRoute) {
-        return NextResponse.redirect(new URL('/auth/sign-in', request.url));
+export default clerkMiddleware(async (auth, req) => {
+    if (!isPublicRoute(req)) {
+        await auth.protect();
     }
+});
 
-    return NextResponse.next();
-}
-
-// Apply to all pages in the (router) group
 export const config = {
-    matcher: ['/(router)/:path*'],
+    matcher: [
+        // Skip internal assets and static files
+        "/((?!_next|.*\\.(?:png|jpg|jpeg|svg|gif|ico|css|js|woff2?|ttf|eot|json|txt|map)).*)",
+        // Include API routes
+        "/(api|trpc)(.*)",
+    ],
 };

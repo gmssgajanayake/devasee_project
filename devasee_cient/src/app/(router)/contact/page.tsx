@@ -1,12 +1,17 @@
-// import SubNavBar from "@/app/(router)/_components/SubNavBar";
+import React from "react";
+import SubNavBar from "@/app/(router)/_components/SubNavBar";
 import Maintenance from "@/components/Maintenance";
+import Head from "@/app/(router)/contact/head";
 
-export default function Page(){
+export default function Page() {
     return (
-        <Maintenance/>
-        /*<div>
-            <SubNavBar/>
-            <p>Contact page</p>
-        </div>*/
+        <>
+            <Head/>
+            <div>
+                <SubNavBar path="CONTACT" />
+                <Maintenance />
+            </div>
+       </>
+
     );
 }

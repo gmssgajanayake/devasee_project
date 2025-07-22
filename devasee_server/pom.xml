@@ -26,6 +26,7 @@
     <module>users</module>
     <module>eureka</module>
     <module>apigateway</module>
+    <module>promo</module>
   </modules>
 
   <build>

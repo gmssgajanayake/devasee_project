@@ -1,12 +1,17 @@
 package com.devasee.product.services;
 
-import com.devasee.product.dto.BookDTO;
+import com.devasee.product.dto.CreateBookDTO;
+import com.devasee.product.dto.DeleteBookDTO;
+import com.devasee.product.dto.RetrieveBookDTO;
 import com.devasee.product.entity.Book;
 import com.devasee.product.repo.BookRepo;
+import com.devasee.product.response.BookAlreadyExistsException;
+import com.devasee.product.response.BookNotFoundException;
+import com.devasee.product.response.ServiceUnavailableException;
 import jakarta.transaction.Transactional;
+import org.hibernate.exception.DataException;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,31 +20,70 @@ import java.util.List;
 @Transactional
 public class BookServices {
 
-    @Autowired
-    private BookRepo bookRepo;
-    @Autowired
-    private ModelMapper modelMapper;
+    private final BookRepo bookRepo;
+    private final ModelMapper modelMapper;
 
-    public List<BookDTO> getAllBooks() {
-        return modelMapper.map(bookRepo.findAll(), new TypeToken<List<BookDTO>>(){}.getType());
+    public BookServices(
+            BookRepo bookRepo,
+            ModelMapper modelMapper
+    ){
+        this.bookRepo = bookRepo;
+        this.modelMapper = modelMapper;
     }
 
-    public BookDTO  getBookById(int bookId) {
-        return modelMapper.map(bookRepo.findById(bookId), BookDTO.class);
+    public List<RetrieveBookDTO> getAllBooks() {
+        try {
+            return modelMapper.map(bookRepo.findAll(), new TypeToken<List<RetrieveBookDTO>>() {
+            }.getType());
+        } catch (DataException exception){
+            throw new ServiceUnavailableException("Something went wrong on the server. Please try again later.");
+        }
     }
 
-    public BookDTO saveBook(BookDTO bookDTO) {
+    public RetrieveBookDTO getBookById(String bookId) {
+        Book book = bookRepo.findById(bookId).orElseThrow(
+                ()-> new BookNotFoundException("Book not found with ID: " + bookId));
+
+        // if error occur above error will return otherwise below returned
+        return modelMapper.map(book, RetrieveBookDTO.class);
+    }
+
+    public List<RetrieveBookDTO> getBookByAuthor(String author) {
+        List<Book> bookList = bookRepo.findByAuthor(author);
+
+        if (bookList.isEmpty()) {
+            throw new BookNotFoundException("No books found for author: " + author);
+        }
+        return modelMapper.map(bookList, new TypeToken<List<RetrieveBookDTO>>() {
+        }.getType());
+    }
+
+    public CreateBookDTO saveBook(CreateBookDTO bookDTO) {
+
+        if(bookRepo.existsByIsbn(bookDTO.getIsbn())){
+            throw new BookAlreadyExistsException("Book with ISBN : " + bookDTO.getIsbn() + " already exists");
+        }
         bookRepo.save(modelMapper.map(bookDTO, Book.class));
         return bookDTO;
     }
 
-    public BookDTO updateBook(BookDTO bookDTO) {
-        bookRepo.save(modelMapper.map(bookDTO, Book.class));
-        return bookDTO;
+    public RetrieveBookDTO updateBook(RetrieveBookDTO bookDTO) {
+
+        Book existingBook = bookRepo.findById(bookDTO.getId()).orElseThrow(
+                ()-> new BookNotFoundException("Book not found"));
+        Book updatedBook = modelMapper.map(bookDTO, Book.class);
+        updatedBook.setId(existingBook.getId());
+        Book savedBook = bookRepo.save(updatedBook);
+
+        return modelMapper.map(savedBook, RetrieveBookDTO.class);
     }
 
-    public boolean deleteBook(BookDTO bookDTO) {
-        bookRepo.delete(modelMapper.map(bookDTO, Book.class));
-        return true;
+    public DeleteBookDTO deleteBook(String id) {
+        Book book = bookRepo.findById(id).orElseThrow(
+                ()-> new BookNotFoundException("Book not found")
+        );
+        bookRepo.deleteById(id);
+
+        return modelMapper.map(book, DeleteBookDTO.class);
     }
 }
