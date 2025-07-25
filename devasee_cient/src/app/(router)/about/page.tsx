@@ -14,12 +14,14 @@ export default function Page() {
           Explore Our Story, Growth, and Commitment to Quality
         </h1>
         <div className="w-16 h-2 bg-blue-500 rounded-full mb-4 mx-auto"></div>
-        <p className="text-blue-600 text-center text-lg md:text-xl mb-4">
+        <div
+            className="text-blue-600 text-center text-lg md:text-xl mb-4">
           Your One-Stop Hub for Books, Stationery, and Custom Printing in Sri Lanka.
-        </p>
-        <p className="text-center text-gray-600 mb-8 max-w-2xl">
-          At Devasee, we believe in quality, variety, and convenience. Since our inception, we've grown from a neighborhood shop to Sri Lanka's go-to source for all things books, stationery, and personalized printing. Our passion drives us to deliver unmatched service, competitive prices, and an ever-evolving product selection tailored to your needs.
-        </p>
+        </div>
+        <div
+            className="text-center text-gray-600 mb-8 max-w-2xl">
+          At Devasee, we believe in quality, variety, and convenience. Since our inception, we&#39;ve grown from a neighborhood shop to Sri Lanka&#39;s go-to source for all things books, stationery, and personalized printing. Our passion drives us to deliver unmatched service, competitive prices, and an ever-evolving product selection tailored to your needs.
+        </div>
       </div>
 
       {/* Break out to wider containers below */}
@@ -41,15 +43,15 @@ export default function Page() {
         <div className="grid md:grid-cols-2 gap-12 w-full max-w-7xl">
           <div className="text-gray-700 text-center md:text-left text-base md:text-lg">
             <h2 className="text-lg font-semibold mb-2 text-blue-500">Our Mission</h2>
-            <p>
+            <div>
               To inspire learning, creativity, and productivity by providing the best products and printing services under one roof. We strive to build lasting relationships with our customers and partners through integrity, reliability, and continual innovation.
-            </p>
+            </div>
           </div>
           <div className="text-gray-700 text-center md:text-left text-base md:text-lg">
             <h2 className="text-lg font-semibold mb-2 text-blue-500">Our Values</h2>
-            <p>
+            <div>
               Each member of our team is committed to customer satisfaction, community support, and sustainability. We pride ourselves on a transparent, friendly service approach—making Devasee a trusted partner for students, professionals, and businesses across Sri Lanka.
-            </p>
+            </div>
           </div>
         </div>
       </div>
