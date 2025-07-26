@@ -1,9 +1,12 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+    images: {
+        domains: ["images.unsplash.com"],
+    },
+
     async redirects() {
         return [
-
             {
                 source: "/:path*",
                 has: [
@@ -15,8 +18,6 @@ const nextConfig: NextConfig = {
                 destination: "https://www.devasee.lk/:path*",
                 permanent: true,
             },
-
-
             {
                 source: "/contact/",
                 destination: "/contact",
