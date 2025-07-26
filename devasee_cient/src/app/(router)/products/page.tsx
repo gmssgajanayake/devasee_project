@@ -99,7 +99,7 @@ export default function Page() {
                 <SubNavBar path="PRODUCTS"/>
 
                 {/* Search Bar */}
-                <div className="w-full px-4 py-3 flex justify-center items-center ">
+                <div className="w-full px-4 py-3 lg:mt-4 flex justify-center items-center ">
                     <div className="relative w-full max-w-xl">
                         <input
                             type="text"

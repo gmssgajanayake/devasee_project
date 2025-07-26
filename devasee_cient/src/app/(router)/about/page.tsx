@@ -42,8 +42,8 @@ export default function AboutPage() {
     const bubblesContainer = useRef<HTMLDivElement>(null);
 
     const safeGSAP = (cb: () => void) => {
-        if ('requestIdleCallback' in window) {
-            (window as Window & { requestIdleCallback: (cb: () => void) => void }).requestIdleCallback(cb);
+        if ("requestIdleCallback" in window) {
+            (window as unknown as { requestIdleCallback: (cb: () => void) => void }).requestIdleCallback(cb);
         } else {
             setTimeout(cb, 200);
         }
@@ -170,22 +170,21 @@ export default function AboutPage() {
             },
         });
 
-        gsap.utils.toArray(".gallery-item").forEach((item, i) => {
-            if (i === 0) return;
-            const galleryItem = item as HTMLElement;
-            gsap.set(galleryItem, { opacity: 0, y: 30 });
+        // Set initial styles
+        gsap.utils.toArray<HTMLElement>(".gallery-item:not(:first-child)").forEach((item) => {
+            gsap.set(item, { opacity: 0, y: 30, willChange: "transform, opacity" });
+
             ScrollTrigger.create({
-                trigger: galleryItem,
-                start: "left 80%",
+                trigger: item,
+                start: "left 85%",
                 end: "left 20%",
                 containerAnimation: galleryTween,
                 onEnter: () =>
-                    gsap.to(galleryItem, {
+                    gsap.to(item, {
                         opacity: 1,
                         y: 0,
                         duration: 0.7,
-                        delay: 0.2 * (i % 3),
-                        ease: "sine.out",
+                        ease: "power2.out",
                     }),
                 once: true,
             });
@@ -193,9 +192,10 @@ export default function AboutPage() {
 
         return () => {
             galleryTween.kill();
-            ScrollTrigger.getAll().forEach(trigger => trigger.kill());
+            ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
         };
     }, []);
+
 
     return (
         <div className="bg-gradient-to-b from-white to-blue-50 min-h-screen overflow-x-hidden relative">
@@ -216,7 +216,6 @@ export default function AboutPage() {
                     />
                 </div>
 
-                {/* About Section */}
                 <section className="max-w-6xl mx-auto px-4 py-16 relative z-10">
                     <div className="text-center space-y-6 mb-20">
                         <div data-anim className="text-blue-600 text-sm tracking-widest font-semibold uppercase">
@@ -249,7 +248,6 @@ export default function AboutPage() {
                     </div>
                 </section>
 
-                {/* Gallery */}
                 <section className="gallery-container h-screen flex items-center overflow-hidden relative z-10">
                     <div className="gallery-wrapper flex gap-6 md:gap-8 py-8 pl-8">
                         <div className="gallery-item bg-blue-100/60 px-6 rounded-2xl flex-shrink-0 w-[35vw] md:w-[30vw] flex flex-col justify-center text-left">
@@ -276,7 +274,6 @@ export default function AboutPage() {
                                         ? { priority: true }
                                         : { loading: "lazy" })}
                                 />
-
                             </div>
                         ))}
 
@@ -284,7 +281,6 @@ export default function AboutPage() {
                     </div>
                 </section>
 
-                {/* Closing Section */}
                 <div className="h-[40vh] w-screen relative overflow-hidden z-10">
                     <div className="absolute inset-0 w-screen flex items-center justify-center">
                         <div className="max-w-5xl w-screen flex gap-6 flex-col mx-auto text-center px-4">

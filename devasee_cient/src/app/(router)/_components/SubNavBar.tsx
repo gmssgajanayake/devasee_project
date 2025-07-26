@@ -37,7 +37,7 @@ export default function SubNavBar({ path }: SubNavBarProps) {
     }, [path]);
 
     return (
-        <nav ref={pathRef} className="w-full flex items-center text-sm lg:text-[16px] justify-center lg:mb-4 pt-32 lg:pt-40 bg-gradient-to-r from-[#f5f5ff] via-[#dee2f5] to-[#f5f5ff] p-6 lg:p-8">
+        <nav ref={pathRef} className="w-full flex items-center text-sm lg:text-[16px] justify-center pt-32 lg:pt-40 bg-gradient-to-r from-[#f5f5ff] via-[#dee2f5] to-[#f5f5ff] p-6 lg:p-8">
             <h2 className="text-[#20145a]">
                 <Link href={".."}>HOME</Link>&nbsp;&nbsp;/&nbsp;&nbsp;<span>{path}</span>
             </h2>
