@@ -1,76 +1,147 @@
-import SubNavBar from "@/app/(router)/_components/SubNavBar";
-import React from "react";
+"use client";
 
-export default function Page() {
+import { useLayoutEffect, useRef } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import SubNavBar from "@/app/(router)/_components/SubNavBar";
+
+gsap.registerPlugin(ScrollTrigger);
+
+// Gallery images
+const galleryImages = [
+    { src: "https://images.unsplash.com/photo-1495640388908-05fa85288e61?auto=format&fit=crop&w=600&q=80" },
+    { src: "https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&w=600&q=80" },
+    { src: "https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=600&q=80" },
+    { src: "https://images.unsplash.com/photo-1491841550275-ad7854e35ca6?auto=format&fit=crop&w=600&q=80" },
+    { src: "https://images.unsplash.com/photo-1491975474562-1f4e30bc9468?auto=format&fit=crop&w=600&q=80" },
+];
+
+export default function AboutPage() {
+    const elementsRef = useRef<(HTMLDivElement | null)[]>([]);
+    const galleryItemsRef = useRef<HTMLDivElement[]>([]);
+    const sectionRef = useRef<HTMLDivElement>(null);
+
+    useLayoutEffect(() => {
+        const ctx = gsap.context(() => {
+            // Header and content fade-in
+            gsap.from(elementsRef.current, {
+                y: 40,
+                opacity: 0,
+                stagger: 0.15,
+                duration: 0.8,
+                ease: "power3.out",
+                delay: 0.2,
+            });
+
+            // Gallery items animation
+            gsap.from(galleryItemsRef.current, {
+                y: 50,
+                opacity: 0,
+                stagger: 0.15,
+                duration: 0.8,
+                ease: "power2.out",
+                scrollTrigger: {
+                    trigger: sectionRef.current,
+                    start: "top 70%",
+                },
+            });
+        }, sectionRef);
+
+        return () => ctx.revert();
+    }, []);
+
+    const addToRefs = (el: HTMLDivElement | null) => {
+        if (el && !elementsRef.current.includes(el)) {
+            elementsRef.current.push(el);
+        }
+    };
+
+
     return (
-        <div>
-            {/* Page-wide SubNavBar at the top */}
+        <div className="bg-gradient-to-b from-white to-blue-50 min-h-screen overflow-hidden">
             <SubNavBar path="ABOUT" />
-            {/* Page content in centered container */}
-            <div style={{ maxWidth: 900, margin: "0 auto", padding: "2rem 1rem" }}>
-                <div style={{ textAlign: "center", marginTop: "2rem" }}>
-                    {/* Small blue title */}
-                    <div style={{ color: "#1976d2", fontSize: 16, letterSpacing: 2, fontWeight: 500 }}>
-                        WHO WE ARE
-                    </div>
-                    {/* Large black, bold subtitle */}
-                    <div style={{ fontSize: 32, fontWeight: 600, color: "#222", margin: "1rem 0 0.5rem" }}>
-                        Explore Our Story, Growth, and Commitment to Quality
-                    </div>
-                    {/* Centered blue line */}
+
+            <section className="max-w-6xl mx-auto px-4 py-16" ref={sectionRef}>
+                <div className="text-center space-y-6 mb-16">
                     <div
-                        style={{
-                            width: 60,
-                            height: 6,
-                            background: "#1976d2",
-                            borderRadius: 6,
-                            margin: "1rem auto"
-                        }}
-                    />
-                    {/* Blue tagline */}
-                    <div style={{ color: "#1976d2", fontSize: 18, marginBottom: "1.5rem" }}>
-                        Your One-Stop Hub for Books, Stationery, and Custom Printing in Sri Lanka.
-                    </div>
-                    {/* Centered paragraph */}
-                    <p style={{ maxWidth: 700, margin: "0 auto 2rem", color: "#444", fontSize: 17 }}>
-                        At Devasee, we are passionate about providing a comprehensive range of books, stationery, and custom printing solutions to meet the diverse needs of our customers. Our journey is rooted in a commitment to quality, innovation, and exceptional service.
-                    </p>
-                    {/* Wide photo */}
-                    <img
-                        src="https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=crop&w=900&q=80"
-                        alt="About us"
-                        style={{
-                            width: "100%",
-                            maxWidth: 900,
-                            borderRadius: 12,
-                            margin: "2rem 0"
-                        }}
-                    />
-                    {/* Two columns under the photo */}
-                    <div
-                        style={{
-                            display: "flex",
-                            gap: "2rem",
-                            justifyContent: "center",
-                            alignItems: "flex-start",
-                            flexWrap: "wrap"
-                        }}
+                        ref={addToRefs}
+                        className="text-blue-600 text-sm tracking-widest font-semibold uppercase"
                     >
-                        <div style={{ flex: 1, minWidth: 260 }}>
-                            <p style={{ color: "#444", fontSize: 16, textAlign: "justify" }}>
-                                Since our inception, we have grown from a small local store to a trusted name in the industry. Our team works tirelessly to curate the best products and deliver personalized solutions for every customer, whether you are a student, professional, or business.
-                            </p>
-                        </div>
-                        <div style={{ flex: 1, minWidth: 260 }}>
-                            <p style={{ color: "#444", fontSize: 16, textAlign: "justify" }}>
-                                We believe in building lasting relationships and continuously evolving to serve you better. Thank you for making us your preferred destination for all your educational and creative needs in Sri Lanka.
-                            </p>
-                        </div>
+                        About Us
+                    </div>
+
+                    <h1
+                        ref={addToRefs}
+                        className="text-4xl md:text-5xl font-bold text-[#1e205a]"
+                    >
+                        We Craft Solutions for Your Educational & Creative Needs
+                    </h1>
+
+                    <p
+                        ref={addToRefs}
+                        className="text-xl text-[#1e205a]/60 italic font-light max-w-2xl mx-auto"
+                    >
+                        Devasee is Sri Lanka's go-to for books, stationery, and custom printing.
+                        Quality and innovation at your service.
+                    </p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-16">
+                    <div data-aos="fade-right" className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-blue-50">
+                        <h2 className="text-2xl font-bold text-blue-600 mb-4">Our Journey</h2>
+                        <p className="text-gray-700 leading-relaxed">
+                            What started as a small local bookstore has now evolved into a trusted brand across Sri Lanka.
+                            With a mission to provide the finest educational and printing solutions, Devasee continues to
+                            grow with its community. We've expanded our offerings while maintaining our commitment to
+                            quality and personalized service.
+                        </p>
+                    </div>
+
+                    <div data-aos="fade-right" className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-blue-50">
+                        <h2 className="text-2xl font-bold text-blue-600 mb-4">Why Choose Us?</h2>
+                        <p className="text-gray-700 leading-relaxed">
+                            Our dedication to quality, personalized service, and customer satisfaction has set us apart.
+                            Whether you're a student, educator, or entrepreneur, we tailor our offerings to meet your
+                            unique needs. We source the best materials and use cutting-edge printing technology to
+                            ensure superior results every time.
+                        </p>
                     </div>
                 </div>
-            </div>
+
+                <div ref={addToRefs} className="text-center mt-20 py-12 px-4 bg-blue-50 rounded-2xl">
+                    <h2 className="text-3xl font-bold text-[#1e205a] mb-4">
+                        We Believe in Growth Together
+                    </h2>
+                    <p className="text-[#1e205a] max-w-2xl mx-auto text-lg">
+                        At Devasee, our story is your story. We innovate, serve, and grow — together.
+                    </p>
+                </div>
+
+                <div className="mt-20">
+                    <h2 ref={addToRefs} className="text-3xl font-bold text-[#1e205a] text-center mb-4">
+                        Our Gallery
+                    </h2>
+                    <p ref={addToRefs} className="text-blue-600 text-center max-w-2xl mx-auto mb-12 text-lg">
+                        A glimpse into our world of books, stationery, and creative spaces
+                    </p>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                        {galleryImages.map((image, index) => (
+                            <div
+                                key={index}
+                                data-aos="flip-left"
+                                className="rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden"
+                            >
+                                <img
+                                    src={image.src}
+                                    alt={`Devasee Gallery ${index + 1}`}
+                                    className="w-full h-[220px] object-cover rounded-xl"
+                                />
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
         </div>
     );
 }
-
-
