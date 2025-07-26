@@ -1,10 +1,14 @@
 "use client";
 
-import { useLayoutEffect, useRef } from "react";
+import {useEffect, useLayoutEffect, useRef} from "react";
 import Image from "next/image";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import SubNavBar from "@/app/(router)/_components/SubNavBar";
+import AOS from 'aos';
+import 'aos/dist/aos.css';
+
+
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -196,16 +200,26 @@ export default function AboutPage() {
         };
     }, []);
 
+    useEffect(() => {
+        AOS.init({
+            duration: 1000,
+            once: true,
+            easing: 'ease-in-out',
+        });
+
+        // Optional: refresh AOS on image load or after dynamic content
+        AOS.refresh();
+    }, []);
+
 
     return (
         <div className="bg-gradient-to-b from-white to-blue-50 min-h-screen overflow-x-hidden relative">
             <div
-                ref={bubblesContainer}
                 className="fixed inset-0 pointer-events-none overflow-hidden z-0"
             />
 
             <SubNavBar path="ABOUT" />
-            <div ref={component}>
+            <div>
                 <div className="fixed top-0 left-1/2 transform -translate-x-1/2 w-64 h-1 bg-blue-100 rounded-full z-50">
                     <div
                         className="h-full bg-blue-600 rounded-full transition-all duration-300"
@@ -218,27 +232,27 @@ export default function AboutPage() {
 
                 <section className="max-w-6xl mx-auto px-4 py-16 relative z-10">
                     <div className="text-center space-y-6 mb-20">
-                        <div data-anim className="text-blue-600 text-sm tracking-widest font-semibold uppercase">
+                        <div data-aos="zoom-in"  className="text-blue-600 text-sm tracking-widest font-semibold uppercase">
                             About Us
                         </div>
-                        <h4 data-anim className="text-4xl md:text-6xl font-bold text-[#1e205a]">
+                        <h4 data-aos="fade-right" className="text-4xl md:text-6xl font-bold text-[#1e205a]">
                             Crafting Solutions for Your Success
                         </h4>
-                        <p data-anim className="text-xl text-[#1e205a]/60 font-light max-w-3xl mx-auto">
+                        <p data-aos="fade-left" className="text-xl text-[#1e205a]/60 font-light max-w-3xl mx-auto">
                             Devasee is Sri Lanka&#39;s premier destination for books, stationery, and bespoke printing.
                             We are dedicated to delivering quality and fostering innovation for all your educational and creative endeavors.
                         </p>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-16">
-                        <div ref={journeyRef} className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-blue-50 relative z-10">
+                        <div data-aos="fade-right"  className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-blue-50 relative z-10">
                             <h2 className="text-2xl font-bold text-blue-600 mb-4">Our Journey</h2>
                             <p className="text-gray-700 leading-relaxed">
                                 What started as a small local bookstore has now evolved into a trusted brand across Sri Lanka.
                                 With a mission to provide the finest educational and printing solutions, Devasee continues to grow with its community.
                             </p>
                         </div>
-                        <div ref={chooseRef} className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-blue-50 relative z-10">
+                        <div data-aos="fade-left"  className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-blue-50 relative z-10">
                             <h2 className="text-2xl font-bold text-blue-600 mb-4">Why Choose Us?</h2>
                             <p className="text-gray-700 leading-relaxed">
                                 Our dedication to quality, personalized service, and customer satisfaction sets us apart.
@@ -248,9 +262,9 @@ export default function AboutPage() {
                     </div>
                 </section>
 
-                <section className="gallery-container h-screen flex items-center overflow-hidden relative z-10">
-                    <div className="gallery-wrapper flex gap-6 md:gap-8 py-8 pl-8">
-                        <div className="gallery-item bg-blue-100/60 px-6 rounded-2xl flex-shrink-0 w-[35vw] md:w-[30vw] flex flex-col justify-center text-left">
+                <section  className="gallery-container h-screen flex items-center overflow-hidden relative z-10">
+                    <div  className="gallery-wrapper flex gap-6 md:gap-8 py-8 pl-8">
+                        <div data-aos="zoom-in" className="gallery-item bg-blue-100/60 px-6 rounded-2xl flex-shrink-0 w-[35vw] md:w-[30vw] flex flex-col justify-center text-left">
                             <h2 className="text-3xl lg:text-5xl font-bold text-[#1e205a] mb-4">Our Gallery</h2>
                             <p className="text-[#1e205a]/60 lg:text-xl">
                                 A glimpse into our world of books, stationery, and creative spaces.
@@ -284,10 +298,10 @@ export default function AboutPage() {
                 <div className="h-[40vh] w-screen relative overflow-hidden z-10">
                     <div className="absolute inset-0 w-screen flex items-center justify-center">
                         <div className="max-w-5xl w-screen flex gap-6 flex-col mx-auto text-center px-4">
-                            <h4 data-anim className="text-4xl md:text-6xl font-bold text-[#1e205a]">
+                            <h4 data-aos="fade-right"  className="text-4xl md:text-6xl font-bold text-[#1e205a]">
                                 We Believe in Growing Together
                             </h4>
-                            <p data-anim className="text-xl text-[#1e205a]/60 font-light max-w-3xl mx-auto">
+                            <p data-aos="fade-left"  className="text-xl text-[#1e205a]/60 font-light max-w-3xl mx-auto">
                                 At Devasee, our story is your story. We innovate, serve, and grow — together.
                             </p>
                         </div>
