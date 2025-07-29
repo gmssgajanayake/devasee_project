@@ -40,6 +40,11 @@ spring:
               uri: lb://users
               predicates:
                 - Path=/api/v1/users/**
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: https://clerk.devasee.lk/.well-known/jwks.json
 
 eureka:
   client:

@@ -20,7 +20,7 @@ public class PromoController {
         this.adsService = adsService;
     }
 
-    @GetMapping("/ads")
+    @GetMapping("/public/ads")
     public List<RetrieveAdsDTO> getAllAds(){
         return adsService.getAllAds();
     }

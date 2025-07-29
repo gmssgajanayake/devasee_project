@@ -23,21 +23,21 @@ public class BookController {
     }
 
     // Get all books
-    @GetMapping("/allBooks")
+    @GetMapping("/public/allBooks")
     public CustomResponse<List<RetrieveBookDTO>> getAllBooks() {
         List<RetrieveBookDTO> bookList = bookServices.getAllBooks();
         return new CustomResponse<>(true, "Books found", bookList);
     }
 
     // Get book by book id
-    @GetMapping("/bookId/{bookId}")
+    @GetMapping("/public/bookId/{bookId}")
     public CustomResponse<RetrieveBookDTO> getBookById(@PathVariable String bookId) {
         RetrieveBookDTO bookDTO = bookServices.getBookById(bookId);
         return new CustomResponse<>(true, "Book found", bookDTO);
     }
 
     // Get book by author
-    @GetMapping("/author/{author}")
+    @GetMapping("/public/author/{author}")
     public CustomResponse<List<RetrieveBookDTO>> getBookByAuthor(@PathVariable String author) {
         List<RetrieveBookDTO> books =  bookServices.getBookByAuthor(author);
         return new CustomResponse<>(true, "Books of " + author, books);
