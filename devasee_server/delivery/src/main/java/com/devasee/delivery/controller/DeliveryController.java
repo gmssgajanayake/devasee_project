@@ -1,42 +1,52 @@
 package com.devasee.delivery.controller;
 
-import com.devasee.delivery.dto.DeliveryDTO;
+import com.devasee.delivery.dto.CreateDeliveryDTO;
+import com.devasee.delivery.dto.DeleteDeliveryDTO;
+import com.devasee.delivery.dto.RetrieveDeliveryDTO;
+import com.devasee.delivery.response.CustomResponse;
 import com.devasee.delivery.services.DeliveryService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @CrossOrigin
 @RestController
-@RequestMapping(value = "api/v1/delivery")
+@RequestMapping("api/v1/delivery")
 public class DeliveryController {
 
-    @Autowired
-    private DeliveryService deliveryService;
+    private final DeliveryService deliveryService;
+
+    public DeliveryController(DeliveryService deliveryService) {
+        this.deliveryService = deliveryService;
+    }
 
     @PostMapping("/add")
-    public DeliveryDTO addDelivery(@RequestBody DeliveryDTO dto) {
-        return deliveryService.addDelivery(dto);
+    public CustomResponse<CreateDeliveryDTO> addDelivery(@RequestBody CreateDeliveryDTO dto) {
+        CreateDeliveryDTO created = deliveryService.addDelivery(dto);
+        return new CustomResponse<>(true, "Delivery created successfully", created);
     }
 
     @GetMapping("/{id}")
-    public DeliveryDTO getDelivery(@PathVariable Long id) {
-        return deliveryService.getDeliveryById(id);
+    public CustomResponse<RetrieveDeliveryDTO> getDelivery(@PathVariable Long id) {
+        RetrieveDeliveryDTO dto = deliveryService.getDeliveryById(id);
+        return new CustomResponse<>(true, "Delivery found", dto);
     }
 
     @GetMapping("/all")
-    public List<DeliveryDTO> getAllDeliveries() {
-        return deliveryService.getAllDeliveries();
+    public CustomResponse<List<RetrieveDeliveryDTO>> getAllDeliveries() {
+        List<RetrieveDeliveryDTO> deliveries = deliveryService.getAllDeliveries();
+        return new CustomResponse<>(true, "All deliveries fetched", deliveries);
     }
 
     @PutMapping("/update/{id}")
-    public DeliveryDTO updateDelivery(@PathVariable Long id, @RequestBody DeliveryDTO dto) {
-        return deliveryService.updateDelivery(id, dto);
+    public CustomResponse<RetrieveDeliveryDTO> updateDelivery(@PathVariable Long id, @RequestBody RetrieveDeliveryDTO dto) {
+        RetrieveDeliveryDTO updated = deliveryService.updateDelivery(id, dto);
+        return new CustomResponse<>(true, "Delivery updated successfully", updated);
     }
 
     @DeleteMapping("/delete/{id}")
-    public boolean deleteDelivery(@PathVariable Long id) {
-        return deliveryService.deleteDelivery(id);
+    public CustomResponse<DeleteDeliveryDTO> deleteDelivery(@PathVariable Long id) {
+        DeleteDeliveryDTO deleted = deliveryService.deleteDelivery(id);
+        return new CustomResponse<>(true, "Delivery deleted successfully", deleted);
     }
 }

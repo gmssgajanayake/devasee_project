@@ -20,13 +20,13 @@ public class StationeryController {
         this.stationeryServices = stationeryServices;
     }
 
-    @GetMapping("/allStationery")
+    @GetMapping("/public/allStationery")
     public CustomResponse<List<RetrieveStationeryDTO>> getAllStationery() {
         List<RetrieveStationeryDTO> list = stationeryServices.getAllStationery();
         return new CustomResponse<>(true, "Stationery items found", list);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/public/{id}")
     public CustomResponse<RetrieveStationeryDTO> getStationeryById(@PathVariable int id) {
         RetrieveStationeryDTO dto = stationeryServices.getStationeryById(id);
         return new CustomResponse<>(true, "Stationery item found", dto);

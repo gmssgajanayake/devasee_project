@@ -1,72 +1,71 @@
 package com.devasee.delivery.services;
 
-import com.devasee.delivery.dto.DeliveryDTO;
+import com.devasee.delivery.dto.CreateDeliveryDTO;
+import com.devasee.delivery.dto.DeleteDeliveryDTO;
+import com.devasee.delivery.dto.RetrieveDeliveryDTO;
 import com.devasee.delivery.entity.Delivery;
+import com.devasee.delivery.exception.DeliveryNotFoundException;
 import com.devasee.delivery.repo.DeliveryRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.transaction.Transactional;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class DeliveryService {
 
-    @Autowired
-    private DeliveryRepository deliveryRepository;
+    private final DeliveryRepository deliveryRepository;
+    private final ModelMapper modelMapper;
 
-    // Convert Entity to DTO
-    private DeliveryDTO convertToDTO(Delivery delivery) {
-        DeliveryDTO dto = new DeliveryDTO();
-        dto.setId(delivery.getId());
-        dto.setOrderId(delivery.getOrderId());
-        dto.setAddress(delivery.getAddress());
-        dto.setStatus(delivery.getStatus());
-        dto.setDeliveryDate(delivery.getDeliveryDate());
-        return dto;
+    public DeliveryService(DeliveryRepository deliveryRepository, ModelMapper modelMapper) {
+        this.deliveryRepository = deliveryRepository;
+        this.modelMapper = modelMapper;
     }
 
-    // Convert DTO to Entity
-    private Delivery convertToEntity(DeliveryDTO dto) {
-        Delivery delivery = new Delivery();
-        delivery.setId(dto.getId());
-        delivery.setOrderId(dto.getOrderId());
-        delivery.setAddress(dto.getAddress());
-        delivery.setStatus(dto.getStatus());
-        delivery.setDeliveryDate(dto.getDeliveryDate());
-        return delivery;
+    // CREATE: ensure ID is null before saving and return saved entity mapped back
+    public CreateDeliveryDTO addDelivery(CreateDeliveryDTO dto) {
+        Delivery delivery = modelMapper.map(dto, Delivery.class);
+        delivery.setId(null); // important: force new insert
+        Delivery saved = deliveryRepository.save(delivery);
+        return modelMapper.map(saved, CreateDeliveryDTO.class);
     }
 
-    // Add new delivery
-    public DeliveryDTO addDelivery(DeliveryDTO dto) {
-        Delivery delivery = deliveryRepository.save(convertToEntity(dto));
-        return convertToDTO(delivery);
+    // READ by ID
+    public RetrieveDeliveryDTO getDeliveryById(Long id) {
+        Delivery delivery = deliveryRepository.findById(id)
+                .orElseThrow(() -> new DeliveryNotFoundException("Delivery not found with ID: " + id));
+        return modelMapper.map(delivery, RetrieveDeliveryDTO.class);
     }
 
-    // Get delivery by ID
-    public DeliveryDTO getDeliveryById(Long id) {
-        return deliveryRepository.findById(id).map(this::convertToDTO).orElse(null);
+    // READ all
+    public List<RetrieveDeliveryDTO> getAllDeliveries() {
+        List<Delivery> deliveries = deliveryRepository.findAll();
+        return modelMapper.map(deliveries, new TypeToken<List<RetrieveDeliveryDTO>>() {}.getType());
     }
 
-    // Get all deliveries
-    public List<DeliveryDTO> getAllDeliveries() {
-        return deliveryRepository.findAll().stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
+    // UPDATE: find existing, update fields, save, return updated mapped dto
+    public RetrieveDeliveryDTO updateDelivery(Long id, RetrieveDeliveryDTO dto) {
+        Delivery existing = deliveryRepository.findById(id)
+                .orElseThrow(() -> new DeliveryNotFoundException("Cannot update. Delivery not found with ID: " + id));
+
+        // Update fields explicitly to avoid accidental ID overwrite
+        existing.setOrderId(dto.getOrderId());
+        existing.setAddress(dto.getAddress());
+        existing.setStatus(dto.getStatus());
+        existing.setDeliveryDate(dto.getDeliveryDate());
+
+        Delivery saved = deliveryRepository.save(existing);
+        return modelMapper.map(saved, RetrieveDeliveryDTO.class);
     }
 
-    // Update delivery
-    public DeliveryDTO updateDelivery(Long id, DeliveryDTO dto) {
-        if (!deliveryRepository.existsById(id)) return null;
-        dto.setId(id);
-        Delivery updated = deliveryRepository.save(convertToEntity(dto));
-        return convertToDTO(updated);
-    }
-
-    // Delete delivery
-    public boolean deleteDelivery(Long id) {
-        if (!deliveryRepository.existsById(id)) return false;
-        deliveryRepository.deleteById(id);
-        return true;
+    // DELETE: find existing, delete, return deleted dto
+    public DeleteDeliveryDTO deleteDelivery(Long id) {
+        Delivery existing = deliveryRepository.findById(id)
+                .orElseThrow(() -> new DeliveryNotFoundException("Cannot delete. Delivery not found with ID: " + id));
+        deliveryRepository.delete(existing);
+        return modelMapper.map(existing, DeleteDeliveryDTO.class);
     }
 }
