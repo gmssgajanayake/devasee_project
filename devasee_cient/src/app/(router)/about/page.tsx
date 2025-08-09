@@ -276,7 +276,7 @@ export default function AboutPage() {
 
             <section className="gallery-container h-screen flex items-center overflow-hidden relative z-10">
                 <div className="gallery-wrapper flex gap-6 md:gap-8 py-8 pl-8">
-                    <div className="gallery-item bg-blue-100/60 px-6 rounded-2xl flex-shrink-0 w-[35vw] md:w-[30vw] flex flex-col justify-center text-left">
+                    <div  data-aos="zoom-in-up" className="gallery-item bg-blue-100/60 px-6 rounded-2xl flex-shrink-0 w-[35vw] md:w-[30vw] flex flex-col justify-center text-left">
                         <h2 className="text-3xl lg:text-5xl font-bold text-[#1e205a] mb-4">
                             Our Gallery
                         </h2>
