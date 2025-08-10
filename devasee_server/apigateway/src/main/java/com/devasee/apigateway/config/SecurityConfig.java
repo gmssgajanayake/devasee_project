@@ -43,14 +43,18 @@ public class SecurityConfig {
         http
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .authorizeExchange(exchanges  -> exchanges
-                        .pathMatchers("/api/v1/promo/public/**").permitAll()
-                        .pathMatchers("/api/v1/product/book/public/**").permitAll()
-                        .pathMatchers("/api/v1/product/stationery/public/**").permitAll()
-                        .pathMatchers("/api/v1/product/printing/public/**").permitAll()
-                        .pathMatchers("/api/v1/inventory/public/**").permitAll()
-                        .pathMatchers("/api/v1/analytics/admin/**").hasRole("ADMIN")
-                        .pathMatchers("/api/v1/inventory/admin/**").hasRole("ADMIN")
-                        .pathMatchers("/api/v1/product/book/admin/**").hasRole("ADMIN")
+                        .pathMatchers(
+                                "/api/v1/promo/public/**",
+                                "/api/v1/product/book/public/**",
+                                "/api/v1/product/stationery/public/**",
+                                "/api/v1/product/printing/public/**",
+                                "/api/v1/inventory/public/**"
+                                ).permitAll()
+                        .pathMatchers(
+                                "/api/v1/analytics/admin/**",
+                                "/api/v1/inventory/admin/**",
+                                "/api/v1/product/book/admin/**"
+                                ).hasRole("ADMIN")
                         .anyExchange().authenticated()
                 )
                 .oauth2ResourceServer(oauth2-> oauth2
