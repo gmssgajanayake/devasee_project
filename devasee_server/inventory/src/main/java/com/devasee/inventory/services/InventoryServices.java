@@ -1,12 +1,15 @@
 package com.devasee.inventory.services;
 
-import com.devasee.inventory.dto.InventoryDTO;
+import com.devasee.inventory.dto.CreateInventoryDTO;
+import com.devasee.inventory.dto.DeleteInventoryDTO;
+import com.devasee.inventory.dto.RetrieveInventoryDTO;
 import com.devasee.inventory.entity.Inventory;
+import com.devasee.inventory.exception.InventoryNotFoundException;
 import com.devasee.inventory.repo.InventoryRepo;
 import jakarta.transaction.Transactional;
+import org.hibernate.exception.DataException;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,31 +18,49 @@ import java.util.List;
 @Transactional
 public class InventoryServices {
 
-    @Autowired
-    private InventoryRepo inventoryRepo;
-    @Autowired
-    private ModelMapper modelMapper;
+    private final InventoryRepo inventoryRepo;
+    private final ModelMapper modelMapper;
 
-    public List<InventoryDTO> getAllInventory() {
-        return modelMapper.map(inventoryRepo.findAll(), new TypeToken<List<InventoryDTO>>(){}.getType());
+    public InventoryServices(InventoryRepo inventoryRepo, ModelMapper modelMapper) {
+        this.inventoryRepo = inventoryRepo;
+        this.modelMapper = modelMapper;
     }
 
-    public InventoryDTO  getInventoryById(int inventoryId) {
-        return modelMapper.map(inventoryRepo.findById(inventoryId), InventoryDTO.class);
+    public List<RetrieveInventoryDTO> getAllInventory() {
+        try {
+            return modelMapper.map(inventoryRepo.findAll(), new TypeToken<List<RetrieveInventoryDTO>>(){}.getType());
+        } catch (DataException e) {
+            throw new RuntimeException("Server error. Please try again later.");
+        }
     }
 
-    public InventoryDTO saveInventory(InventoryDTO inventoryDTO) {
-        inventoryRepo.save(modelMapper.map(inventoryDTO, Inventory.class));
-        return inventoryDTO;
+    public RetrieveInventoryDTO getInventoryById(int inventoryId) {
+        Inventory inventory = inventoryRepo.findById(inventoryId)
+                .orElseThrow(() -> new InventoryNotFoundException("Inventory not found with ID: " + inventoryId));
+        return modelMapper.map(inventory, RetrieveInventoryDTO.class);
     }
 
-    public InventoryDTO updateInventory(InventoryDTO inventoryDTO) {
-        inventoryRepo.save(modelMapper.map(inventoryDTO, Inventory.class));
-        return inventoryDTO;
+    public CreateInventoryDTO saveInventory(CreateInventoryDTO createInventoryDTO) {
+        Inventory inventory = modelMapper.map(createInventoryDTO, Inventory.class);
+        inventoryRepo.save(inventory);
+        return createInventoryDTO;
     }
 
-    public boolean deleteInventory(InventoryDTO inventoryDTO) {
-        inventoryRepo.delete(modelMapper.map(inventoryDTO, Inventory.class));
-        return true;
+    public RetrieveInventoryDTO updateInventory(RetrieveInventoryDTO retrieveInventoryDTO) {
+        Inventory existingInventory = inventoryRepo.findById(retrieveInventoryDTO.getId())
+                .orElseThrow(() -> new InventoryNotFoundException("Inventory not found with ID: " + retrieveInventoryDTO.getId()));
+
+        Inventory updatedInventory = modelMapper.map(retrieveInventoryDTO, Inventory.class);
+        updatedInventory.setId(existingInventory.getId());
+
+        Inventory savedInventory = inventoryRepo.save(updatedInventory);
+        return modelMapper.map(savedInventory, RetrieveInventoryDTO.class);
+    }
+
+    public DeleteInventoryDTO deleteInventory(int inventoryId) {
+        Inventory inventory = inventoryRepo.findById(inventoryId)
+                .orElseThrow(() -> new InventoryNotFoundException("Inventory not found with ID: " + inventoryId));
+        inventoryRepo.delete(inventory);
+        return modelMapper.map(inventory, DeleteInventoryDTO.class);
     }
 }

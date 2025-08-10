@@ -1,9 +1,6 @@
 package com.devasee.inventory.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,32 +12,46 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Data
 public class Inventory {
+
     @Id
-    //@GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)  // Auto-generated ID
     private int id;
-    //    @Column(nullable = false,length = 255)
+
+    private int productId;  // Link inventory to product
+
     private int quantity;
+
     private int reservedQuantity;
+
     private int availableQuantity;
-    private String warehouseLocation; // optional field
+
+    private String warehouseLocation; // Optional field
+
     private LocalDateTime lastRestockedAt;
+
     private LocalDateTime createdAt;
+
     private LocalDateTime updatedAt;
 
     @PrePersist
     protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
-        this.lastRestockedAt = LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now();
+        this.createdAt = now;
+        this.updatedAt = now;
+        if (this.lastRestockedAt == null) {
+            this.lastRestockedAt = now;
+        }
+        updateAvailableQuantity();
     }
 
     @PreUpdate
     protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();
+        updateAvailableQuantity();
     }
 
     /**
-     * Optional: Utility method to recalculate available quantity.
+     * Utility method to recalculate available quantity.
      */
     public void updateAvailableQuantity() {
         this.availableQuantity = this.quantity - this.reservedQuantity;
