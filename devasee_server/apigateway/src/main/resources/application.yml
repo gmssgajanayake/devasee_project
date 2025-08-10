@@ -45,12 +45,15 @@ spring:
       resourceserver:
         jwt:
           jwk-set-uri: https://clerk.devasee.lk/.well-known/jwks.json
+clerk:
+  issuer-uri: https://clerk.devasee.lk
+  expected-audience: https://www.devasee.lk
 
 eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka
-      
+
 server:
   port: 8080
 
@@ -59,3 +62,7 @@ logging:
     root: INFO
     org.springframework.cloud.gateway.route.RouteDefinitionLocator: INFO
     org.springframework.cloud.gateway: TRACE
+
+services:
+  user-service:
+    base-url: lb://users/api/v1/users/customer

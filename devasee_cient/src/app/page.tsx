@@ -15,15 +15,17 @@ export default function Home() {
     const { user } = useUser();
     const { getToken } = useAuth();
 
+    async function getCustomJwt() {
+        const token = await getToken({ template: "devasee_user_token" });
+        console.log("JWT with user details:", token);
+    }
+
     useEffect(() => {
-        const fetchToken = async () => {
-            const token = await getToken(); // You can optionally pass { template: "your-template-name" }
-            console.log("User Token:", token);
-        };
+        getCustomJwt()
 
         if (user) {
             console.log("User Info:", user);
-            fetchToken();
+            //fetchToken();
         }
     }, [user]);
 
