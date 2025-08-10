@@ -1,41 +1,52 @@
 package com.devasee.product.controller;
 
-import com.devasee.product.dto.StationeryDTO;
+import com.devasee.product.dto.CreateStationeryDTO;
+import com.devasee.product.dto.DeleteStationeryDTO;
+import com.devasee.product.dto.RetrieveStationeryDTO;
+import com.devasee.product.response.CustomResponse;
 import com.devasee.product.services.StationeryServices;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @CrossOrigin
 @RestController
-@RequestMapping(value = "api/v1/product/stationery")
+@RequestMapping("api/v1/product/stationery")
 public class StationeryController {
 
-    @Autowired
-    private StationeryServices stationeryServices;
+    private final StationeryServices stationeryServices;
 
-    @GetMapping("/allStationery")
-    public List<StationeryDTO> getAllStationery() {
-        return stationeryServices.getAllStationery();
+    public StationeryController(StationeryServices stationeryServices) {
+        this.stationeryServices = stationeryServices;
     }
-    @GetMapping("/{stationeryId}")
-    public StationeryDTO getStationeryById(@PathVariable int stationeryId) {
-        return stationeryServices.getStationeryById(stationeryId);
+
+    @GetMapping("/public/allStationery")
+    public CustomResponse<List<RetrieveStationeryDTO>> getAllStationery() {
+        List<RetrieveStationeryDTO> list = stationeryServices.getAllStationery();
+        return new CustomResponse<>(true, "Stationery items found", list);
+    }
+
+    @GetMapping("/public/{id}")
+    public CustomResponse<RetrieveStationeryDTO> getStationeryById(@PathVariable int id) {
+        RetrieveStationeryDTO dto = stationeryServices.getStationeryById(id);
+        return new CustomResponse<>(true, "Stationery item found", dto);
     }
 
     @PostMapping("/addStationery")
-    public StationeryDTO saveStationery(@RequestBody StationeryDTO stationeryDTO) {
-        return stationeryServices.saveStationery(stationeryDTO);
+    public CustomResponse<CreateStationeryDTO> saveStationery(@RequestBody CreateStationeryDTO dto) {
+        CreateStationeryDTO saved = stationeryServices.saveStationery(dto);
+        return new CustomResponse<>(true, "Stationery item saved successfully", saved);
     }
 
     @PutMapping("/updateStationery")
-    public StationeryDTO updateStationery(@RequestBody StationeryDTO stationeryDTO) {
-        return stationeryServices.updateStationery(stationeryDTO);
+    public CustomResponse<RetrieveStationeryDTO> updateStationery(@RequestBody RetrieveStationeryDTO dto) {
+        RetrieveStationeryDTO updated = stationeryServices.updateStationery(dto);
+        return new CustomResponse<>(true, "Stationery item updated successfully", updated);
     }
 
-    @DeleteMapping("/deleteStationery")
-    public boolean deleteStationery(@RequestBody StationeryDTO stationeryDTO) {
-        return stationeryServices.deleteStationery(stationeryDTO);
+    @DeleteMapping("/deleteStationery/{id}")
+    public CustomResponse<DeleteStationeryDTO> deleteStationery(@PathVariable int id) {
+        DeleteStationeryDTO deleted = stationeryServices.deleteStationery(id);
+        return new CustomResponse<>(true, "Stationery item deleted successfully", deleted);
     }
 }
