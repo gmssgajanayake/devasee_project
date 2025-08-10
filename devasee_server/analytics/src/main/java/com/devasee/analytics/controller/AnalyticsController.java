@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(value = "api/v1/analytics")
 public class AnalyticsController {
 
-    @GetMapping("/all")
+    @GetMapping("/admin/all")
     public String getAllAnalytics(){
         return "getting all analytics";
     }

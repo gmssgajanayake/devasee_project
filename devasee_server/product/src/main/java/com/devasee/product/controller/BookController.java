@@ -46,7 +46,7 @@ public class BookController {
     // Save the book in database
     @PostMapping("/addBook")
     public CustomResponse<CreateBookDTO> saveBook(@RequestBody CreateBookDTO bookDTO) {
-       CreateBookDTO dtoResponse =  bookServices.saveBook(bookDTO);
+        CreateBookDTO dtoResponse =  bookServices.saveBook(bookDTO);
         return new CustomResponse<>(true, "Book saved success", dtoResponse);
     }
 
