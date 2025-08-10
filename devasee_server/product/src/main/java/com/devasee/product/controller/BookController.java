@@ -22,8 +22,6 @@ public class BookController {
         this.bookServices = bookServices;
     }
 
-    // --------------------------------- Public ---------------------------------
-
     // Get all books
     @GetMapping("/public/allBooks")
     public CustomResponse<List<RetrieveBookDTO>> getAllBooks() {
@@ -39,32 +37,28 @@ public class BookController {
     }
 
     // Get book by author
-    @GetMapping("/info/author/{author}") // TODO
+    @GetMapping("/public/author/{author}")
     public CustomResponse<List<RetrieveBookDTO>> getBookByAuthor(@PathVariable String author) {
         List<RetrieveBookDTO> books =  bookServices.getBookByAuthor(author);
         return new CustomResponse<>(true, "Books of " + author, books);
     }
 
-
-
-    // --------------------------------- Admin ---------------------------------
-
     // Save the book in database
-    @PostMapping("/admin/addBook")
+    @PostMapping("/addBook")
     public CustomResponse<CreateBookDTO> saveBook(@RequestBody CreateBookDTO bookDTO) {
         CreateBookDTO dtoResponse =  bookServices.saveBook(bookDTO);
         return new CustomResponse<>(true, "Book saved success", dtoResponse);
     }
 
     // Update book details (price, quantity, ...)
-    @PutMapping("/admin/updateBook")
+    @PutMapping("/updateBook")
     public CustomResponse<RetrieveBookDTO> updateBook(@RequestBody RetrieveBookDTO bookDTO) {
         RetrieveBookDTO book = bookServices.updateBook(bookDTO);
         return new CustomResponse<>(true, "Book updated success", book);
     }
 
     // Delete book by id
-    @DeleteMapping("/admin/deleteId/{id}")
+    @DeleteMapping("/deleteId/{id}")
     public CustomResponse<DeleteBookDTO> deleteBook(@PathVariable String id) {
         DeleteBookDTO bookDTO = bookServices.deleteBook(id);
         return new CustomResponse<>(true, "Book deleted success", bookDTO);
