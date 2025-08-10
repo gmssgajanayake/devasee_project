@@ -10,6 +10,7 @@ import {useEffect, useRef, useState} from "react";
 import gsap from "gsap";
 import {SignedIn, SignedOut, UserButton} from "@clerk/nextjs";
 import {useCart} from "@/app/context/CartContext";
+import {faListCheck} from "@fortawesome/free-solid-svg-icons";
 
 
 export default function MainNavBar() {
@@ -171,6 +172,9 @@ export default function MainNavBar() {
                     </SignedOut>
                     <SignedIn>
                         <UserButton/>
+                        <Link href={"/my-orders"}>
+                            <FontAwesomeIcon icon={faListCheck}/>
+                        </Link>
                     </SignedIn>
 
                     <span>|</span>
@@ -268,14 +272,14 @@ export default function MainNavBar() {
                                     className="group relative mt-4 block text-center text-sm font-semibold text-[#0000ff] transition-all duration-300 hover:text-blue-600"
                                 >
                                     <span className="relative z-10">Go to Checkout</span>
-                                    <span className="ml-1 inline-block transition-transform duration-300 group-hover:translate-x-1">
+                                    <span
+                                        className="ml-1 inline-block transition-transform duration-300 group-hover:translate-x-1">
     →
   </span>
                                     <span
                                         className="absolute left-1/2 bottom-0 h-[1.5px] w-0 -translate-x-1/2 transform bg-[#0000ff] transition-all duration-300 group-hover:w-[45%]"
                                     />
                                 </Link>
-
 
 
                             </div>
@@ -342,6 +346,9 @@ export default function MainNavBar() {
                             </SignedOut>
                             <SignedIn>
                                 <UserButton/>
+                                <Link  onClick={toggleMobileMenu} href={"/my-orders"} >
+                                    <FontAwesomeIcon className={"text-white mt-2"} icon={faListCheck}/>
+                                </Link>
                             </SignedIn>
 
                             <span className={"text-white font-light"}>|</span>
