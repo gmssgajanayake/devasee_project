@@ -1,8 +1,10 @@
 package com.devasee.inventory.controller;
 
-import com.devasee.inventory.dto.InventoryDTO;
+import com.devasee.inventory.dto.CreateInventoryDTO;
+import com.devasee.inventory.dto.DeleteInventoryDTO;
+import com.devasee.inventory.dto.RetrieveInventoryDTO;
+import com.devasee.inventory.response.CustomResponse;
 import com.devasee.inventory.services.InventoryServices;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -12,34 +14,44 @@ import java.util.List;
 @RequestMapping(value = "api/v1/inventory")
 public class InventoryController {
 
+    private final InventoryServices inventoryServices;
 
-    @Autowired
-    private InventoryServices inventoryServices;
-
-    @GetMapping("/allInventory")
-    public List<InventoryDTO> getInventory() {
-        return inventoryServices.getAllInventory();
+    public InventoryController(InventoryServices inventoryServices) {
+        this.inventoryServices = inventoryServices;
     }
 
-    @GetMapping("/{inventoryId}")
-    public InventoryDTO getInventoryById(@PathVariable("inventoryId") int inventoryId) {
-        return inventoryServices.getInventoryById(inventoryId);
+    // Get all inventory
+    @GetMapping("/public/allInventory")
+    public CustomResponse<List<RetrieveInventoryDTO>> getAllInventory() {
+        List<RetrieveInventoryDTO> inventoryList = inventoryServices.getAllInventory();
+        return new CustomResponse<>(true, "Inventory found", inventoryList);
     }
 
+    // Get inventory by id
+    @GetMapping("/public/inventoryId/{inventoryId}")
+    public CustomResponse<RetrieveInventoryDTO> getInventoryById(@PathVariable int inventoryId) {
+        RetrieveInventoryDTO inventoryDTO = inventoryServices.getInventoryById(inventoryId);
+        return new CustomResponse<>(true, "Inventory found", inventoryDTO);
+    }
 
-
+    // Save inventory
     @PostMapping("/addInventory")
-    public InventoryDTO saveInventory(@RequestBody InventoryDTO inventoryDTO) {
-        return inventoryServices.saveInventory(inventoryDTO);
+    public CustomResponse<CreateInventoryDTO> saveInventory(@RequestBody CreateInventoryDTO inventoryDTO) {
+        CreateInventoryDTO responseDTO = inventoryServices.saveInventory(inventoryDTO);
+        return new CustomResponse<>(true, "Inventory saved successfully", responseDTO);
     }
 
+    // Update inventory
     @PutMapping("/updateInventory")
-    public InventoryDTO updateInventory(@RequestBody InventoryDTO inventoryDTO) {
-        return inventoryServices.updateInventory(inventoryDTO);
+    public CustomResponse<RetrieveInventoryDTO> updateInventory(@RequestBody RetrieveInventoryDTO inventoryDTO) {
+        RetrieveInventoryDTO updatedInventory = inventoryServices.updateInventory(inventoryDTO);
+        return new CustomResponse<>(true, "Inventory updated successfully", updatedInventory);
     }
 
-    @DeleteMapping("/deleteInventory")
-    public boolean deleteInventory(@RequestBody InventoryDTO inventoryDTO) {
-        return inventoryServices.deleteInventory(inventoryDTO);
+    // Delete inventory by id
+    @DeleteMapping("/deleteId/{id}")
+    public CustomResponse<DeleteInventoryDTO> deleteInventory(@PathVariable int id) {
+        DeleteInventoryDTO deletedDTO = inventoryServices.deleteInventory(id);
+        return new CustomResponse<>(true, "Inventory deleted successfully", deletedDTO);
     }
 }

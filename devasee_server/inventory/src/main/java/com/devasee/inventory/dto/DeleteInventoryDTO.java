@@ -7,12 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-
-
-public class InventoryDTO {
+public class DeleteInventoryDTO {
     private int id;
-    private int quantity;
-    private int reservedQuantity;
-    private int availableQuantity;
-    private String warehouseLocation;
+    private String message;  // "Deleted successfully"
 }
