@@ -23,6 +23,7 @@ public class OrderController {
     // Get all orders
     @GetMapping("/allOrders")
     public CustomResponse<List<RetrieveOrderDTO>> getAllOrders() {
+        System.out.println("######## order controller############");
         List<RetrieveOrderDTO> orders = orderServices.getAllOrders();
         return new CustomResponse<>(true, "Orders retrieved successfully", orders);
     }
