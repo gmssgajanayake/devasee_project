@@ -25,21 +25,103 @@ public class SecurityConfig {
     @Value("${spring.security.oauth2.resourceserver.jwt.jwk-set-uri}")
     private  String clerkJwkSetUri ;
 
+    @Value("${clerk.issuer-uri}")
+    private String clerkIssuerUri;
+
+    @Value("${clerk.expected-audience}")
+    private String expectedAudience;
+
+    // Inject your user service here (Reactive)
+    private final ReactiveUserService userService;
+
+    public SecurityConfig(ReactiveUserService userService) {
+        this.userService = userService;
+    }
+
     @Bean
     public SecurityWebFilterChain securityWebFilterChain (ServerHttpSecurity http) throws Exception{
         http
+                .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .authorizeExchange(exchanges  -> exchanges
                         .pathMatchers("/api/v1/promo/public/**").permitAll()
                         .pathMatchers("/api/v1/product/book/public/**").permitAll()
                         .pathMatchers("/api/v1/product/stationery/public/**").permitAll()
                         .pathMatchers("/api/v1/product/printing/public/**").permitAll()
                         .pathMatchers("/api/v1/inventory/public/**").permitAll()
+                        .pathMatchers("/api/v1/analytics/admin/**").hasRole("ADMIN")
+                        .pathMatchers("/api/v1/inventory/admin/**").hasRole("ADMIN")
+                        .pathMatchers("/api/v1/product/book/admin/**").hasRole("ADMIN")
                         .anyExchange().authenticated()
                 )
                 .oauth2ResourceServer(oauth2-> oauth2
-                        .jwt(jwt-> jwt.jwkSetUri(clerkJwkSetUri))
+                        .authenticationEntryPoint(jsonAuthEntryPoint())
+                        .jwt(jwt-> jwt
+                                        .jwtDecoder(clerkJwtDecoder())
+                                        .jwtAuthenticationConverter(customJwtAuthenticationConverter())
+                                //.jwkSetUri(clerkJwkSetUri) //
+                        )
                 );
 
         return http.build();
+    }
+
+    // Clerk JWT Decoder with issuer & audience validation
+    @Bean
+    public ReactiveJwtDecoder clerkJwtDecoder() {
+        NimbusReactiveJwtDecoder jwtDecoder = (NimbusReactiveJwtDecoder)
+                ReactiveJwtDecoders.fromIssuerLocation(clerkIssuerUri);
+
+        // Add audience & issuer validation
+        OAuth2TokenValidator<Jwt> withIssuer = JwtValidators.createDefaultWithIssuer(clerkIssuerUri);
+        OAuth2TokenValidator<Jwt> withAudience = new JwtClaimValidator<String>(
+                "azp",
+                azp-> azp != null && azp.equals(expectedAudience)
+        );
+
+        jwtDecoder.setJwtValidator(new DelegatingOAuth2TokenValidator<>(withIssuer, withAudience)); // (withIssuer,withAudience)
+
+        return jwtDecoder;
+    }
+
+    // Custom converter that loads roles from your user service
+    @Bean
+    public Converter<Jwt, Mono<AbstractAuthenticationToken>> customJwtAuthenticationConverter() {
+        return jwt -> {
+            String userId = jwt.getClaimAsString("userId"); // or "userId", whichever you use
+
+            // Call your user service here asynchronously to get roles for the user
+            // For example, assuming you have a ReactiveUserService returning Mono<List<String>>
+            return userService.findRolesByUserId(userId)
+                    .map(roles -> {
+                        var authorities = roles.stream()
+                                .map(role -> "ROLE_" + role)
+                                .map(SimpleGrantedAuthority::new)
+                                .toList();
+                        System.out.println("########## user roles : "+authorities);
+                        return new JwtAuthenticationToken(jwt, authorities);
+                    });
+        };
+    }
+
+
+
+    // Custom JSON Authentication Entry Point for Unauthorized Requests
+    @Bean
+    public ServerAuthenticationEntryPoint jsonAuthEntryPoint(){
+        return (exchange, ex) -> {
+
+            System.err.println("####### Authentication error: " + ex.getClass().getSimpleName() + " - " + ex.getMessage());
+
+
+            exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+            exchange.getResponse().getHeaders().add("Content-Type", "application/json");
+
+            String body = "{\"success\":false,\"message\":\"Unauthorized or invalid token\",\"errorCode\":\"AUTH_ERROR\"}";
+            byte[] bytes = body.getBytes();
+            return exchange.getResponse().writeWith(Mono.just(exchange.getResponse()
+                            .bufferFactory()
+                            .wrap(bytes)))
+                    .onErrorResume(Mono::error);
+        };
     }
 }
