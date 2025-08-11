@@ -4,7 +4,6 @@ import com.devasee.inventory.dto.CreateInventoryDTO;
 import com.devasee.inventory.dto.DeleteInventoryDTO;
 import com.devasee.inventory.dto.RetrieveInventoryDTO;
 import com.devasee.inventory.entity.Inventory;
-import com.devasee.inventory.exception.InventoryNotFoundException;
 import com.devasee.inventory.repo.InventoryRepo;
 import jakarta.transaction.Transactional;
 import org.hibernate.exception.DataException;
@@ -34,21 +33,26 @@ public class InventoryServices {
         }
     }
 
-    public RetrieveInventoryDTO getInventoryById(int inventoryId) {
+    public RetrieveInventoryDTO getInventoryById(String inventoryId) {
         Inventory inventory = inventoryRepo.findById(inventoryId)
-                .orElseThrow(() -> new InventoryNotFoundException("Inventory not found with ID: " + inventoryId));
+                .orElseThrow(() -> new RuntimeException("Inventory not found with ID: " + inventoryId));
         return modelMapper.map(inventory, RetrieveInventoryDTO.class);
     }
 
     public CreateInventoryDTO saveInventory(CreateInventoryDTO createInventoryDTO) {
-        Inventory inventory = modelMapper.map(createInventoryDTO, Inventory.class);
-        inventoryRepo.save(inventory);
+        try {
+            Inventory inventory = modelMapper.map(createInventoryDTO, Inventory.class);
+            Inventory savedInventory = inventoryRepo.save(inventory);
+            return modelMapper.map(savedInventory, CreateInventoryDTO.class);
+        }catch (Exception e){
+            System.out.println("############ saveInventory err: "+e.getMessage());
+        }
         return createInventoryDTO;
     }
 
     public RetrieveInventoryDTO updateInventory(RetrieveInventoryDTO retrieveInventoryDTO) {
         Inventory existingInventory = inventoryRepo.findById(retrieveInventoryDTO.getId())
-                .orElseThrow(() -> new InventoryNotFoundException("Inventory not found with ID: " + retrieveInventoryDTO.getId()));
+                .orElseThrow(() -> new RuntimeException("Inventory not found with ID: " + retrieveInventoryDTO.getId()));
 
         Inventory updatedInventory = modelMapper.map(retrieveInventoryDTO, Inventory.class);
         updatedInventory.setId(existingInventory.getId());
@@ -57,9 +61,9 @@ public class InventoryServices {
         return modelMapper.map(savedInventory, RetrieveInventoryDTO.class);
     }
 
-    public DeleteInventoryDTO deleteInventory(int inventoryId) {
+    public DeleteInventoryDTO deleteInventory(String inventoryId) {
         Inventory inventory = inventoryRepo.findById(inventoryId)
-                .orElseThrow(() -> new InventoryNotFoundException("Inventory not found with ID: " + inventoryId));
+                .orElseThrow(() -> new RuntimeException("Inventory not found with ID: " + inventoryId));
         inventoryRepo.delete(inventory);
         return modelMapper.map(inventory, DeleteInventoryDTO.class);
     }
