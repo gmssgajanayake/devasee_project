@@ -1,92 +1,52 @@
 package com.devasee.users.controller;
 
-import com.devasee.users.dto.CustomerDTO;
+import com.devasee.users.dto.CreateCustomerDTO;
+import com.devasee.users.dto.DeleteCustomerDTO;
+import com.devasee.users.dto.RetrieveCustomerDTO;
+import com.devasee.users.response.CustomResponse;
 import com.devasee.users.service.CustomerService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @CrossOrigin
 @RestController
-@RequestMapping(value = "api/v1/users/customer")
+@RequestMapping("api/v1/users/customer")
 public class CustomerController {
 
-    @Autowired
-    private CustomerService customerService;
+    private final CustomerService customerService;
 
-    @GetMapping("/allCustomer")
-    public ResponseEntity<List<CustomerDTO>> getAllCustomer() {
-        try {
-            List<CustomerDTO> customers = customerService.getAllCustomers();
-            return ResponseEntity.ok(customers);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(null);
-        }
+    public CustomerController(CustomerService customerService) {
+        this.customerService = customerService;
     }
 
-    @GetMapping("/{customerId}")
-    public ResponseEntity<?> getCustomerById(@PathVariable Long customerId) {
-        try {
-            CustomerDTO customer = customerService.getCustomerById(customerId);
-            if (customer != null) {
-                return ResponseEntity.ok(customer);
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body("Customer not found with ID: " + customerId);
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error retrieving customer: " + e.getMessage());
-        }
+    @GetMapping("/public/all")
+    public CustomResponse<List<RetrieveCustomerDTO>> getAllCustomers() {
+        List<RetrieveCustomerDTO> customers = customerService.getAllCustomers();
+        return new CustomResponse<>(true, "Customers retrieved successfully", customers);
     }
 
-    @PostMapping("/addCustomer")
-    public ResponseEntity<?> saveCustomer(@RequestBody CustomerDTO customerDTO) {
-        try {
-            CustomerDTO saved = customerService.saveCustomer(customerDTO);
-            if (saved != null) {
-                return ResponseEntity.status(HttpStatus.CREATED).body(saved);
-            } else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to save customer.");
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error saving customer: " + e.getMessage());
-        }
+    @GetMapping("/public/{id}")
+    public CustomResponse<RetrieveCustomerDTO> getCustomerById(@PathVariable Long id) {
+        RetrieveCustomerDTO customer = customerService.getCustomerById(id);
+        return new CustomResponse<>(true, "Customer retrieved successfully", customer);
     }
 
-    @PutMapping("/updateCustomer")
-    public ResponseEntity<?> updateCustomer(@RequestBody CustomerDTO customerDTO) {
-        try {
-            CustomerDTO updated = customerService.updateCustomer(customerDTO);
-            if (updated != null) {
-                return ResponseEntity.ok(updated);
-            } else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to update customer.");
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error updating customer: " + e.getMessage());
-        }
+    @PostMapping("/add")
+    public CustomResponse<CreateCustomerDTO> addCustomer(@RequestBody CreateCustomerDTO dto) {
+        CreateCustomerDTO saved = customerService.saveCustomer(dto);
+        return new CustomResponse<>(true, "Customer created successfully", saved);
     }
 
+    @PutMapping("/update")
+    public CustomResponse<RetrieveCustomerDTO> updateCustomer(@RequestBody RetrieveCustomerDTO dto) {
+        RetrieveCustomerDTO updated = customerService.updateCustomer(dto);
+        return new CustomResponse<>(true, "Customer updated successfully", updated);
+    }
 
-    @DeleteMapping("/deleteCustomer/{customerId}")
-    public ResponseEntity<?> deleteCustomer(@PathVariable Long customerId) {
-        try {
-            boolean deleted = customerService.deleteCustomerById(customerId);
-            if (deleted) {
-                return ResponseEntity.ok("Customer deleted successfully.");
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Customer not found.");
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error deleting customer: " + e.getMessage());
-        }
+    @DeleteMapping("/delete/{id}")
+    public CustomResponse<DeleteCustomerDTO> deleteCustomer(@PathVariable Long id) {
+        DeleteCustomerDTO deleted = customerService.deleteCustomer(id);
+        return new CustomResponse<>(true, "Customer deleted successfully", deleted);
     }
 }

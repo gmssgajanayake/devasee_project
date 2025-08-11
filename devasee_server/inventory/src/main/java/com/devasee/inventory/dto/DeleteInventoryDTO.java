@@ -8,6 +8,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DeleteInventoryDTO {
-    private int id;
-    private String message;  // "Deleted successfully"
+    private String id;
+    private String productId;  // "Deleted successfully"
 }
