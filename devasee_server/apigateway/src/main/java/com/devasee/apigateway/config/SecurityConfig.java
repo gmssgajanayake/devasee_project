@@ -22,9 +22,6 @@ import reactor.core.publisher.Mono;
 @EnableWebFluxSecurity // This is the reactive version
 public class SecurityConfig {
 
-    @Value("${spring.security.oauth2.resourceserver.jwt.jwk-set-uri}")
-    private  String clerkJwkSetUri ;
-
     @Value("${clerk.issuer-uri}")
     private String clerkIssuerUri;
 
@@ -53,7 +50,8 @@ public class SecurityConfig {
                         .pathMatchers(
                                 "/api/v1/analytics/admin/**",
                                 "/api/v1/inventory/admin/**",
-                                "/api/v1/product/book/admin/**"
+                                "/api/v1/product/book/admin/**",
+                                "/api/v1/inventory/admin/**"
                                 ).hasRole("ADMIN")
                         .anyExchange().authenticated()
                 )
@@ -62,7 +60,6 @@ public class SecurityConfig {
                         .jwt(jwt-> jwt
                                         .jwtDecoder(clerkJwtDecoder())
                                         .jwtAuthenticationConverter(customJwtAuthenticationConverter())
-                                //.jwkSetUri(clerkJwkSetUri) //
                         )
                 );
 
@@ -120,7 +117,12 @@ public class SecurityConfig {
             exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
             exchange.getResponse().getHeaders().add("Content-Type", "application/json");
 
-            String body = "{\"success\":false,\"message\":\"Unauthorized or invalid token\",\"errorCode\":\"AUTH_ERROR\"}";
+            String body = """
+                    "success": false,
+                    "message": "%s",
+                    "data": "AUTH_ERROR"
+                    """.formatted(ex.getMessage());
+
             byte[] bytes = body.getBytes();
             return exchange.getResponse().writeWith(Mono.just(exchange.getResponse()
                             .bufferFactory()
@@ -129,3 +131,8 @@ public class SecurityConfig {
         };
     }
 }
+
+
+//.jwkSetUri(clerkJwkSetUri)
+//@Value("${spring.security.oauth2.resourceserver.jwt.jwk-set-uri}")
+//private  String clerkJwkSetUri ;
