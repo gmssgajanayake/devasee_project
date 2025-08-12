@@ -1,43 +1,65 @@
 package com.devasee.orders.controller;
 
-import com.devasee.orders.dto.OrderDTO;
+import com.devasee.orders.dto.CreateOrderDTO;
+import com.devasee.orders.dto.DeleteOrderDTO;
+import com.devasee.orders.dto.RetrieveOrderDTO;
+import com.devasee.orders.response.CustomResponse;
 import com.devasee.orders.services.OrderServices;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @CrossOrigin
 @RestController
-@RequestMapping(value = "api/v1/orders")
+@RequestMapping(value = "api/v1/orders/order")
 public class OrderController {
 
-    @Autowired
-    private OrderServices orderServices;
+    private final OrderServices orderServices;
 
+    public OrderController(OrderServices orderServices) {
+        this.orderServices = orderServices;
+    }
+
+    // Get all orders
     @GetMapping("/allOrders")
-    public List<OrderDTO> getOrders() {
-        return orderServices.getAllOrders();
+    public CustomResponse<List<RetrieveOrderDTO>> getAllOrders() {
+        System.out.println("######## order controller############");
+        List<RetrieveOrderDTO> orders = orderServices.getAllOrders();
+        return new CustomResponse<>(true, "Orders retrieved successfully", orders);
     }
 
-    @GetMapping("/{orderId}")
-    public OrderDTO getOrderById(@PathVariable("orderId") int orderId) {
-        return orderServices.getOrderById(orderId);
+    // Get order by order ID
+    @GetMapping("/orderId/{orderId}")
+    public CustomResponse<RetrieveOrderDTO> getOrderById(@PathVariable int orderId) {
+        RetrieveOrderDTO order = orderServices.getOrderById(orderId);
+        return new CustomResponse<>(true, "Order found", order);
     }
 
+    // Get orders by customer name
+    @GetMapping("/customer/{customerName}")
+    public CustomResponse<List<RetrieveOrderDTO>> getOrdersByCustomer(@PathVariable String customerName) {
+        List<RetrieveOrderDTO> orders = orderServices.getOrdersByCustomerName(customerName);
+        return new CustomResponse<>(true, "Orders for " + customerName, orders);
+    }
+
+    // Save a new order
     @PostMapping("/addOrder")
-    public OrderDTO saveOrder(@RequestBody OrderDTO orderDTO) {
-        return orderServices.saveOrder(orderDTO);
+    public CustomResponse<CreateOrderDTO> saveOrder(@RequestBody CreateOrderDTO orderDTO) {
+        CreateOrderDTO savedOrder = orderServices.saveOrder(orderDTO);
+        return new CustomResponse<>(true, "Order saved successfully", savedOrder);
     }
 
+    // Update an existing order
     @PutMapping("/updateOrder")
-    public OrderDTO updateOrder(@RequestBody OrderDTO orderDTO) {
-        return orderServices.updateOrder(orderDTO);
+    public CustomResponse<RetrieveOrderDTO> updateOrder(@RequestBody RetrieveOrderDTO orderDTO) {
+        RetrieveOrderDTO updatedOrder = orderServices.updateOrder(orderDTO);
+        return new CustomResponse<>(true, "Order updated successfully", updatedOrder);
     }
 
-    @DeleteMapping("/deleteOrder")
-    public boolean deleteOrder(@RequestBody OrderDTO orderDTO) {
-        return orderServices.deleteOrder(orderDTO);
+    // Delete order by ID
+    @DeleteMapping("/deleteId/{id}")
+    public CustomResponse<DeleteOrderDTO> deleteOrder(@PathVariable int id) {
+        DeleteOrderDTO deletedOrder = orderServices.deleteOrder(id);
+        return new CustomResponse<>(true, "Order deleted successfully", deletedOrder);
     }
-
 }

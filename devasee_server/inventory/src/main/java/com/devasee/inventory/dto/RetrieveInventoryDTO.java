@@ -4,15 +4,15 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-
-
-public class InventoryDTO {
-    private int id;
-    private int quantity;
-    private int reservedQuantity;
+public class RetrieveInventoryDTO {
+    private String id;
+    private String productId;
     private int availableQuantity;
     private String warehouseLocation;
+    private LocalDateTime updatedAt;
 }
