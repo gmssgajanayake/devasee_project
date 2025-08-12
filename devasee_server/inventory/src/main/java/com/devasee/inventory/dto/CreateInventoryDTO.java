@@ -8,9 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CreateInventoryDTO {
-    private int productId;
-    private int quantity;
+    private String productId;
     private int reservedQuantity;
-    private int availableQuantity;
     private String warehouseLocation;
 }

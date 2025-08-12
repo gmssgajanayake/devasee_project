@@ -16,7 +16,7 @@ public class Customer {
 
     private String name;
     private String email;
-    //private String password;
+    private String password;
     private boolean active;
     private String address;
     private String phoneNumber;

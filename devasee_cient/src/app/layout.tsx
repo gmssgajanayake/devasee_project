@@ -9,14 +9,11 @@ import Footer from "@/app/_components/Footer";
 import React from "react";
 import {CartProvider} from "@/app/context/CartContext";
 
-
 const inter = Inter({
     subsets: ["latin"],
     weight: ["400", "500", "600", "700"], // Add only the weights you use
     variable: "--font-inter", // Tailwind will use this
 });
-
-
 
 
 // Example: /src/app/layout.tsx or /src/app/(router)/layout.tsx
@@ -75,7 +72,6 @@ export const metadata: Metadata = {
         creator: "@devasee_lk", // optional
     },
 };
-
 
 
 export default function RootLayout({

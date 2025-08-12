@@ -1,82 +1,69 @@
 package com.devasee.users.service;
 
-import com.devasee.users.dto.CustomerDTO;
+import com.devasee.users.dto.CreateCustomerDTO;
+import com.devasee.users.dto.DeleteCustomerDTO;
+import com.devasee.users.dto.RetrieveCustomerDTO;
 import com.devasee.users.entity.Customer;
+import com.devasee.users.exceptions.CustomerAlreadyExistsException;
+import com.devasee.users.exceptions.CustomerNotFoundException;
+import com.devasee.users.exceptions.ServiceUnavailableException;
 import com.devasee.users.repository.CustomerRepository;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Transactional
 public class CustomerService {
 
-    @Autowired
-    private CustomerRepository customerRepository;
+    private final CustomerRepository customerRepository;
+    private final ModelMapper modelMapper;
 
-    @Autowired
-    private ModelMapper modelMapper;
+    public CustomerService(CustomerRepository customerRepository, ModelMapper modelMapper) {
+        this.customerRepository = customerRepository;
+        this.modelMapper = modelMapper;
+    }
 
-    public List<CustomerDTO> getAllCustomers() {
+    public List<RetrieveCustomerDTO> getAllCustomers() {
         try {
             List<Customer> customers = customerRepository.findAll();
-            return modelMapper.map(customers, new TypeToken<List<CustomerDTO>>() {}.getType());
+            return modelMapper.map(customers, new TypeToken<List<RetrieveCustomerDTO>>(){}.getType());
         } catch (Exception e) {
-            // Log the exception and return an empty list or throw custom
-            System.err.println("Error fetching all customers: " + e.getMessage());
-            return Collections.emptyList();
+            throw new ServiceUnavailableException("Failed to fetch customers. Please try again later.");
         }
     }
 
-    public CustomerDTO getCustomerById(Long customerId) {
-        try {
-            Optional<Customer> customer = customerRepository.findById(customerId);
-            if (customer.isPresent()) {
-                return modelMapper.map(customer.get(), CustomerDTO.class);
-            } else {
-                System.err.println("Customer not found with ID: " + customerId);
-                return null;
-            }
-        } catch (Exception e) {
-            System.err.println("Error fetching customer by ID: " + e.getMessage());
-            return null;
-        }
+    public RetrieveCustomerDTO getCustomerById(Long id) {
+        Customer customer = customerRepository.findById(id)
+                .orElseThrow(() -> new CustomerNotFoundException("Customer not found with ID: " + id));
+        return modelMapper.map(customer, RetrieveCustomerDTO.class);
     }
 
-    public CustomerDTO saveCustomer(CustomerDTO customerDTO) {
-        try {
-            Customer customer = modelMapper.map(customerDTO, Customer.class);
-            customerRepository.save(customer);
-            return customerDTO;
-        } catch (Exception e) {
-            System.err.println("Error saving customer: " + e.getMessage());
-            return null;
+    public CreateCustomerDTO saveCustomer(CreateCustomerDTO dto) {
+        if(customerRepository.existsByEmail(dto.getEmail())) {
+            throw new CustomerAlreadyExistsException("Customer with email '" + dto.getEmail() + "' already exists");
         }
+        Customer customer = modelMapper.map(dto, Customer.class);
+        customerRepository.save(customer);
+        return dto;
     }
 
-    public CustomerDTO updateCustomer(CustomerDTO customerDTO) {
-        try {
-            Customer customer = modelMapper.map(customerDTO, Customer.class);
-            customerRepository.save(customer);
-            return customerDTO;
-        } catch (Exception e) {
-            System.err.println("Error updating customer: " + e.getMessage());
-            return null;
-        }
+    public RetrieveCustomerDTO updateCustomer(RetrieveCustomerDTO dto) {
+        Customer existing = customerRepository.findById(dto.getId())
+                .orElseThrow(() -> new CustomerNotFoundException("Customer not found with ID: " + dto.getId()));
+        Customer updated = modelMapper.map(dto, Customer.class);
+        updated.setId(existing.getId());
+        Customer saved = customerRepository.save(updated);
+        return modelMapper.map(saved, RetrieveCustomerDTO.class);
     }
 
-    public boolean deleteCustomerById(Long customerId) {
-        Optional<Customer> customer = customerRepository.findById(customerId);
-        if (customer.isPresent()) {
-            customerRepository.delete(customer.get());
-            return true;
-        }
-        return false;
+    public DeleteCustomerDTO deleteCustomer(Long id) {
+        Customer existing = customerRepository.findById(id)
+                .orElseThrow(() -> new CustomerNotFoundException("Customer not found with ID: " + id));
+        customerRepository.delete(existing);
+        return modelMapper.map(existing, DeleteCustomerDTO.class);
     }
 }
