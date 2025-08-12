@@ -4,16 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-
-public class RetrieveCustomerDTO {
-    private Long id;
-    private String name;
+public class CreateUserDTO {
+    private String userId;
     private String email;
-    private boolean active;
-    private String address;
-    private String phoneNumber;
+    private String firstName;
+    private String lastName;
+    private String username;
+    private String imageUrl;
 }

@@ -30,10 +30,4 @@ public class ReactiveUserServiceImpl implements ReactiveUserService {
                                 <List<String>>(){}
                 );
     }
-//
-//    @Bean
-//    @LoadBalanced
-//    public WebClient.Builder webClientBuilder() {
-//        return WebClient.builder();
-//    }
 }
