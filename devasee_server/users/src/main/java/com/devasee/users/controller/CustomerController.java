@@ -1,10 +1,11 @@
 package com.devasee.users.controller;
 
-import com.devasee.users.dto.CreateCustomerDTO;
-import com.devasee.users.dto.DeleteCustomerDTO;
-import com.devasee.users.dto.RetrieveCustomerDTO;
+import com.devasee.users.dto.CreateUserDTO;
 import com.devasee.users.response.CustomResponse;
+import com.devasee.users.service.AdminService;
 import com.devasee.users.service.CustomerService;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,38 +16,49 @@ import java.util.List;
 public class CustomerController {
 
     private final CustomerService customerService;
+    private final AdminService adminService;
 
-    public CustomerController(CustomerService customerService) {
+    public CustomerController(CustomerService customerService, AdminService adminService) {
         this.customerService = customerService;
+        this.adminService = adminService;
     }
 
-    @GetMapping("/public/all")
-    public CustomResponse<List<RetrieveCustomerDTO>> getAllCustomers() {
-        List<RetrieveCustomerDTO> customers = customerService.getAllCustomers();
-        return new CustomResponse<>(true, "Customers retrieved successfully", customers);
+
+
+    // ------------------------------- User -------------------------------
+
+//    // Saving an user after registering in frontend
+//    @PostMapping("/info/save")
+//    public CustomResponse<Object> saveCustomer(
+//            HttpServletRequest request
+//    ) {
+//        System.out.println("############ conteoller save");
+//        // Get the Authorization header
+//        String authHeader = request.getHeader("Authorization");
+//
+//        CreateUserDTO dto = customerService.saveCustomer(authHeader);
+//        return new CustomResponse<>(true, "Customer created successfully", dto);
+//    }
+
+    // TODO : update user
+    @PutMapping("/info/update")
+    public String updateUser(){
+        return "updating user";
     }
 
-    @GetMapping("/public/{id}")
-    public CustomResponse<RetrieveCustomerDTO> getCustomerById(@PathVariable Long id) {
-        RetrieveCustomerDTO customer = customerService.getCustomerById(id);
-        return new CustomResponse<>(true, "Customer retrieved successfully", customer);
+    // Delete user by header id by user
+    @DeleteMapping("/info/delete")
+    public ResponseEntity<Void> deleteCustomer(@RequestHeader("X-User-Id") String customerId) {
+        System.out.println("######### customerId : "+customerId);
+        customerService.deleteUser(customerId);
+        return ResponseEntity.noContent().build(); // 204 No Content
     }
 
-    @PostMapping("/add")
-    public CustomResponse<CreateCustomerDTO> addCustomer(@RequestBody CreateCustomerDTO dto) {
-        CreateCustomerDTO saved = customerService.saveCustomer(dto);
-        return new CustomResponse<>(true, "Customer created successfully", saved);
-    }
-
-    @PutMapping("/update")
-    public CustomResponse<RetrieveCustomerDTO> updateCustomer(@RequestBody RetrieveCustomerDTO dto) {
-        RetrieveCustomerDTO updated = customerService.updateCustomer(dto);
-        return new CustomResponse<>(true, "Customer updated successfully", updated);
-    }
-
-    @DeleteMapping("/delete/{id}")
-    public CustomResponse<DeleteCustomerDTO> deleteCustomer(@PathVariable Long id) {
-        DeleteCustomerDTO deleted = customerService.deleteCustomer(id);
-        return new CustomResponse<>(true, "Customer deleted successfully", deleted);
+    // Delete user by id by user
+    // TODO :  testing
+    @DeleteMapping("/info/deleteTest/{customerId}")
+    public ResponseEntity<Void> deleteCustomerTesting(@PathVariable String customerId) {
+        customerService.deleteUser(customerId);
+        return ResponseEntity.noContent().build(); // 204 No Content
     }
 }

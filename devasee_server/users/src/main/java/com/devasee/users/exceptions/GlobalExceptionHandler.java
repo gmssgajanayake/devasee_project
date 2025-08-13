@@ -47,4 +47,10 @@ public class GlobalExceptionHandler {
         CustomResponse<Object> response = new CustomResponse<>(false, message, null);
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    @ExceptionHandler(InvalidAuthHeaderException.class)
+    public ResponseEntity<CustomResponse<Object>> handleInvalidAuthHeaderException(InvalidAuthHeaderException ex){
+        CustomResponse<Object> response = new CustomResponse<>(false, ex.getMessage(),null);
+        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED); // 401
+    }
 }

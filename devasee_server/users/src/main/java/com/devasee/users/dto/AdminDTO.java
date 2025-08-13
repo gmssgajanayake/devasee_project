@@ -1,15 +1,20 @@
 package com.devasee.users.dto;
 
+import com.devasee.users.entity.Role;
 import lombok.*;
 
-@Getter
-@Setter
+import java.time.LocalDateTime;
+import java.util.Set;
+
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class AdminDTO {
-    private Long id;
-    private String name;
+    private String userId;
+    private String firstName;
+    private String lastName;
     private String email;
-    private boolean active;
-    private String adminCode;
+    private String imageUrl;
+    private Set<Role> roles;
+    private LocalDateTime updatedAt;
 }

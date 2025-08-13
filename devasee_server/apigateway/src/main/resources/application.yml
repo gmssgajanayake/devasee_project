@@ -40,6 +40,12 @@ spring:
               uri: lb://users
               predicates:
                 - Path=/api/v1/users/**
+
+            - id: users
+              uri: lb://users
+              predicates:
+                - Path=/api/v1/auth/**
+
   security:
     oauth2:
       resourceserver:
@@ -65,4 +71,4 @@ logging:
 
 services:
   user-service:
-    base-url: lb://users/api/v1/users/customer
+    base-url: lb://users/api/v1/auth/info

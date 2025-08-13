@@ -4,7 +4,7 @@ spring:
 
 # Postgres sql db configuration
   datasource:
-    url: jdbc:postgresql://localhost:5432/users_db
+    url: jdbc:postgresql://localhost:5432/devasee_users_db
     username: postgres
     password: postgres
     driver-class-name: org.postgresql.Driver
@@ -25,3 +25,7 @@ eureka:
       defaultZone: http://localhost:8761/eureka
   instance:
     prefer-ip-address: true
+
+app:
+  super-admin:
+    email: npathumdilhara@gmail.com

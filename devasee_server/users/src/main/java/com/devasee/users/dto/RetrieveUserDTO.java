@@ -8,8 +8,11 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class DeleteCustomerDTO {
-    private Long id;
-    private String name;
+public class RetrieveUserDTO {
+    private String userId;
     private String email;
+    private String firstName;
+    private String lastName;
+    private String username;
+    private String imageUrl;
 }

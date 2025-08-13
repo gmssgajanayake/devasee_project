@@ -4,16 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-// For creation
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-
-public class CreateCustomerDTO {
-    private String name;
+public class DeleteUserDTO {
+    private String userId;
     private String email;
-    private String password;
-    private boolean active;
-    private String address;
-    private String phoneNumber;
+    private String username;
 }
