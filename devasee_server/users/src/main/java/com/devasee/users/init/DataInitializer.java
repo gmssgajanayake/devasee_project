@@ -5,14 +5,17 @@ import com.devasee.users.enums.Roles;
 import com.devasee.users.repository.RoleRepo;
 import com.devasee.users.repository.UserRepo;
 import com.devasee.users.service.CustomerService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 @Component
 public class DataInitializer implements CommandLineRunner {
 
-    private final RoleRepo roleRepo;
+    private static final Logger log = LoggerFactory.getLogger(DataInitializer.class);
 
+    private final RoleRepo roleRepo;
 
     public DataInitializer(
             RoleRepo roleRepo,
@@ -29,7 +32,7 @@ public class DataInitializer implements CommandLineRunner {
             String roleName = roleEnum.name();
             if (!roleRepo.existsByName(roleName)) {
                 roleRepo.save(new Role(roleName)); // Use constructor with only name
-                System.out.println("####### Inserted role: " + roleName);
+                log.info("####### DataInitializer Inserted role: {}", roleName);
             }
         }
     }
