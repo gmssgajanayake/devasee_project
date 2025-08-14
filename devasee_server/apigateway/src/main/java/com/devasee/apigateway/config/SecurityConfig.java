@@ -1,6 +1,8 @@
 package com.devasee.apigateway.config;
 
 import com.devasee.apigateway.service.ReactiveUserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.convert.converter.Converter; // convert JWT into Spring Security auth tokens
 import org.springframework.context.annotation.Bean;
@@ -25,6 +27,8 @@ import java.util.Collections;
 @EnableWebFluxSecurity // This is the reactive version
 public class SecurityConfig {
 
+    private static final Logger log = LoggerFactory.getLogger(SecurityConfig.class);
+
     @Value("${clerk.issuer-uri}")
     private String clerkIssuerUri;
 
@@ -48,8 +52,7 @@ public class SecurityConfig {
                                 "/api/v1/product/book/public/**",
                                 "/api/v1/product/stationery/public/**",
                                 "/api/v1/product/printing/public/**",
-                                "/api/v1/inventory/public/**",
-                                "api/v1/users/customer/public/**"
+                                "/api/v1/inventory/public/**"
                         ).permitAll()
                         .pathMatchers(
                                 "/api/v1/analytics/admin/**",
@@ -76,7 +79,7 @@ public class SecurityConfig {
     @Bean
     public ServerAccessDeniedHandler jsonAccessDeniedHandler() {
         return (exchange, ex) -> {
-            System.err.println("####### Access denied error: " + ex.getClass().getSimpleName() + " - " + ex.getMessage());
+            log.error("### Access denied error: {} - {}", ex.getClass().getSimpleName(), ex.getMessage());
 
             exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
             exchange.getResponse().getHeaders().add("Content-Type", "application/json");
@@ -128,7 +131,7 @@ public class SecurityConfig {
             // For example, assuming you have a ReactiveUserService returning Mono<List<String>>
             return userService.findRolesByUserId(userId)
                     .onErrorResume(e -> {
-                        System.out.println("Error fetching roles, using empty list: " + e.getMessage());
+                        log.error("### Error fetching roles, using empty list: {}", e.getMessage());
                         return Mono.just(Collections.emptyList());
                     })
                     .map(roles -> {
@@ -137,7 +140,7 @@ public class SecurityConfig {
                                 .map(SimpleGrantedAuthority::new)
                                 .toList();
 
-                        System.out.println("########## user roles : " + authorities);
+                        log.info("### User roles: {}", authorities);
                         return new JwtAuthenticationToken(jwt, authorities);
                     });
 
@@ -149,8 +152,7 @@ public class SecurityConfig {
     public ServerAuthenticationEntryPoint jsonAuthEntryPoint(){
         return (exchange, ex) -> {
 
-            System.err.println("####### Authentication error: " + ex.getClass().getSimpleName() + " - " + ex.getMessage());
-
+            log.error("### Authentication error: {} - {}", ex.getClass().getSimpleName(), ex.getMessage());
 
             exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
             exchange.getResponse().getHeaders().add("Content-Type", "application/json");
@@ -169,42 +171,3 @@ public class SecurityConfig {
         };
     }
 }
-
-
-//                        // Add default role if no roles found
-//                        if (authorities.isEmpty()) {
-//                            authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
-//                        }
-
-
-//    @Bean
-//    public Converter<Jwt, Mono<AbstractAuthenticationToken>> customJwtAuthenticationConverter() {
-//        return jwt -> {
-//            String userId = jwt.getClaim("sub");
-//            System.out.println("Authenticating user ID: " + userId);
-//
-//            return userService.findRolesByUserId(userId)
-//                    .onErrorResume(e -> {
-//                        System.out.println("Error fetching roles, using default USER role");
-//                        return Mono.just(Collections.singletonList("CUSTOMER")); // Return mutable list with default role
-//                    })
-//                    .map(roles -> {
-//                        // Create a new mutable list for authorities
-//                        List<GrantedAuthority> authorities = new ArrayList<>();
-//
-//                        // Add roles from the service
-//                        roles.stream()
-//                                .map(role -> "ROLE_" + role.toUpperCase())
-//                                .map(SimpleGrantedAuthority::new)
-//                                .forEach(authorities::add);
-//
-//                        // Ensure at least one role exists
-//                        if (authorities.isEmpty()) {
-//                            authorities.add(new SimpleGrantedAuthority("ROLE_CUSTOMER"));
-//                        }
-//
-//                        System.out.println("Final authorities: " + authorities);
-//                        return new JwtAuthenticationToken(jwt, authorities);
-//                    });
-//        };
-//    }

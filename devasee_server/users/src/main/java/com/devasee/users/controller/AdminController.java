@@ -6,7 +6,6 @@ import com.devasee.users.dto.RetrieveUserDTO;
 import com.devasee.users.response.CustomResponse;
 import com.devasee.users.service.AdminService;
 import com.devasee.users.service.CustomerService;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

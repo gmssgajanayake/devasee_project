@@ -39,7 +39,7 @@ public class BookController {
     }
 
     // Get book by author
-    @GetMapping("/info/author/{author}") // TODO
+    @GetMapping("/public/author/{author}") // TODO
     public CustomResponse<List<RetrieveBookDTO>> getBookByAuthor(@PathVariable String author) {
         List<RetrieveBookDTO> books =  bookServices.getBookByAuthor(author);
         return new CustomResponse<>(true, "Books of " + author, books);
