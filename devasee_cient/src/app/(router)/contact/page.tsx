@@ -84,7 +84,7 @@ const Page = () => {
                             <button
                                 type="submit"
                                 data-aos="zoom-in"
-                                className="w-full  bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium py-3 px-6 rounded-xl transition duration-300 transform hover:scale-105"
+                                className="w-full bg-[#0000ff] hover:to-indigo-700 text-white font-medium py-3 px-6 rounded-xl transition duration-300 transform hover:scale-105"
                             >
                                 Send Message
                             </button>
