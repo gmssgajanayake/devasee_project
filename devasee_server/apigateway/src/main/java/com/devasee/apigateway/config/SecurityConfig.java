@@ -1,6 +1,8 @@
 package com.devasee.apigateway.config;
 
 import com.devasee.apigateway.service.ReactiveUserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.convert.converter.Converter; // convert JWT into Spring Security auth tokens
 import org.springframework.context.annotation.Bean;
@@ -16,11 +18,16 @@ import org.springframework.security.oauth2.jwt.*;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.ServerAuthenticationEntryPoint;
+import org.springframework.security.web.server.authorization.ServerAccessDeniedHandler;
 import reactor.core.publisher.Mono;
+
+import java.util.Collections;
 
 @Configuration
 @EnableWebFluxSecurity // This is the reactive version
 public class SecurityConfig {
+
+    private static final Logger log = LoggerFactory.getLogger(SecurityConfig.class);
 
     @Value("${clerk.issuer-uri}")
     private String clerkIssuerUri;
@@ -36,47 +43,76 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityWebFilterChain securityWebFilterChain (ServerHttpSecurity http) throws Exception{
+    public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) throws Exception {
         http
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
-                .authorizeExchange(exchanges  -> exchanges
+                .authorizeExchange(exchanges -> exchanges
                         .pathMatchers(
                                 "/api/v1/promo/public/**",
                                 "/api/v1/product/book/public/**",
                                 "/api/v1/product/stationery/public/**",
                                 "/api/v1/product/printing/public/**",
                                 "/api/v1/inventory/public/**"
-                                ).permitAll()
+                        ).permitAll()
                         .pathMatchers(
                                 "/api/v1/analytics/admin/**",
                                 "/api/v1/inventory/admin/**",
                                 "/api/v1/product/book/admin/**",
-                                "/api/v1/inventory/admin/**"
-                                ).hasRole("ADMIN")
+                                "/api/v1/inventory/admin/**",
+                                "/api/v1/users/admin/**"
+                        ).hasRole("ADMIN")
                         .anyExchange().authenticated()
                 )
-                .oauth2ResourceServer(oauth2-> oauth2
+                .oauth2ResourceServer(oauth2 -> oauth2
                         .authenticationEntryPoint(jsonAuthEntryPoint())
-                        .jwt(jwt-> jwt
-                                        .jwtDecoder(clerkJwtDecoder())
-                                        .jwtAuthenticationConverter(customJwtAuthenticationConverter())
+                        .accessDeniedHandler(jsonAccessDeniedHandler()) // 403
+                        .jwt(jwt -> jwt
+                                .jwtDecoder(clerkJwtDecoder())
+                                .jwtAuthenticationConverter(customJwtAuthenticationConverter())
                         )
                 );
 
         return http.build();
     }
 
+    // Custom JSON Access Denied Handler for Forbidden Requests (403)
+    @Bean
+    public ServerAccessDeniedHandler jsonAccessDeniedHandler() {
+        return (exchange, ex) -> {
+            log.error("### Access denied error: {} - {}", ex.getClass().getSimpleName(), ex.getMessage());
+
+            exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
+            exchange.getResponse().getHeaders().add("Content-Type", "application/json");
+
+            String body = """
+                    {
+                        "success": false,
+                        "message": "Access denied. You don't have permission to access this resource.",
+                        "data": {
+                                "status": 403,
+                                "requiredRole": "ADMIN"
+                            }
+                    }
+                    """;
+
+            byte[] bytes = body.getBytes();
+            return exchange.getResponse().writeWith(Mono.just(exchange.getResponse()
+                            .bufferFactory()
+                            .wrap(bytes)))
+                    .onErrorResume(Mono::error);
+        };
+    }
+
     // Clerk JWT Decoder with issuer & audience validation
     @Bean
     public ReactiveJwtDecoder clerkJwtDecoder() {
-        NimbusReactiveJwtDecoder jwtDecoder = (NimbusReactiveJwtDecoder)
-                ReactiveJwtDecoders.fromIssuerLocation(clerkIssuerUri);
+        NimbusReactiveJwtDecoder jwtDecoder = ReactiveJwtDecoders.fromIssuerLocation(clerkIssuerUri);
 
         // Add audience & issuer validation
         OAuth2TokenValidator<Jwt> withIssuer = JwtValidators.createDefaultWithIssuer(clerkIssuerUri);
         OAuth2TokenValidator<Jwt> withAudience = new JwtClaimValidator<String>(
                 "azp",
-                azp-> azp != null && azp.equals(expectedAudience)
+                azp -> azp != null && azp.equals(expectedAudience)
         );
 
         jwtDecoder.setJwtValidator(new DelegatingOAuth2TokenValidator<>(withIssuer, withAudience)); // (withIssuer,withAudience)
@@ -88,40 +124,44 @@ public class SecurityConfig {
     @Bean
     public Converter<Jwt, Mono<AbstractAuthenticationToken>> customJwtAuthenticationConverter() {
         return jwt -> {
+
             String userId = jwt.getClaimAsString("userId"); // or "userId", whichever you use
 
             // Call your user service here asynchronously to get roles for the user
             // For example, assuming you have a ReactiveUserService returning Mono<List<String>>
             return userService.findRolesByUserId(userId)
+                    .onErrorResume(e -> {
+                        log.error("### Error fetching roles, using empty list: {}", e.getMessage());
+                        return Mono.just(Collections.emptyList());
+                    })
                     .map(roles -> {
                         var authorities = roles.stream()
                                 .map(role -> "ROLE_" + role)
                                 .map(SimpleGrantedAuthority::new)
                                 .toList();
-                        System.out.println("########## user roles : "+authorities);
+
+                        log.info("### User roles: {}", authorities);
                         return new JwtAuthenticationToken(jwt, authorities);
                     });
+
         };
     }
-
-
 
     // Custom JSON Authentication Entry Point for Unauthorized Requests
     @Bean
     public ServerAuthenticationEntryPoint jsonAuthEntryPoint(){
         return (exchange, ex) -> {
 
-            System.err.println("####### Authentication error: " + ex.getClass().getSimpleName() + " - " + ex.getMessage());
-
+            log.error("### Authentication error: {} - {}", ex.getClass().getSimpleName(), ex.getMessage());
 
             exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
             exchange.getResponse().getHeaders().add("Content-Type", "application/json");
 
             String body = """
-                    "success": false,
+                    {"success": false,
                     "message": "%s",
                     "data": "AUTH_ERROR"
-                    """.formatted(ex.getMessage());
+                    }""".formatted(ex.getMessage());
 
             byte[] bytes = body.getBytes();
             return exchange.getResponse().writeWith(Mono.just(exchange.getResponse()
@@ -131,8 +171,3 @@ public class SecurityConfig {
         };
     }
 }
-
-
-//.jwkSetUri(clerkJwkSetUri)
-//@Value("${spring.security.oauth2.resourceserver.jwt.jwk-set-uri}")
-//private  String clerkJwkSetUri ;

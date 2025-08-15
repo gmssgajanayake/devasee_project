@@ -1,69 +1,128 @@
 package com.devasee.users.service;
 
 import com.devasee.users.dto.AdminDTO;
-import com.devasee.users.entity.Admin;
-import com.devasee.users.repository.AdminRepository;
+import com.devasee.users.dto.PromoteAsAdminDTO;
+import com.devasee.users.entity.AppUser;
+import com.devasee.users.entity.Role;
+import com.devasee.users.enums.Roles;
+import com.devasee.users.exceptions.CustomerNotFoundException;
+import com.devasee.users.repository.RoleRepo;
+import com.devasee.users.repository.UserRepo;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
 public class AdminService {
 
-    @Autowired
-    private AdminRepository adminRepository;
+    private static final Logger log = LoggerFactory.getLogger(AdminService.class);
 
-    @Autowired
-    private ModelMapper modelMapper;
+    private final UserRepo userRepo;
+    private final RoleRepo roleRepo;
+    private final ModelMapper modelMapper;
+
+    public AdminService(UserRepo userRepo, RoleRepo roleRepo, ModelMapper modelMapper) {
+        this.userRepo = userRepo;
+        this.roleRepo = roleRepo;
+        this.modelMapper = modelMapper;
+    }
 
     public List<AdminDTO> getAllAdmins() {
         try {
-            return modelMapper.map(adminRepository.findAll(), new TypeToken<List<AdminDTO>>() {}.getType());
+            log.info("### Fetching all admins");
+            return modelMapper.map(userRepo.findAllAdmins(), new TypeToken<List<AdminDTO>>() {}.getType());
         } catch (Exception e) {
+            log.error("### Failed to fetch admins: {}", e.getMessage(), e);
             throw new RuntimeException("Failed to fetch admins", e);
         }
     }
 
-    public AdminDTO getAdminById(Long adminId) {
+    public AdminDTO promoteAsAdmin(PromoteAsAdminDTO promoteAsAdminDTO) {
         try {
-            Optional<Admin> admin = adminRepository.findById(adminId);
-            return admin.map(value -> modelMapper.map(value, AdminDTO.class)).orElse(null);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to fetch admin with ID: " + adminId, e);
-        }
-    }
+            log.info("### Promoting user as admin: {}", promoteAsAdminDTO.getEmail());
 
-    public AdminDTO saveAdmin(AdminDTO adminDTO) {
-        try {
-            adminRepository.save(modelMapper.map(adminDTO, Admin.class));
-            return adminDTO;
+            Optional<AppUser> existingUser =  userRepo.findByEmail(promoteAsAdminDTO.getEmail());
+
+            if(existingUser.isPresent()){
+                Role adminRole = roleRepo.findByName(Roles.ADMIN.name()).orElseThrow(
+                        ()-> new RuntimeException("Role Admin not found"));
+
+                existingUser.get().getRoles().add(adminRole);
+                safeSaveUser(existingUser.get());
+                log.info("### ADMIN role added to user: {}", promoteAsAdminDTO.getEmail());
+            }else {
+                log.warn("### Cannot promote non-registered user: {}", promoteAsAdminDTO.getEmail());
+                throw new RuntimeException("Before promoting ad admin you must be registered");
+            }
+
+            return modelMapper.map(existingUser, AdminDTO.class);
         } catch (Exception e) {
+            log.error("### Failed to save admin: {}", e.getMessage(), e);
             throw new RuntimeException("Failed to save admin", e);
         }
     }
 
-    public AdminDTO updateAdmin(AdminDTO adminDTO) {
+    public AdminDTO demoteAdmin(String email) {
         try {
-            adminRepository.save(modelMapper.map(adminDTO, Admin.class));
-            return adminDTO;
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to update admin", e);
+            log.info("### Demoting admin: {}", email);
+            AppUser user = userRepo.findByEmail(email).orElseThrow(
+                    () -> new CustomerNotFoundException("Admin not found")
+            );
+
+            Role adminRole = roleRepo.findByName(Roles.ADMIN.name()).orElseThrow(
+                    () -> new RuntimeException("Role Admin not found"));
+
+            user.getRoles().remove(adminRole);
+
+            safeSaveUser(user);
+            log.info("### ADMIN role removed from user: {}", email);
+            return modelMapper.map(user, AdminDTO.class);
+        } catch (Exception e){
+            log.error("### Failed to demote admin {}: {}", email, e.getMessage(), e);
+            throw e;
         }
     }
 
-
-    public boolean deleteAdminById(Long adminId) {
-        Optional<Admin> admin = adminRepository.findById(adminId);
-        if (admin.isPresent()) {
-            adminRepository.delete(admin.get());
-            return true;
+    public void safeSaveUser(AppUser appUser){
+        try {
+            userRepo.save(appUser);
+            log.info("### User saved: {} | Roles: {}", appUser.getEmail(),
+                    appUser.getRoles().stream().map(Role::getName).toList());
+        }catch (Exception e){
+            log.error("### Error safe saving user {}: {}", appUser.getEmail(), e.getMessage(), e);
+            throw new RuntimeException("Failed to save user");
         }
-        return false;
+    }
+
+    public List<String> getUserRole(String userId) {
+        try {
+            log.warn("### User not found in database, returning default CUSTOMER role");
+            Optional<AppUser> existingUser = userRepo.findById(userId);
+
+            if (existingUser.isEmpty()) {
+                log.warn("### User not found in database, returning default CUSTOMER role");
+                return new ArrayList<>(Collections.singletonList("CUSTOMER")); // Mutable list
+            }
+
+            List<String> roles = existingUser.get().getRoles().stream()
+                    .map(Role::getName)
+                    .collect(Collectors.toList()
+                    ); // This returns a mutable list
+            log.info("### Roles for user {}: {}", userId, roles);
+            return roles;
+        } catch (Exception e) {
+            log.error("### Failed to get roles for userId {}: {}", userId, e.getMessage(), e);
+            throw e;
+        }
     }
 }

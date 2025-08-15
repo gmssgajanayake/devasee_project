@@ -1,10 +1,11 @@
 package com.devasee.users.controller;
 
 import com.devasee.users.dto.AdminDTO;
+import com.devasee.users.dto.PromoteAsAdminDTO;
+import com.devasee.users.dto.RetrieveUserDTO;
+import com.devasee.users.response.CustomResponse;
 import com.devasee.users.service.AdminService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import com.devasee.users.service.CustomerService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,58 +15,86 @@ import java.util.List;
 @RequestMapping(value = "api/v1/users/admin")
 public class AdminController {
 
-    @Autowired
-    private AdminService adminService;
+    private final AdminService adminService;
+    private final CustomerService customerService;
 
-    @GetMapping("/allAdmin")
-    public List<AdminDTO> getAllAdmin() {
-        try {
-            return adminService.getAllAdmins();
-        } catch (Exception e) {
-            throw new RuntimeException("Error fetching all admins", e);
-        }
+    public AdminController(
+            AdminService adminService,
+            CustomerService customerService
+    ) {
+        this.adminService = adminService;
+        this.customerService = customerService;
     }
 
-    @GetMapping("/{adminId}")
-    public AdminDTO getAdminById(@PathVariable Long adminId) {
-        try {
-            return adminService.getAdminById(adminId);
-        } catch (Exception e) {
-            throw new RuntimeException("Error fetching admin by ID: " + adminId, e);
-        }
+    // --------------------- Manage Admins Info ------------------------------
+
+    // Get all admins
+    @GetMapping("/allAdmins")
+    public CustomResponse<List<AdminDTO>> getAllAdmin() {
+        List<AdminDTO> admins = adminService.getAllAdmins();
+        return new CustomResponse<>(
+                false,
+                "All admin returned successfully, No of admins : "+admins.toArray().length,
+                admins
+        );
     }
 
-    @PostMapping("/addAdmin")
-    public AdminDTO saveAdmin(@RequestBody AdminDTO adminDTO) {
-        try {
-            return adminService.saveAdmin(adminDTO);
-        } catch (Exception e) {
-            throw new RuntimeException("Error saving admin", e);
-        }
+    // Promote existing user as admin or create a new admin
+    @PostMapping("/promote")
+    public CustomResponse<AdminDTO> promoteAsAdmin(@RequestBody PromoteAsAdminDTO promoteDemoteAdminDTO) {
+        AdminDTO adminDTO = adminService.promoteAsAdmin(promoteDemoteAdminDTO);
+        return new CustomResponse<>(
+                false,
+                String.format("User <%s> promoted successfully", promoteDemoteAdminDTO.getEmail()),
+                adminDTO
+        );
     }
 
-    @PutMapping("/updateAdmin")
-    public AdminDTO updateAdmin(@RequestBody AdminDTO adminDTO) {
-        try {
-            return adminService.updateAdmin(adminDTO);
-        } catch (Exception e) {
-            throw new RuntimeException("Error updating admin", e);
-        }
+    // Demote an admin as user by email
+    @PostMapping("/demote/{email}")
+    public CustomResponse<Object> demoteAdmin(@RequestBody PromoteAsAdminDTO promoteDemoteAdminDTO) {
+
+        AdminDTO dto = adminService.demoteAdmin(promoteDemoteAdminDTO.getEmail());
+        return new CustomResponse<>(
+                false,
+                "Admin deleted successfully.",
+                dto
+        );
     }
 
 
-    @DeleteMapping("/deleteAdmin/{adminId}")
-    public ResponseEntity<?> deleteAdmin(@PathVariable Long adminId) {
-        try {
-            boolean deleted = adminService.deleteAdminById(adminId);
-            if (deleted) {
-                return ResponseEntity.ok("Admin deleted successfully.");
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Admin not found.");
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error deleting admin: " + e.getMessage());
-        }
+
+    // ------------------------------- User management by admin -------------------------------
+
+    // Get all users both customers, admins
+    @GetMapping("/allUsers")
+    public CustomResponse<List<RetrieveUserDTO>> getAllUsers() {
+        List<RetrieveUserDTO> customers = customerService.getAllUsers();
+        return new CustomResponse<>(
+                true,
+                "Customers retrieved successfully, No of users : "+customers.toArray().length,
+                customers
+        );
+    }
+
+    // Get user by user id
+    @GetMapping("/{userId}")
+    public CustomResponse<RetrieveUserDTO> getCustomerById(@PathVariable String userId) {
+        RetrieveUserDTO customer = customerService.getUserById(userId);
+        return new CustomResponse<>(true, "Customer retrieved successfully", customer);
+    }
+
+    // Search user by a term email, first name, last name
+    @GetMapping("/search/{term}")
+    public CustomResponse<Object> findUser(@PathVariable String term) {
+        return new CustomResponse<>(true, term, null);
+    }
+
+    // Suspend an user by account status
+    @PostMapping("/suspend/{userId}")
+    public CustomResponse<RetrieveUserDTO> suspendUserByEmail(@PathVariable String userId){
+        RetrieveUserDTO retrieveUserDTO = customerService.suspendUser(userId);
+        return new CustomResponse<>(true, "User suspended successful", retrieveUserDTO);
     }
 }
+

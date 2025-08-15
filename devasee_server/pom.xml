@@ -19,7 +19,6 @@
   <modules>
     <module>product</module>
     <module>inventory</module>
-    <module>auth</module>
     <module>orders</module>
     <module>delivery</module>
     <module>analytics</module>
