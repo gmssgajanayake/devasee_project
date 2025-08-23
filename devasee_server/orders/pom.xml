@@ -52,6 +52,11 @@
             <version>42.7.3</version>
             <scope>runtime</scope>
         </dependency>
+        <dependency>
+            <groupId>org.devasee</groupId>
+            <artifactId>inventory</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
 
         <!-- Eureka client-->
         <dependency>
