@@ -8,13 +8,6 @@ import java.util.List;
 
 public interface InventoryRepo extends JpaRepository<Inventory, String> {
 
-    // Find all inventory entries in a specific warehouse location
-    @Query(value = "SELECT * FROM inventory WHERE warehouse_location = ?1", nativeQuery = true)
-    List<Inventory> findByWarehouseLocation(String warehouseLocation);
-
-    // Check if inventory exists for a particular product ID
-    boolean existsByProductId(String productId);
-
-    // Optionally find inventory by product ID
-    List<Inventory> findByProductId(String productId);
+    @Query(value = "SELECT* FROM inventory WHERE id=?1",nativeQuery = true)
+    Inventory getInventoryById(String inventoryId);
 }
