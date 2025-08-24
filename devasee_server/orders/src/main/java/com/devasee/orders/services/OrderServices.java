@@ -63,6 +63,22 @@ public class OrderServices {
    // }
 
 
+    public CreateOrderDTO saveOrder(CreateOrderDTO orderDTO) {
+        // Optional duplicate check
+        if (orderRepo.existsByOrderNumber(orderDTO.getOrderNumber())) {
+            throw new OrderAlreadyExistsException(
+                    "Order with number: " + orderDTO.getOrderNumber() + " already exists"
+            );
+        }
+
+        // Save entity
+        OrderEntity orderEntity = modelMapper.map(orderDTO, OrderEntity.class);
+        OrderEntity savedEntity = orderRepo.save(orderEntity);
+
+        // Return DTO with saved values
+        return modelMapper.map(savedEntity, CreateOrderDTO.class);
+    }
+
     public RetrieveOrderDTO updateOrder(RetrieveOrderDTO orderDTO) {
         OrderEntity existingOrder = orderRepo.findById(orderDTO.getId()).orElseThrow(
                 () -> new OrderNotFoundException("Order not found with ID: " + orderDTO.getId())
