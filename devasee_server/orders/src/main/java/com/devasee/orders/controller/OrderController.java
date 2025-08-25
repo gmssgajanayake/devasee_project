@@ -21,22 +21,21 @@ public class OrderController {
     }
 
     // Get all orders
-    @GetMapping("/allOrders")
+    @GetMapping("/public/allOrders")
     public CustomResponse<List<RetrieveOrderDTO>> getAllOrders() {
-        System.out.println("######## order controller############");
         List<RetrieveOrderDTO> orders = orderServices.getAllOrders();
         return new CustomResponse<>(true, "Orders retrieved successfully", orders);
     }
 
     // Get order by order ID
-    @GetMapping("/orderId/{orderId}")
+    @GetMapping("/public/orderId/{orderId}")
     public CustomResponse<RetrieveOrderDTO> getOrderById(@PathVariable int orderId) {
         RetrieveOrderDTO order = orderServices.getOrderById(orderId);
         return new CustomResponse<>(true, "Order found", order);
     }
 
     // Get orders by customer name
-    @GetMapping("/customer/{customerName}")
+    @GetMapping("/public/customer/{customerName}")
     public CustomResponse<List<RetrieveOrderDTO>> getOrdersByCustomer(@PathVariable String customerName) {
         List<RetrieveOrderDTO> orders = orderServices.getOrdersByCustomerName(customerName);
         return new CustomResponse<>(true, "Orders for " + customerName, orders);

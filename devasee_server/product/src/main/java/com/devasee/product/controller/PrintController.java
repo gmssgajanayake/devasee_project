@@ -1,8 +1,8 @@
 package com.devasee.product.controller;
 
 import com.devasee.product.dto.PrintDTO;
+import com.devasee.product.response.CustomResponse;
 import com.devasee.product.services.PrintServices;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -10,35 +10,51 @@ import java.util.List;
 @CrossOrigin
 @RestController
 @RequestMapping(value = "api/v1/product/printing")
-
 public class PrintController {
 
-    @Autowired
-    private PrintServices printServices;
+    private final PrintServices printServices;
 
-    @GetMapping("/printTypes")
-    public List<PrintDTO> getPrint() {
-        return printServices.getPrintType();
+    public PrintController(PrintServices printServices) {
+        this.printServices = printServices;
     }
 
-    @GetMapping("/{printId}")
-    public PrintDTO getPrintById(@PathVariable int printId) {
-        return printServices.getPrintById(printId);
-    }
-    @PostMapping("/addPrint")
-    public PrintDTO savePrint(@RequestBody PrintDTO printDTO) {
-        return printServices.savePrint(printDTO);
+    // --------------------------------- Public ---------------------------------
+
+    // Get all print types
+    @GetMapping("/public/allPrints")
+    public CustomResponse<List<PrintDTO>> getAllPrints() {
+        List<PrintDTO> printList = printServices.getPrintType();
+        return new CustomResponse<>(true, "Print types found", printList);
     }
 
-    @PutMapping("/updatePrint")
-    public PrintDTO updatePrint(@RequestBody PrintDTO printDTO) {
-        return printServices.updatePrint(printDTO);
+    // Get print by ID
+    @GetMapping("/public/printId/{printId}")
+    public CustomResponse<PrintDTO> getPrintById(@PathVariable int printId) {
+        PrintDTO printDTO = printServices.getPrintById(printId);
+        return new CustomResponse<>(true, "Print found", printDTO);
     }
 
-    @DeleteMapping("/deletePrint")
-    public boolean deletePrint(@RequestBody PrintDTO printDTO) {
-        return printServices.deletePrint(printDTO);
+
+    // --------------------------------- Admin ---------------------------------
+
+    // Save new print type
+    @PostMapping("/admin/addPrint")
+    public CustomResponse<PrintDTO> savePrint(@RequestBody PrintDTO printDTO) {
+        PrintDTO dtoResponse = printServices.savePrint(printDTO);
+        return new CustomResponse<>(true, "Print type saved successfully", dtoResponse);
+    }
+
+    // Update print details
+    @PutMapping("/admin/updatePrint")
+    public CustomResponse<PrintDTO> updatePrint(@RequestBody PrintDTO printDTO) {
+        PrintDTO updatedPrint = printServices.updatePrint(printDTO);
+        return new CustomResponse<>(true, "Print type updated successfully", updatedPrint);
+    }
+
+    @DeleteMapping("/admin/deletePrint/{id}")
+    public CustomResponse<Boolean> deletePrint(@PathVariable int id) {
+        boolean deleted = printServices.deletePrint(id);
+        return new CustomResponse<>(deleted, deleted ? "Print type deleted successfully" : "Failed to delete print type", deleted);
     }
 
 }
-

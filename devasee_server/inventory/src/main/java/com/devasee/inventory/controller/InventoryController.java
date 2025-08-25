@@ -21,14 +21,14 @@ public class InventoryController {
     }
 
     // Get all inventory
-    @GetMapping("/public/allInventory")
+    @GetMapping("/admin/allInventory")
     public CustomResponse<List<RetrieveInventoryDTO>> getAllInventory() {
         List<RetrieveInventoryDTO> inventoryList = inventoryServices.getAllInventory();
         return new CustomResponse<>(true, "Inventory found", inventoryList);
     }
 
     // Get inventory by id
-    @GetMapping("/public/inventoryId/{inventoryId}")
+    @GetMapping("/admin/inventoryId/{inventoryId}")
     public CustomResponse<RetrieveInventoryDTO> getInventoryById(@PathVariable String inventoryId) {
         RetrieveInventoryDTO inventoryDTO = inventoryServices.getInventoryById(inventoryId);
         return new CustomResponse<>(true, "Inventory found", inventoryDTO);
@@ -42,14 +42,14 @@ public class InventoryController {
     }
 
     // Update inventory
-    @PutMapping("/updateInventory")
+    @PutMapping("/admin/updateInventory")
     public CustomResponse<RetrieveInventoryDTO> updateInventory(@RequestBody RetrieveInventoryDTO inventoryDTO) {
         RetrieveInventoryDTO updatedInventory = inventoryServices.updateInventory(inventoryDTO);
         return new CustomResponse<>(true, "Inventory updated successfully", updatedInventory);
     }
 
     // Delete inventory by id
-    @DeleteMapping("/deleteId/{id}")
+    @DeleteMapping("/admin/deleteId/{id}")
     public CustomResponse<DeleteInventoryDTO> deleteInventory(@PathVariable String id) {
         DeleteInventoryDTO deletedDTO = inventoryServices.deleteInventory(id);
         return new CustomResponse<>(true, "Inventory deleted successfully", deletedDTO);
