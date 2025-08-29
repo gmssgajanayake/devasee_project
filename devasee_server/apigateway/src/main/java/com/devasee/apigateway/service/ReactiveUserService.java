@@ -5,5 +5,5 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 
 public interface ReactiveUserService {
-   Mono<List<String>> findRolesByUserId(String userId);
+      Mono<List<String>> findRolesByUserId(String userId);
 }

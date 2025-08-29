@@ -56,12 +56,8 @@ public class AuthController {
     // Return actual role or if not there return default role CUSTOMER
     @GetMapping("/{userId}/roles")
     public ResponseEntity<List<String>> getUserRole(@PathVariable String userId) {
-        try {
-            List<String> roles = adminService.getUserRole(userId);
-            return ResponseEntity.ok(new ArrayList<>(roles)); // Ensure mutable list
-        } catch (Exception e) {
-            return ResponseEntity.ok(new ArrayList<>(Collections.singletonList("CUSTOMER")));
-        }
+        List<String> roles = adminService.getUserRole(userId);
+        return ResponseEntity.ok(new ArrayList<>(roles)); // Ensure mutable list
     }
 
     // Delete user by id by user
