@@ -2,6 +2,7 @@ package com.devasee.delivery.controller;
 
 import com.devasee.delivery.dto.CreateDeliveryDTO;
 import com.devasee.delivery.dto.DeleteDeliveryDTO;
+import com.devasee.delivery.dto.DeliveryStatsDTO;
 import com.devasee.delivery.dto.RetrieveDeliveryDTO;
 import com.devasee.delivery.response.CustomResponse;
 import com.devasee.delivery.services.DeliveryService;
@@ -17,6 +18,7 @@ public class DeliveryController {
     private final DeliveryService deliveryService;
 
     public DeliveryController(DeliveryService deliveryService) {
+
         this.deliveryService = deliveryService;
     }
 
@@ -48,5 +50,11 @@ public class DeliveryController {
     public CustomResponse<DeleteDeliveryDTO> deleteDelivery(@PathVariable Long id) {
         DeleteDeliveryDTO deleted = deliveryService.deleteDelivery(id);
         return new CustomResponse<>(true, "Delivery deleted successfully", deleted);
+    }
+    // New Endpoint for analytics: Delivery Stats
+    @GetMapping("/stats")
+    public CustomResponse<DeliveryStatsDTO> getDeliveryStats() {
+        DeliveryStatsDTO stats = deliveryService.calculateDeliveryStats();
+        return new CustomResponse<>(true, "Delivery stats calculated", stats);
     }
 }
