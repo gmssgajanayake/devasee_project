@@ -4,7 +4,7 @@ spring:
 
 # Postgres sql db configuration
   datasource:
-    url: jdbc:postgresql://localhost:5432/devasee_users_db
+    url: jdbc:postgresql://localhost:5432/devasee_users_db?IfExists=true
     username: postgres
     password: postgres
     driver-class-name: org.postgresql.Driver
