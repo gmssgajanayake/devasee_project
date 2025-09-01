@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: devasee-eureka
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: devasee-eureka
+  template:
+    metadata:
+      labels:
+        app: devasee-eureka
+    spec:
+      containers:
+        - name: devasee-eureka
+          image: devaseebookstoreacr.azurecr.io/devasee-eureka:1.0
+          ports:
+            - containerPort: 8761
