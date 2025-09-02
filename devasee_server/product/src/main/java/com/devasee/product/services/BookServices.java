@@ -8,7 +8,10 @@ import com.devasee.product.repo.BookRepo;
 import com.devasee.product.exception.ProductAlreadyExistsException;
 import com.devasee.product.exception.ProductNotFoundException;
 import com.devasee.product.exception.ServiceUnavailableException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
+import jakarta.ws.rs.InternalServerErrorException;
 import org.hibernate.exception.DataException;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
@@ -16,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -27,13 +31,16 @@ public class BookServices {
 
     private final BookRepo bookRepo;
     private final ModelMapper modelMapper;
+    private final AzureBlobService azureBlobService;
 
     public BookServices(
             BookRepo bookRepo,
-            ModelMapper modelMapper
+            ModelMapper modelMapper,
+            AzureBlobService azureBlobService
     ){
         this.bookRepo = bookRepo;
         this.modelMapper = modelMapper;
+        this.azureBlobService = azureBlobService;
     }
 
     public List<RetrieveBookDTO> getAllBooks() {
@@ -75,13 +82,27 @@ public class BookServices {
         }.getType());
     }
 
-    public CreateBookDTO saveBook(CreateBookDTO bookDTO) {
+    public CreateBookDTO saveBook(String bookJson, MultipartFile file) {
 
-        if(bookRepo.existsByIsbn(bookDTO.getIsbn())){
-            throw new ProductAlreadyExistsException("Book with ISBN : " + bookDTO.getIsbn() + " already exists");
+        CreateBookDTO bookDTO;
+
+        try{
+            // Convert JSON string to DTO
+            ObjectMapper mapper = new ObjectMapper();
+            bookDTO = mapper.readValue(bookJson, CreateBookDTO.class);
+
+            if (bookRepo.existsByIsbn(bookDTO.getIsbn())) {
+                throw new ProductAlreadyExistsException("Book with ISBN : " + bookDTO.getIsbn() + " already exists");
+            }
+        } catch (Exception e){
+            throw new InternalServerErrorException("Error mapping JSON to DTO", e);
         }
 
         try {
+            // Upload the image to Azure Blob Storage
+            String imageUrl = azureBlobService.uploadFile(file);
+            bookDTO.setImgUrl(imageUrl); // Set uploaded image URL in DTO
+
             Book savedBook = bookRepo.save(modelMapper.map(bookDTO, Book.class));
             log.info("### Book saved successfully with ID: {}", savedBook.getId());
         } catch (Exception e){

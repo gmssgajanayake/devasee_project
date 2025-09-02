@@ -1,0 +1,146 @@
+services:
+
+#  # PostgreSQL for Product Service
+#  product-db:
+#    image: postgres:15
+#    container_name: product-db
+#    environment:
+#      POSTGRES_DB: devasee_product_db
+#      POSTGRES_USER: postgres
+#      POSTGRES_PASSWORD: postgres
+#    ports:
+#      - "5432:5432"
+#
+#  # PostgreSQL for Product Service
+#  users-db:
+#    image: postgres:15
+#    container_name: users-db
+#    environment:
+#      POSTGRES_DB: devasee_users_db
+#      POSTGRES_USER: postgres
+#      POSTGRES_PASSWORD: postgres
+#    ports:
+#      - "5433:5432"
+
+  # Single PostgreSQL for all services
+  db:
+    image: postgres:15
+    container_name: devasee-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+
+  # Eureka
+  eureka:
+    build: ./eureka
+    image: devasee-eureka:1.0
+    ports:
+      - "8761:8761"
+
+  # API Gateway
+  apigateway:
+    build: ./apigateway
+    image: devasee-apigateway:1.0
+    ports:
+      - "8080:8080"
+    depends_on:
+      - eureka
+    extra_hosts:
+      - "clerk.devasee.lk:172.64.153.110"
+
+  # User
+  users:
+    build: ./users
+    image: devasee-users:1.0
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/devasee_users_db
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+    depends_on:
+      - eureka
+      - db
+
+  # Orders
+  orders:
+    build: ./orders
+    image: devasee-orders:1.0
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/devasee_orders_db
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+    depends_on:
+      - eureka
+      - db
+      - inventory
+
+  # Inventory
+  inventory:
+    build: ./inventory
+    image: devasee-inventory:1.0
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/devasee_inventory_db
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+    depends_on:
+      - eureka
+      - db
+
+  # Delivery
+  delivery:
+    build: ./delivery
+    image: devasee-delivery:1.0
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/devasee_delivery_db
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+    depends_on:
+      - eureka
+      - db
+
+  # Product
+  product:
+    build: ./product
+    image: devasee-product:1.0
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/devasee_product_db
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+    depends_on:
+      - eureka
+      - db
+
+  # Promo
+  promo:
+    build: ./promo
+    image: devasee-promo:1.0
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/devasee_promo_db
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+    depends_on:
+      - eureka
+      - db
+
+  # Analytics
+  analytics:
+    build: ./analytics
+    image: devasee-analytics:1.0
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/devasee_analytics_db
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+    depends_on:
+      - eureka
+      - db

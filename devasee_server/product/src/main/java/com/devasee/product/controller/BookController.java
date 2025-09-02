@@ -6,6 +6,7 @@ import com.devasee.product.dto.RetrieveBookDTO;
 import com.devasee.product.response.CustomResponse;
 import com.devasee.product.services.BookServices;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -51,8 +52,11 @@ public class BookController {
 
     // Save the book in database
     @PostMapping("/admin/addBook")
-    public CustomResponse<CreateBookDTO> saveBook(@RequestBody CreateBookDTO bookDTO) {
-        CreateBookDTO dtoResponse =  bookServices.saveBook(bookDTO);
+    public CustomResponse<CreateBookDTO> saveBook(
+            @RequestParam("book") String bookJson,
+            @RequestParam("file") MultipartFile file
+    ) {
+        CreateBookDTO dtoResponse =  bookServices.saveBook(bookJson, file);
         return new CustomResponse<>(true, "Book saved success", dtoResponse);
     }
 
@@ -69,4 +73,14 @@ public class BookController {
         DeleteBookDTO bookDTO = bookServices.deleteBook(id);
         return new CustomResponse<>(true, "Book deleted success", bookDTO);
     }
+
+//    @PostMapping("/image/upload")
+//    public ResponseEntity<String> uploadImage(@RequestParam("file") MultipartFile file) {
+//        try {
+//            String url = azureBlobService.uploadFile(file);
+//            return ResponseEntity.ok(url);
+//        } catch (Exception e) {
+//            return ResponseEntity.status(500).body("Upload failed: " + e.getMessage());
+//        }
+//    }
 }
