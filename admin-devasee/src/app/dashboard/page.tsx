@@ -8,7 +8,6 @@ import { Button } from '@/components/ui/button';
 import {
     recentBooks as allBooks,
     stats,
-    recentActivity,
     navItems,
 } from '@/lib/dashboard-data';
 import { Sidebar } from '@/components/dashboard/Sidebar';
@@ -46,6 +45,7 @@ export default function BookDashboard() {
                     setSearchQuery={setSearchQuery}
                 />
 
+
                 <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8 overflow-auto">
                     <div className="flex items-center">
                         <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
@@ -54,6 +54,7 @@ export default function BookDashboard() {
                                 <Plus className="h-3.5 w-3.5" />
                                 <span className="sm:whitespace-nowrap">Add New Book</span>
                             </Button>
+
                         </div>
                     </div>
 

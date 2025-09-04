@@ -11,6 +11,7 @@ import { Header } from '@/components/dashboard/Header';
 import DashboardPage from './pages/DashboardPage';
 import BooksPage from './pages/BooksPage';
 import SettingsPage from './pages/SettingsPage';
+import {UserButton} from "@clerk/nextjs";
 
 export default function DashboardLayout() {
     const [activeTab, setActiveTab] = useState('dashboard');
@@ -32,7 +33,7 @@ export default function DashboardLayout() {
     };
 
     return (
-        <div className="flex h-screen w-full bg-muted/40">
+        <div className="flex  h-screen w-full bg-muted/40">
             <Sidebar
                 isOpen={sidebarOpen}
                 onClose={() => setSidebarOpen(false)}
@@ -42,11 +43,18 @@ export default function DashboardLayout() {
             />
 
             <div className="flex-1 flex flex-col overflow-hidden">
+
+
                 <Header
                     onMenuClick={() => setSidebarOpen(true)}
                     searchQuery={searchQuery}
                     setSearchQuery={setSearchQuery}
                 />
+
+                <UserButton
+                    afterSignOutUrl="/sign-in"
+                />
+
                 {/* The main content area now renders the active page */}
                 {renderActivePage()}
             </div>
