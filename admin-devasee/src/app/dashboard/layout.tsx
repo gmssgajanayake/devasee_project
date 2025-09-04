@@ -1,7 +1,6 @@
-// app/dashboard/layout.tsx
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { navItems } from '@/lib/dashboard-data';
 import { Sidebar } from '@/components/dashboard/Sidebar';
 import { Header } from '@/components/dashboard/Header';
@@ -9,7 +8,7 @@ import DashboardPage from './pages/DashboardPage';
 import BooksPage from './pages/BooksPage';
 import SettingsPage from './pages/SettingsPage';
 import { UserButton, useUser } from "@clerk/nextjs";
-import {redirect} from "next/navigation";
+import { useRouter } from "next/navigation";
 
 export default function DashboardLayout() {
     const [activeTab, setActiveTab] = useState('dashboard');
@@ -17,11 +16,14 @@ export default function DashboardLayout() {
     const [searchQuery, setSearchQuery] = useState('');
 
     const { isSignedIn, user } = useUser();
+    const router = useRouter();
 
-    if (!isSignedIn) {
-        redirect("/sign-in");
-    }
-
+    // ✅ Redirect client-side
+    useEffect(() => {
+        if (!isSignedIn) {
+            router.push("/sign-in");
+        }
+    }, [isSignedIn, router]);
 
     const renderActivePage = () => {
         switch (activeTab) {
@@ -34,6 +36,11 @@ export default function DashboardLayout() {
                 return <DashboardPage searchQuery={searchQuery} />;
         }
     };
+
+    if (!isSignedIn) {
+        // Show nothing or loading while redirecting
+        return null;
+    }
 
     return (
         <div className="flex h-screen w-full bg-muted/40">
