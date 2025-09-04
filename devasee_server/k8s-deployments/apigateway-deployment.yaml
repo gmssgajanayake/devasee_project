@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: devasee-apigateway
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: devasee-apigateway
+  template:
+    metadata:
+      labels:
+        app: devasee-apigateway
+    spec:
+      containers:
+        - name: devasee-apigateway
+          image: devaseebookstoreacr.azurecr.io/devasee-apigateway:1.0
+          ports:
+            - containerPort: 8080
+          env:
+            - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+              value: http://devasee-eureka:8761/eureka

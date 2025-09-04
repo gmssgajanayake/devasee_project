@@ -1,17 +1,24 @@
 package com.devasee.analytics.controller;
 
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.devasee.analytics.dto.FullAnalyticsReportDTO;
+import com.devasee.analytics.response.CustomResponse;
+import com.devasee.analytics.services.AnalyticsService;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequestMapping("/api/v1/analytics/admin")
 @CrossOrigin
-@RequestMapping(value = "api/v1/analytics")
 public class AnalyticsController {
 
-    @GetMapping("/admin/all")
-    public String getAllAnalytics(){
-        return "getting all analytics";
+    private final AnalyticsService analyticsService;
+
+    public AnalyticsController(AnalyticsService analyticsServices) {
+        this.analyticsService = analyticsServices;
+    }
+
+    @GetMapping("/report")
+    public CustomResponse<FullAnalyticsReportDTO> getReport() {
+        FullAnalyticsReportDTO report = analyticsService.generateReport();
+        return new CustomResponse<>(true, "Analytics report generated", report);
     }
 }

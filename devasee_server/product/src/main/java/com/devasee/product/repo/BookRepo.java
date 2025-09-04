@@ -1,16 +1,15 @@
 package com.devasee.product.repo;
 
 import com.devasee.product.entity.Book;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 
-import java.util.List;
 
 
 public interface BookRepo extends JpaRepository<Book, String> {
 
-    @Query(value = "SELECT * FROM book WHERE author=?1",  nativeQuery = true)
-    List<Book> findByAuthor(String author);
+    Page<Book> findByAuthor(String author, Pageable pageable);
 
     // existsByIsbn(String isbn) is automatically implemented by Spring Data JPA, thanks to method name conventions.
     // Spring Data JPA provides "query method derivation".

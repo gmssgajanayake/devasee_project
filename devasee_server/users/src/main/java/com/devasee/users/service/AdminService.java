@@ -106,23 +106,24 @@ public class AdminService {
 
     public List<String> getUserRole(String userId) {
         try {
-            log.warn("### User not found in database, returning default CUSTOMER role");
             Optional<AppUser> existingUser = userRepo.findById(userId);
 
             if (existingUser.isEmpty()) {
                 log.warn("### User not found in database, returning default CUSTOMER role");
-                return new ArrayList<>(Collections.singletonList("CUSTOMER")); // Mutable list
+                return new ArrayList<>(Collections.singletonList(Roles.CUSTOMER.name())); // Mutable list
             }
 
             List<String> roles = existingUser.get().getRoles().stream()
                     .map(Role::getName)
-                    .collect(Collectors.toList()
-                    ); // This returns a mutable list
+                    .collect(Collectors.toList()); // This returns a mutable list
+
             log.info("### Roles for user {}: {}", userId, roles);
-            return roles;
+            return roles.isEmpty()
+                    ? new ArrayList<>(Collections.singletonList(Roles.CUSTOMER.name()))
+                    : roles;
         } catch (Exception e) {
             log.error("### Failed to get roles for userId {}: {}", userId, e.getMessage(), e);
-            throw e;
+            return new ArrayList<>(Collections.singletonList(Roles.CUSTOMER.name())); // Mutable list
         }
     }
 }

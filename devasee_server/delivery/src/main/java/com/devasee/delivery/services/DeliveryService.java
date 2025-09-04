@@ -2,6 +2,7 @@ package com.devasee.delivery.services;
 
 import com.devasee.delivery.dto.CreateDeliveryDTO;
 import com.devasee.delivery.dto.DeleteDeliveryDTO;
+import com.devasee.delivery.dto.DeliveryStatsDTO;
 import com.devasee.delivery.dto.RetrieveDeliveryDTO;
 import com.devasee.delivery.entity.Delivery;
 import com.devasee.delivery.exception.DeliveryNotFoundException;
@@ -67,5 +68,15 @@ public class DeliveryService {
                 .orElseThrow(() -> new DeliveryNotFoundException("Cannot delete. Delivery not found with ID: " + id));
         deliveryRepository.delete(existing);
         return modelMapper.map(existing, DeleteDeliveryDTO.class);
+    }
+    // ✅ New Method: Delivery Stats
+    public DeliveryStatsDTO calculateDeliveryStats() {
+        List<RetrieveDeliveryDTO> deliveries = getAllDeliveries();
+        int totalDeliveries = deliveries.size();
+        int pendingDeliveries = (int) deliveries.stream()
+                .filter(d -> "PENDING".equalsIgnoreCase(d.getStatus()))
+                .count();
+
+        return new DeliveryStatsDTO(totalDeliveries, pendingDeliveries);
     }
 }
