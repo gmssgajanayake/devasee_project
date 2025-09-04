@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import {Geist, Geist_Mono, Inter} from "next/font/google";
 import "./globals.css";
+import {ClerkProvider} from "@clerk/nextjs";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -11,6 +12,13 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
+
+const inter = Inter({
+    subsets: ["latin"],
+    weight: ["400", "500", "600", "700"], // Add only the weights you use
+    variable: "--font-inter", // Tailwind will use this
+});
+
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -23,6 +31,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
+      <ClerkProvider appearance={
+          {
+              variables: {
+                  colorPrimary: "#0000ff", // Tailwind's blue-800
+                  colorText: "#1F2937", // Tailwind's gray-800
+                  colorBackground: "#ffffff", // White background
+                  fontFamily: inter.style.fontFamily,
+                  // Use Inter font
+              },
+          }
+      }>
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
@@ -30,5 +49,7 @@ export default function RootLayout({
         {children}
       </body>
     </html>
+        </ClerkProvider>
   );
+
 }
