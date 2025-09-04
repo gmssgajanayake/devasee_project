@@ -1,31 +1,34 @@
 // app/dashboard/layout.tsx
-
 'use client';
 
 import { useState } from 'react';
 import { navItems } from '@/lib/dashboard-data';
 import { Sidebar } from '@/components/dashboard/Sidebar';
 import { Header } from '@/components/dashboard/Header';
-
-// Import the new pages we will create
 import DashboardPage from './pages/DashboardPage';
 import BooksPage from './pages/BooksPage';
 import SettingsPage from './pages/SettingsPage';
-import {UserButton} from "@clerk/nextjs";
+import { UserButton, useUser } from "@clerk/nextjs";
+import {redirect} from "next/navigation";
 
 export default function DashboardLayout() {
     const [activeTab, setActiveTab] = useState('dashboard');
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
 
-    // A simple router to render the correct page based on the active tab
+    const { isSignedIn, user } = useUser();
+
+    if (!isSignedIn) {
+        redirect("/sign-in");
+    }
+
+
     const renderActivePage = () => {
         switch (activeTab) {
             case 'books':
                 return <BooksPage searchQuery={searchQuery} />;
             case 'settings':
                 return <SettingsPage />;
-            // Add cases for 'members' and 'reports' here
             case 'dashboard':
             default:
                 return <DashboardPage searchQuery={searchQuery} />;
@@ -33,7 +36,7 @@ export default function DashboardLayout() {
     };
 
     return (
-        <div className="flex  h-screen w-full bg-muted/40">
+        <div className="flex h-screen w-full bg-muted/40">
             <Sidebar
                 isOpen={sidebarOpen}
                 onClose={() => setSidebarOpen(false)}
@@ -43,19 +46,19 @@ export default function DashboardLayout() {
             />
 
             <div className="flex-1 flex flex-col overflow-hidden">
-
-
                 <Header
                     onMenuClick={() => setSidebarOpen(true)}
                     searchQuery={searchQuery}
                     setSearchQuery={setSearchQuery}
                 />
 
-                <UserButton
-                    afterSignOutUrl="/sign-in"
-                />
+                <div className="p-2">
+                    <UserButton afterSignOutUrl="/sign-in" />
+                    <p className="mt-2 text-sm text-gray-600">
+                        Logged in as {user?.emailAddresses[0]?.emailAddress}
+                    </p>
+                </div>
 
-                {/* The main content area now renders the active page */}
                 {renderActivePage()}
             </div>
         </div>
