@@ -8,20 +8,19 @@ import com.devasee.product.repo.BookRepo;
 import com.devasee.product.exception.ProductAlreadyExistsException;
 import com.devasee.product.exception.ProductNotFoundException;
 import com.devasee.product.exception.ServiceUnavailableException;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
-import jakarta.ws.rs.InternalServerErrorException;
 import org.hibernate.exception.DataException;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 
 @Service
 @Transactional
@@ -43,43 +42,66 @@ public class BookServices {
         this.azureBlobService = azureBlobService;
     }
 
-    public List<RetrieveBookDTO> getAllBooks() {
+    private RetrieveBookDTO sasUrlAdder(Book book){
+
+            RetrieveBookDTO dto = modelMapper.map(book, RetrieveBookDTO.class);
+
+            String blobName = dto.getImgUrl(); // stored as filename
+            if (blobName != null && !blobName.isEmpty()) {
+                String sasUrl = azureBlobService.generateSasUrl(blobName);
+                dto.setImgUrl(sasUrl);
+            }
+
+            return dto;
+    }
+
+    public Page<RetrieveBookDTO> getPaginatedBooks(int page, int size) {
         try {
-            return modelMapper.map(bookRepo.findAll(), new TypeToken<List<RetrieveBookDTO>>() {
-            }.getType());
+
+            Pageable pageable = PageRequest.of(page ,size, Sort.by("title").ascending());
+            Page<Book> bookPage = bookRepo.findAll(pageable);
+
+            // Convert Book → DTO and replace blob names with SAS URLs
+            Page<RetrieveBookDTO> dtoPage = bookPage.map(this::sasUrlAdder);
+
+            if (dtoPage.isEmpty()) {
+                throw new ProductNotFoundException("No books found");
+            }
+
+            return dtoPage;
+
         } catch (DataException exception){
             log.error("### Error fetching all books", exception);
             throw new ServiceUnavailableException("Something went wrong on the server. Please try again later.");
         }
     }
 
+
+
     public RetrieveBookDTO getBookById(String bookId) {
         try {
             Book book = bookRepo.findById(bookId)
                     .orElseThrow(() -> new ProductNotFoundException("Book not found with ID: " + bookId));
-            return modelMapper.map(book, RetrieveBookDTO.class);
+
+           return sasUrlAdder(book);
+
         } catch (DataAccessException e) {
             log.error("### Error fetching book by ID: {}", bookId, e);
             throw new ServiceUnavailableException("Something went wrong on the server. Please try again later.");
         }
     }
 
-    public List<RetrieveBookDTO> getBookByAuthor(String author) {
-        List<Book> bookList;
-
+    public Page<RetrieveBookDTO> getBookByAuthor(String author, int page, int size) {
         try {
-            bookList = bookRepo.findByAuthor(author);
+            Pageable pageable = PageRequest.of(page, size);
+            Page<Book> bookPage = bookRepo.findByAuthor(author, pageable);
+
+            return bookPage.map(this::sasUrlAdder);
+
         } catch (Exception e){
             log.error("### Error fetching books by author: {}", author, e);
             throw new ServiceUnavailableException("Something went wrong in server");
         }
-
-        if (bookList== null || bookList.isEmpty()) {
-            throw new ProductNotFoundException("No books found for author: " + author);
-        }
-
-        return modelMapper.map(bookList, new TypeToken<List<RetrieveBookDTO>>() {
-        }.getType());
     }
 
     public CreateBookDTO saveBook(String bookJson, MultipartFile file) {
@@ -95,12 +117,12 @@ public class BookServices {
                 throw new ProductAlreadyExistsException("Book with ISBN : " + bookDTO.getIsbn() + " already exists");
             }
         } catch (Exception e){
-            throw new InternalServerErrorException("Error mapping JSON to DTO", e);
+            throw new ServiceUnavailableException("Error mapping JSON to DTO : "+ e);
         }
 
         try {
             // Upload the image to Azure Blob Storage
-            String imageUrl = azureBlobService.uploadFile(file);
+            String imageUrl = (file!=null)? azureBlobService.uploadFile(file) : null;
             bookDTO.setImgUrl(imageUrl); // Set uploaded image URL in DTO
 
             Book savedBook = bookRepo.save(modelMapper.map(bookDTO, Book.class));
@@ -124,7 +146,7 @@ public class BookServices {
             Book savedBook = bookRepo.save(updatedBook);
             log.info("### Book updated successfully with ID: {}", savedBook.getId());
 
-            return modelMapper.map(savedBook, RetrieveBookDTO.class);
+            return sasUrlAdder(savedBook);
 
         } catch (DataAccessException  e){
             log.error("### Error updating book with ID: {}", bookDTO.getId(), e);
@@ -138,6 +160,13 @@ public class BookServices {
         );
 
         try {
+
+            // Delete file from Azure
+            if (book.getImgUrl() != null && !book.getImgUrl().isEmpty()) {
+                azureBlobService.deleteFile(book.getImgUrl());
+            }
+
+            // Delete book from database
             bookRepo.deleteById(id);
             log.info("### Book deleted successfully with ID: {}", id);
         } catch (Exception e){

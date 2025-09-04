@@ -5,10 +5,9 @@ import com.devasee.product.dto.DeleteBookDTO;
 import com.devasee.product.dto.RetrieveBookDTO;
 import com.devasee.product.response.CustomResponse;
 import com.devasee.product.services.BookServices;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 
 @CrossOrigin
 @RestController
@@ -25,11 +24,20 @@ public class BookController {
 
     // --------------------------------- Public ---------------------------------
 
-    // Get all books
-    @GetMapping("/public/allBooks")
-    public CustomResponse<List<RetrieveBookDTO>> getAllBooks() {
-        List<RetrieveBookDTO> bookList = bookServices.getAllBooks();
-        return new CustomResponse<>(true, "Books found", bookList);
+    ///  Just make sure callers know that Spring’s pages are 0-based (page=0 is first page).
+
+    // Get paginated books
+    @GetMapping("/public/books")
+    public CustomResponse<Page<RetrieveBookDTO>> getAllBooks(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+    ) {
+        Page<RetrieveBookDTO> bookPage  = bookServices.getPaginatedBooks(page, size);
+        return new CustomResponse<>(true, "Books found", bookPage);
+
+        // Example API Call
+        // /public/books?page=0&size=20   → first 20 books
+        // /public/books?page=1&size=20   → next 20 books
     }
 
     // Get book by book id
@@ -40,10 +48,23 @@ public class BookController {
     }
 
     // Get book by author
-    @GetMapping("/public/author/{author}") // TODO
-    public CustomResponse<List<RetrieveBookDTO>> getBookByAuthor(@PathVariable String author) {
-        List<RetrieveBookDTO> books =  bookServices.getBookByAuthor(author);
-        return new CustomResponse<>(true, "Books of " + author, books);
+    @GetMapping("/public/author/{author}")
+    public CustomResponse<Page<RetrieveBookDTO>> getBookByAuthor(
+            @PathVariable String author,
+             @RequestParam(defaultValue = "0") int page,
+             @RequestParam(defaultValue = "10") int size) {
+        Page<RetrieveBookDTO> bookDTOS =  bookServices.getBookByAuthor(author, page, size);
+        return new CustomResponse<>(true, "Books of " + author, bookDTOS);
+
+        // Get first page (default 0) of books by author "J.K. Rowling" with default size 10
+        // GET /public/author/J.K.%20Rowling
+
+        // Get second page (page = 1) with 5 books per page
+        // GET /public/author/J.K.%20Rowling?page=1&size=5
+
+        // Get first page with 20 books per page
+        // GET /public/author/J.K.%20Rowling?page=0&size=20
+
     }
 
 
