@@ -134,6 +134,8 @@ export default function MainNavBar() {
                         src={logo}
                         alt={"logo"}
                         priority
+                        width={200}
+                        height={300}
                         className="h-10 w-10 lg:w-16 lg:h-16"
                     />
                 </Link>
@@ -215,7 +217,8 @@ export default function MainNavBar() {
                                             <div key={item.id}
                                                  className="text-sm justify-between flex items-center gap-4 border-b border-gray-400/20 pb-2">
                                                 <div className="flex items-center gap-2">
-                                                    <Image src={item.image} className={'w-10 h-auto'}
+                                                    <Image src={item.image}  width={200}
+                                                           height={300} className={'w-10 h-auto'}
                                                            alt={"Item image"}/>
                                                     <div className="">
                                                         <p className="font-medium">{item.title}</p>
