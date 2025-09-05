@@ -28,6 +28,8 @@ public class AppUser {
     @Column(unique = true, nullable = false)
     private String email;
 
+//    @Column(length = 72)
+//    private String password;
     @Enumerated(EnumType.STRING)
     private AccountStatus accountStatus = AccountStatus.INACTIVE;
 

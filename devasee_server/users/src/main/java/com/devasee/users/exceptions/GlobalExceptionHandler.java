@@ -10,14 +10,14 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(CustomerNotFoundException.class)
-    public ResponseEntity<CustomResponse<Object>> handleCustomerNotFound(CustomerNotFoundException ex) {
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<CustomResponse<Object>> handleCustomerNotFound(UserNotFoundException ex) {
         CustomResponse<Object> response = new CustomResponse<>(false, ex.getMessage(), null);
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(CustomerAlreadyExistsException.class)
-    public ResponseEntity<CustomResponse<Object>> handleCustomerAlreadyExists(CustomerAlreadyExistsException ex) {
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    public ResponseEntity<CustomResponse<Object>> handleCustomerAlreadyExists(UserAlreadyExistsException ex) {
         CustomResponse<Object> response = new CustomResponse<>(false, ex.getMessage(), null);
         return new ResponseEntity<>(response, HttpStatus.CONFLICT);
     }
