@@ -5,14 +5,17 @@ import com.devasee.users.dto.PromoteAsAdminDTO;
 import com.devasee.users.entity.AppUser;
 import com.devasee.users.entity.Role;
 import com.devasee.users.enums.Roles;
-import com.devasee.users.exceptions.CustomerNotFoundException;
+import com.devasee.users.exceptions.UserNotFoundException;
 import com.devasee.users.repository.RoleRepo;
 import com.devasee.users.repository.UserRepo;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -31,16 +34,23 @@ public class AdminService {
     private final RoleRepo roleRepo;
     private final ModelMapper modelMapper;
 
-    public AdminService(UserRepo userRepo, RoleRepo roleRepo, ModelMapper modelMapper) {
+    public AdminService(
+            UserRepo userRepo,
+            RoleRepo roleRepo,
+            ModelMapper modelMapper
+    ) {
         this.userRepo = userRepo;
         this.roleRepo = roleRepo;
         this.modelMapper = modelMapper;
     }
 
-    public List<AdminDTO> getAllAdmins() {
+    public Page<AdminDTO> getAllAdmins(int page, int size) {
         try {
+            Pageable pageable = PageRequest.of(page, size, Sort.by("firstName").ascending());
+            Page<AppUser> appUserPage = userRepo.findAllByRoleName(Roles.ADMIN.name(), pageable);
             log.info("### Fetching all admins");
-            return modelMapper.map(userRepo.findAllAdmins(), new TypeToken<List<AdminDTO>>() {}.getType());
+
+            return appUserPage.map(user-> modelMapper.map(user, AdminDTO.class));
         } catch (Exception e) {
             log.error("### Failed to fetch admins: {}", e.getMessage(), e);
             throw new RuntimeException("Failed to fetch admins", e);
@@ -58,6 +68,7 @@ public class AdminService {
                         ()-> new RuntimeException("Role Admin not found"));
 
                 existingUser.get().getRoles().add(adminRole);
+
                 safeSaveUser(existingUser.get());
                 log.info("### ADMIN role added to user: {}", promoteAsAdminDTO.getEmail());
             }else {
@@ -76,7 +87,7 @@ public class AdminService {
         try {
             log.info("### Demoting admin: {}", email);
             AppUser user = userRepo.findByEmail(email).orElseThrow(
-                    () -> new CustomerNotFoundException("Admin not found")
+                    () -> new UserNotFoundException("Admin not found")
             );
 
             Role adminRole = roleRepo.findByName(Roles.ADMIN.name()).orElseThrow(

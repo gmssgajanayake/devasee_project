@@ -32,7 +32,8 @@ public class BookController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size
     ) {
-        Page<RetrieveBookDTO> bookPage  = bookServices.getPaginatedBooks(page, size);
+
+        Page<RetrieveBookDTO> bookPage  = bookServices.getAllBooks(page, size);
         return new CustomResponse<>(true, "Books found", bookPage);
 
         // Example API Call
@@ -47,25 +48,29 @@ public class BookController {
         return new CustomResponse<>(true, "Book found", bookDTO);
     }
 
-    // Get book by author
-    @GetMapping("/public/author/{author}")
-    public CustomResponse<Page<RetrieveBookDTO>> getBookByAuthor(
-            @PathVariable String author,
-             @RequestParam(defaultValue = "0") int page,
-             @RequestParam(defaultValue = "10") int size) {
-        Page<RetrieveBookDTO> bookDTOS =  bookServices.getBookByAuthor(author, page, size);
-        return new CustomResponse<>(true, "Books of " + author, bookDTOS);
 
-        // Get first page (default 0) of books by author "J.K. Rowling" with default size 10
-        // GET /public/author/J.K.%20Rowling
+    // GET /public/search?field=author&value=J.K.%20Rowling&page=0&size=10
+    // GET /public/search?field=title&value=Harry%20Potter
+    // GET /public/search?field=category&value=Fantasy
+    // Search book by field
+    @GetMapping("/public/search")
+    public CustomResponse<Page<RetrieveBookDTO>> getBookByTerm(
+            @RequestParam String field,
+            @RequestParam String value,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
 
-        // Get second page (page = 1) with 5 books per page
-        // GET /public/author/J.K.%20Rowling?page=1&size=5
+        Page<RetrieveBookDTO> bookDTOS = bookServices.searchBookByTerm(field, value, page, size);
 
-        // Get first page with 20 books per page
-        // GET /public/author/J.K.%20Rowling?page=0&size=20
-
+        return new CustomResponse<>(
+                true,
+                "Books by " + field + " : " + value,
+                bookDTOS
+        );
     }
+
+
 
 
 
@@ -95,13 +100,4 @@ public class BookController {
         return new CustomResponse<>(true, "Book deleted success", bookDTO);
     }
 
-//    @PostMapping("/image/upload")
-//    public ResponseEntity<String> uploadImage(@RequestParam("file") MultipartFile file) {
-//        try {
-//            String url = azureBlobService.uploadFile(file);
-//            return ResponseEntity.ok(url);
-//        } catch (Exception e) {
-//            return ResponseEntity.status(500).body("Upload failed: " + e.getMessage());
-//        }
-//    }
 }

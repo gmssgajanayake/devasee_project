@@ -55,9 +55,8 @@ public class BookServices {
             return dto;
     }
 
-    public Page<RetrieveBookDTO> getPaginatedBooks(int page, int size) {
+    public Page<RetrieveBookDTO> getAllBooks(int page, int size) {
         try {
-
             Pageable pageable = PageRequest.of(page ,size, Sort.by("title").ascending());
             Page<Book> bookPage = bookRepo.findAll(pageable);
 
@@ -91,15 +90,32 @@ public class BookServices {
         }
     }
 
-    public Page<RetrieveBookDTO> getBookByAuthor(String author, int page, int size) {
-        try {
-            Pageable pageable = PageRequest.of(page, size);
-            Page<Book> bookPage = bookRepo.findByAuthor(author, pageable);
+    public Page<RetrieveBookDTO> searchBookByTerm(
+            String field,
+            String value,
+            int page,
+            int size
+    ) {
+        Page<Book> bookPage;
+        Pageable pageable = PageRequest.of(page, size);
 
-            return bookPage.map(this::sasUrlAdder);
+       try {
+           bookPage = switch (field.toLowerCase()) {
+               case "title" -> bookRepo.findByTitleContainingIgnoreCase(value, pageable);
+               case "author" -> bookRepo.findByAuthorContainingIgnoreCase(value, pageable);
+               case "publisher" -> bookRepo.findByPublisherContainingIgnoreCase(value, pageable);
+               case "category" -> bookRepo.findByCategoryContainingIgnoreCase(value, pageable);
+               default -> throw new IllegalArgumentException("Invalid search field: " + field);
+           };
+
+           if (bookPage.isEmpty()) {
+               throw new ProductNotFoundException("No books found for " + field + " : " + value);
+           }
+
+           return bookPage.map(this::sasUrlAdder);
 
         } catch (Exception e){
-            log.error("### Error fetching books by author: {}", author, e);
+            log.error("### Error fetching books by {} : {}", field, value, e);
             throw new ServiceUnavailableException("Something went wrong in server");
         }
     }
