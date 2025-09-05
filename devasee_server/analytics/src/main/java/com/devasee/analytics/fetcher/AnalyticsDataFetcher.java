@@ -19,6 +19,7 @@ public class AnalyticsDataFetcher {
 
     // Fetch and aggregate Orders
 //    public SalesSummaryDTO fetchSalesSummary(String period) {
+
 //        CustomResponse<List<OrderDTO>> response = webClientBuilder.build()
 //                .get()
 //                .uri("http://order-service/api/v1/orders/order/allOrders")
