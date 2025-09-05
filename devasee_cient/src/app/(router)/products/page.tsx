@@ -7,12 +7,7 @@ import FilterBar from "@/app/(router)/products/_components/FilterBar";
 import Container from "@/app/(router)/products/_components/Container";
 
 import book1 from "@/assets/items image/img.png";
-// import book2 from "@/assets/items image/img_1.png";
-// import book3 from "@/assets/items image/img_2.png";
-// import book4 from "@/assets/items image/img_3.png";
-// import book5 from "@/assets/items image/img_1.png";
-// import book6 from "@/assets/items image/img_2.png";
-// import book7 from "@/assets/items image/img_3.png";
+
 
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {
@@ -27,18 +22,6 @@ import {Book} from "@/types/types";
 import Head from "@/app/(router)/products/head";
 import {getAllBooks} from "@/lib/actions";
 
-
-// const allBooks: Book[] = Array.from({length: 5}, (_, i) => ({
-//     id: `book-${i + 1}`,
-//     image: [book1, book2, book3, book4, book5, book6, book7][i % 7],
-//     title: `Book ${i + 1}`,
-//     author: `Author ${i + 1}`,
-//     price: 1000 + (i % 7) * 100,
-//     type: i % 2 === 0 ? "Books" : "Stationery",
-//     brand: i % 3 === 0 ? "Devasee" : "Other",
-//     stock: 10 + (i % 5),
-//     quantity: 1,
-// }));
 
 
 export default function  Page() {
@@ -118,6 +101,15 @@ export default function  Page() {
             if (sortBy === "author") return a.author.localeCompare(b.author);
             return a.price - b.price;
         });
+
+    if (!isMounted || loading) {
+        return (
+            <div className="w-full h-[calc(100vh-80px)] flex justify-center items-center">
+                <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+            </div>
+        );
+    }
+
 
     return (
         <>
