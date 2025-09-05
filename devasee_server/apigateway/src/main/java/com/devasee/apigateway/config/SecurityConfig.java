@@ -36,10 +36,10 @@ public class SecurityConfig {
     private String expectedAudience;
 
     // Inject your user service here (Reactive)
-    private final ReactiveUserService userService;
+    private final ReactiveUserService reactiveUserService;
 
-    public SecurityConfig(ReactiveUserService userService) {
-        this.userService = userService;
+    public SecurityConfig(ReactiveUserService reactiveUserService) {
+        this.reactiveUserService = reactiveUserService;
     }
 
     @Bean
@@ -129,7 +129,7 @@ public class SecurityConfig {
 
             // Call your user service here asynchronously to get roles for the user
             // For example, assuming you have a ReactiveUserService returning Mono<List<String>>
-            return userService.findRolesByUserId(userId)
+            return reactiveUserService.findRolesByUserId(userId)
                     .onErrorResume(e -> {
                         log.error("### Error fetching roles, using empty list: {}", e.getMessage());
                         return Mono.just(Collections.emptyList());

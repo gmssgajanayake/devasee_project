@@ -6,8 +6,8 @@ import com.devasee.users.entity.Role;
 import com.devasee.users.enums.AccountStatus;
 import com.devasee.users.entity.AppUser;
 import com.devasee.users.enums.Roles;
-import com.devasee.users.exceptions.CustomerAlreadyExistsException;
-import com.devasee.users.exceptions.CustomerNotFoundException;
+import com.devasee.users.exceptions.UserAlreadyExistsException;
+import com.devasee.users.exceptions.UserNotFoundException;
 import com.devasee.users.exceptions.InvalidAuthHeaderException;
 import com.devasee.users.exceptions.ServiceUnavailableException;
 import com.devasee.users.repository.RoleRepo;
@@ -60,7 +60,7 @@ public class CustomerService {
     public RetrieveUserDTO getUserById(String id) {
         log.info("### Fetching customer by ID: {}", id);
         AppUser appUser = userRepo.findById(id)
-                .orElseThrow(() -> new CustomerNotFoundException("Customer not found with ID: " + id));
+                .orElseThrow(() -> new UserNotFoundException("Customer not found with ID: " + id));
         return modelMapper.map(appUser, RetrieveUserDTO.class);
     }
 
@@ -87,7 +87,7 @@ public class CustomerService {
 
         if(userRepo.existsByEmail(email)) {
             log.warn("### Customer already exists: {}", email);
-            throw new CustomerAlreadyExistsException("Customer with email '" + email + "' already exists");
+            throw new UserAlreadyExistsException("Customer with email '" + email + "' already exists");
         }
 
         AppUser appUser = new AppUser();
@@ -155,7 +155,7 @@ public class CustomerService {
     //    public RetrieveUserDTO updateCustomer(RetrieveUserDTO dto) {
     //
     //        AppUser existing = userRepo.findById(dto.getUserId())
-    //                .orElseThrow(() -> new CustomerNotFoundException("Customer not found with ID: " + dto.getUserId()));
+    //                .orElseThrow(() -> new UserNotFoundException("Customer not found with ID: " + dto.getUserId()));
     //
     //        AppUser updatedAppUser = modelMapper.map(dto, AppUser.class);
     //        updatedAppUser.setUserId(existing.getUserId());
@@ -166,7 +166,7 @@ public class CustomerService {
     // Delete user by id
     public void deleteUser(String userId) {
         AppUser existingUser = userRepo.findById(userId).orElseThrow(()->
-                new CustomerNotFoundException("Customer not found with id: " + userId)
+                new UserNotFoundException("Customer not found with id: " + userId)
         );
 
        try {
@@ -181,7 +181,7 @@ public class CustomerService {
     // Suspend the user
     public RetrieveUserDTO suspendUser(String userId){
         AppUser existingUser = userRepo.findById(userId).orElseThrow(
-                ()-> new CustomerNotFoundException("Customer not found"));
+                ()-> new UserNotFoundException("Customer not found"));
 
         existingUser.setAccountStatus(AccountStatus.SUSPENDED);
         log.info("### Suspended customer with ID: {}", userId);

@@ -6,6 +6,7 @@ import com.devasee.users.dto.RetrieveUserDTO;
 import com.devasee.users.response.CustomResponse;
 import com.devasee.users.service.AdminService;
 import com.devasee.users.service.CustomerService;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,14 +29,17 @@ public class AdminController {
 
     // --------------------- Manage Admins Info ------------------------------
 
-    // Get all admins
+    // Get all admins by page
     @GetMapping("/allAdmins")
-    public CustomResponse<List<AdminDTO>> getAllAdmin() {
-        List<AdminDTO> admins = adminService.getAllAdmins();
+    public CustomResponse<Page<AdminDTO>> getAllAdmin(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+    ) {
+        Page<AdminDTO> adminsPage = adminService.getAllAdmins(page,size);
         return new CustomResponse<>(
-                false,
-                "All admin returned successfully, No of admins : "+admins.toArray().length,
-                admins
+                true,
+                "Admin returned successfully",
+                adminsPage
         );
     }
 
@@ -44,7 +48,7 @@ public class AdminController {
     public CustomResponse<AdminDTO> promoteAsAdmin(@RequestBody PromoteAsAdminDTO promoteDemoteAdminDTO) {
         AdminDTO adminDTO = adminService.promoteAsAdmin(promoteDemoteAdminDTO);
         return new CustomResponse<>(
-                false,
+                true,
                 String.format("User <%s> promoted successfully", promoteDemoteAdminDTO.getEmail()),
                 adminDTO
         );
@@ -56,15 +60,13 @@ public class AdminController {
 
         AdminDTO dto = adminService.demoteAdmin(promoteDemoteAdminDTO.getEmail());
         return new CustomResponse<>(
-                false,
+                true,
                 "Admin deleted successfully.",
                 dto
         );
     }
 
-
-
-    // ------------------------------- User management by admin -------------------------------
+    // ------------------------------- User Management By Admin -------------------------------
 
     // Get all users both customers, admins
     @GetMapping("/allUsers")

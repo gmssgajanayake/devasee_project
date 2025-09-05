@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @CrossOrigin
@@ -20,17 +19,17 @@ public class AuthController {
     private final CustomerService customerService;
     private final AdminService adminService;
 
-    public AuthController(CustomerService customerService, AdminService adminService) {
+    public AuthController(
+            CustomerService customerService,
+            AdminService adminService
+    ) {
         this.customerService = customerService;
         this.adminService = adminService;
     }
 
-
-
-
     // Saving an user after registering in frontend, default role returning and assigning as CUSTOMER
-    @PostMapping("/save")
-    public CustomResponse<Object> saveCustomer(
+    @PostMapping("/register")
+    public CustomResponse<Object> createUser(
             HttpServletRequest request
     ) {
         // Get the Authorization header
@@ -56,12 +55,8 @@ public class AuthController {
     // Return actual role or if not there return default role CUSTOMER
     @GetMapping("/{userId}/roles")
     public ResponseEntity<List<String>> getUserRole(@PathVariable String userId) {
-        try {
-            List<String> roles = adminService.getUserRole(userId);
-            return ResponseEntity.ok(new ArrayList<>(roles)); // Ensure mutable list
-        } catch (Exception e) {
-            return ResponseEntity.ok(new ArrayList<>(Collections.singletonList("CUSTOMER")));
-        }
+        List<String> roles = adminService.getUserRole(userId);
+        return ResponseEntity.ok(new ArrayList<>(roles)); // Ensure mutable list
     }
 
     // Delete user by id by user
