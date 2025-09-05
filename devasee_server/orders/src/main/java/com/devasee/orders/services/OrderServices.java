@@ -13,6 +13,7 @@ import org.hibernate.exception.DataException;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.List;
 
@@ -20,10 +21,12 @@ import java.util.List;
 @Transactional
 public class OrderServices {
 
+    private  final WebClient webClient;
     private final OrderRepo orderRepo;
     private final ModelMapper modelMapper;
 
-    public OrderServices(OrderRepo orderRepo, ModelMapper modelMapper) {
+    public OrderServices(WebClient webClient,OrderRepo orderRepo, ModelMapper modelMapper) {
+        this.webClient  = webClient;
         this.orderRepo = orderRepo;
         this.modelMapper = modelMapper;
     }
@@ -51,12 +54,29 @@ public class OrderServices {
         return modelMapper.map(orderList, new TypeToken<List<RetrieveOrderDTO>>() {}.getType());
     }
 
+   // public CreateOrderDTO saveOrder(CreateOrderDTO orderDTO) {
+      //  if (orderRepo.existsByOrderNumber(orderDTO.getOrderNumber())) {
+        //    throw new OrderAlreadyExistsException("Order with number: " + orderDTO.getOrderNumber() + " already exists");
+       // }
+      //  orderRepo.save(modelMapper.map(orderDTO, OrderEntity.class));
+      //  return orderDTO;
+   // }
+
+
     public CreateOrderDTO saveOrder(CreateOrderDTO orderDTO) {
+        // Optional duplicate check
         if (orderRepo.existsByOrderNumber(orderDTO.getOrderNumber())) {
-            throw new OrderAlreadyExistsException("Order with number: " + orderDTO.getOrderNumber() + " already exists");
+            throw new OrderAlreadyExistsException(
+                    "Order with number: " + orderDTO.getOrderNumber() + " already exists"
+            );
         }
-        orderRepo.save(modelMapper.map(orderDTO, OrderEntity.class));
-        return orderDTO;
+
+        // Save entity
+        OrderEntity orderEntity = modelMapper.map(orderDTO, OrderEntity.class);
+        OrderEntity savedEntity = orderRepo.save(orderEntity);
+
+        // Return DTO with saved values
+        return modelMapper.map(savedEntity, CreateOrderDTO.class);
     }
 
     public RetrieveOrderDTO updateOrder(RetrieveOrderDTO orderDTO) {
