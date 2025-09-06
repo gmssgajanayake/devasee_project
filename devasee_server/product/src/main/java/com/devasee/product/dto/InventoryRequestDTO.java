@@ -1,14 +1,13 @@
-package com.devasee.inventory.dto;
+package com.devasee.product.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-public class CreateInventoryDTO {
+@NoArgsConstructor
+public class InventoryRequestDTO {
     private String productId;
     private int reservedQuantity;
-    private String warehouseLocation;
 }

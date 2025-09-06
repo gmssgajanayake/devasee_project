@@ -26,6 +26,7 @@ public class BookController {
 
     ///  Just make sure callers know that Spring’s pages are 0-based (page=0 is first page).
 
+    //public/books?page=0&size=20
     // Get paginated books
     @GetMapping("/public/books")
     public CustomResponse<Page<RetrieveBookDTO>> getAllBooks(
@@ -35,10 +36,6 @@ public class BookController {
 
         Page<RetrieveBookDTO> bookPage  = bookServices.getAllBooks(page, size);
         return new CustomResponse<>(true, "Books found", bookPage);
-
-        // Example API Call
-        // /public/books?page=0&size=20   → first 20 books
-        // /public/books?page=1&size=20   → next 20 books
     }
 
     // Get book by book id
@@ -47,6 +44,7 @@ public class BookController {
         RetrieveBookDTO bookDTO = bookServices.getBookById(bookId);
         return new CustomResponse<>(true, "Book found", bookDTO);
     }
+
 
 
     // GET /public/search?field=author&value=J.K.%20Rowling&page=0&size=10
@@ -72,8 +70,6 @@ public class BookController {
 
 
 
-
-
     // --------------------------------- Admin ---------------------------------
 
     // Save the book in database
@@ -88,8 +84,11 @@ public class BookController {
 
     // Update book details (price, quantity, ...)
     @PutMapping("/admin/updateBook")
-    public CustomResponse<RetrieveBookDTO> updateBook(@RequestBody RetrieveBookDTO bookDTO) {
-        RetrieveBookDTO book = bookServices.updateBook(bookDTO);
+    public CustomResponse<RetrieveBookDTO> updateBook(
+            @RequestParam("book") String bookJson,
+            @RequestParam("file") MultipartFile file
+    ) {
+        RetrieveBookDTO book = bookServices.updateBook(bookJson, file);
         return new CustomResponse<>(true, "Book updated success", book);
     }
 
