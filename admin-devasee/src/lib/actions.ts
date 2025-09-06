@@ -3,8 +3,8 @@
 
 export async function addBook(formData: FormData, JWTtoken: string | null) {
     try {
+        //const token = JWTtoken;
         const token = JWTtoken;
-
         if (!token) {
             throw new Error("Missing authentication token");
         }
@@ -23,9 +23,8 @@ export async function addBook(formData: FormData, JWTtoken: string | null) {
                     "Comprehensive textbook covering a broad range of algorithms in depth, widely used in universities.",
                 language: "English",
                 price: 65.0,
-                stockQuantity: 40,
-                isbn: 972923342033848,
-                imgUrl: "",
+                initialQuantity: 40,
+                isbn: 12038481112
             })
         );
 
