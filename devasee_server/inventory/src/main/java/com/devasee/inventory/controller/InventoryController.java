@@ -34,13 +34,13 @@ public class InventoryController {
         return new CustomResponse<>(true, "Inventory found", inventoryDTO);
     }
 
-    // Get item quantity by productId
+    // For Product Service : Get item quantity by productId
     @GetMapping("/admin/productId/{productId}")
     public Integer getInventoryQuantityById(@PathVariable String productId) {
         return inventoryServices.getInventoryQuantityById(productId);
     }
 
-    // Save inventory
+    // For Product Service: Save inventory
     @PostMapping("/admin/addInventory")
     public CustomResponse<CreateUpdateInventoryDTO> saveInventory(@RequestBody CreateUpdateInventoryDTO inventoryDTO) {
         CreateUpdateInventoryDTO responseDTO = inventoryServices.saveInventory(inventoryDTO);
@@ -60,6 +60,13 @@ public class InventoryController {
     @DeleteMapping("/admin/deleteId/{id}")
     public CustomResponse<DeleteInventoryDTO> deleteInventory(@PathVariable String id) {
         DeleteInventoryDTO deletedDTO = inventoryServices.deleteInventory(id);
+        return new CustomResponse<>(true, "Inventory deleted successfully", deletedDTO);
+    }
+
+    // For Product Service : Delete inventory by deleteBookId
+    @DeleteMapping("/admin/deleteByProductId/{productId}")
+    public CustomResponse<DeleteInventoryDTO> deleteInventoryByBookId(@PathVariable String productId) {
+        DeleteInventoryDTO deletedDTO = inventoryServices.deleteInventoryByProductId(productId);
         return new CustomResponse<>(true, "Inventory deleted successfully", deletedDTO);
     }
 }
