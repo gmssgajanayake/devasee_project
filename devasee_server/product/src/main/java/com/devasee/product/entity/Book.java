@@ -26,7 +26,6 @@ public class Book {
     private String description;
     private String language;
     private double price;
-    private int stockQuantity;
     private long isbn;
     private String imgUrl;
     private LocalDateTime createdAt;
