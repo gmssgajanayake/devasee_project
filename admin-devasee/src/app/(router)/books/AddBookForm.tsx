@@ -1,10 +1,34 @@
 "use client";
 
-import { useState} from "react";
+import {useEffect, useState} from "react";
 import { addBook } from "@/lib/actions";
+import {useAuth, useUser} from "@clerk/nextjs";
 
 export default function AddBookForm() {
     const [loading, setLoading] = useState(false);
+    const [token, setToken] = useState<string | null>(null);
+
+    const { user } = useUser();
+    const { getToken } = useAuth();
+
+
+    async function getCustomJwt() {
+        try {
+            const jwt = await getToken({ template: "devasee_user_token" });
+            setToken(jwt);
+            console.log("JWT with user details:", jwt);
+            return jwt;
+        } catch (err) {
+            console.error("Error getting JWT:", err);
+            return null;
+        }
+    }
+
+    useEffect(() => {
+        getCustomJwt();
+        console.log(token)
+        if (user) console.log("User Info:", user);
+    }, [user]);
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
@@ -14,7 +38,7 @@ export default function AddBookForm() {
         const formData = new FormData(form); // Correct way to create FormData
 
         try {
-            const result = await addBook(formData);
+            const result = await addBook(formData,token);
             console.log("Book saved:", result);
             alert("Book added successfully!");
             form.reset();

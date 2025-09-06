@@ -1,17 +1,9 @@
 // src/lib/actions.ts
 "use server";
 
-import { auth } from "@clerk/nextjs/server";
-
-export async function getToken() {
-    const { getToken } = await auth();
-    const token = await getToken({ template: "devasee_user_token" });
-    return token;
-}
-
-export async function addBook(formData: FormData) {
+export async function addBook(formData: FormData, JWTtoken: string | null) {
     try {
-        const token = getToken();
+        const token = JWTtoken;
 
         if (!token) {
             throw new Error("Missing authentication token");
@@ -32,7 +24,7 @@ export async function addBook(formData: FormData) {
                 language: "English",
                 price: 65.0,
                 stockQuantity: 40,
-                isbn: 9729033848,
+                isbn: 972923342033848,
                 imgUrl: "",
             })
         );
