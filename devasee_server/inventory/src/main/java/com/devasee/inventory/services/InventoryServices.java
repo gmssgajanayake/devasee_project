@@ -40,12 +40,13 @@ public class InventoryServices {
         return modelMapper.map(inventory, RetrieveInventoryDTO.class);
     }
 
-    // Get quantity form database if error return 0
+    // For Product Service : Get quantity form database if error return 0
     public int getInventoryQuantityById(String productId) {
         return inventoryRepo.findByProductId(productId).map(Inventory::getAvailableQuantity)
                 .orElse(0);
     }
 
+    // For Product Service
     public CreateUpdateInventoryDTO saveInventory(CreateUpdateInventoryDTO createUpdateInventoryDTO) {
         try {
             Inventory inventory = modelMapper.map(createUpdateInventoryDTO, Inventory.class);
@@ -57,6 +58,7 @@ public class InventoryServices {
         return createUpdateInventoryDTO;
     }
 
+    // For Product Service
     public RetrieveInventoryDTO updateInventory(CreateUpdateInventoryDTO inventoryDTO) {
         Inventory existingInventory = inventoryRepo.findByProductIdForUpdate(inventoryDTO.getProductId())
                 .orElseThrow(() -> new InventoryNotFoundException("Inventory not found with ID: " + inventoryDTO.getProductId()));
@@ -75,8 +77,25 @@ public class InventoryServices {
 
     public DeleteInventoryDTO deleteInventory(String inventoryId) {
         Inventory inventory = inventoryRepo.findById(inventoryId)
-                .orElseThrow(() -> new RuntimeException("Inventory not found with ID: " + inventoryId));
+                .orElseThrow(() -> new InventoryNotFoundException("Inventory not found with ID: " + inventoryId));
         inventoryRepo.delete(inventory);
         return modelMapper.map(inventory, DeleteInventoryDTO.class);
+    }
+
+    // For Product Service
+    public DeleteInventoryDTO deleteInventoryByProductId(String productId) {
+        try {
+            Inventory inventory = inventoryRepo.findByProductId(productId)
+                    .orElseThrow(() -> new InventoryNotFoundException("Inventory not found with bookId: " + productId));
+            inventoryRepo.delete(inventory);
+
+            return modelMapper.map(inventory, DeleteInventoryDTO.class);
+
+        } catch (InventoryNotFoundException e) {
+            throw e;
+
+        } catch (Exception e){
+            throw new RuntimeException("Service unavailable : " +e.getMessage());
+        }
     }
 }

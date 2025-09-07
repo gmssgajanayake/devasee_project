@@ -13,9 +13,11 @@ public interface InventoryRepo extends JpaRepository<Inventory, String> {
     @Query(value = "SELECT*FROM inventory WHERE id=?1",nativeQuery = true)
     Inventory getInventoryById(String inventoryId);
 
+    // For Product Service
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT i FROM Inventory i WHERE i.productId = :productId")
     Optional<Inventory> findByProductIdForUpdate(String productId);
 
+    // For Product Service
     Optional<Inventory> findByProductId(String productId);
 }

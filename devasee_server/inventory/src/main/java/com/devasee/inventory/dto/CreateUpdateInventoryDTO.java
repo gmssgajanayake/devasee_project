@@ -10,5 +10,4 @@ import lombok.NoArgsConstructor;
 public class CreateUpdateInventoryDTO {
     private String productId;
     private int reservedQuantity;
-//    private String warehouseLocation;
 }

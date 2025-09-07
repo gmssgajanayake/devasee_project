@@ -47,6 +47,8 @@ public class BookServices {
         this.inventoryClient = inventoryClient;
     }
 
+    // Due to image original url is private generate new SAS url
+    // Same time add available quantity to response from Inventory
     private RetrieveBookDTO sasUrlAdderAndQuantitySetter(Book book){
 
             RetrieveBookDTO dto = modelMapper.map(book, RetrieveBookDTO.class);
@@ -62,6 +64,7 @@ public class BookServices {
             return dto;
     }
 
+    // Get available product item quantity from Inventory
     private int stockQuantityGetter(String productId){
         try {
             return inventoryClient.getStockQuantity(productId);
@@ -70,6 +73,7 @@ public class BookServices {
         }
     }
 
+    // Get All Books
     public Page<RetrieveBookDTO> getAllBooks(int page, int size) {
         try {
             Pageable pageable = PageRequest.of(page , size, Sort.by("title").ascending());
@@ -90,8 +94,7 @@ public class BookServices {
         }
     }
 
-
-
+    // Get Book By BookId
     public RetrieveBookDTO getBookById(String bookId) {
         try {
             Book book = bookRepo.findById(bookId)
@@ -105,6 +108,7 @@ public class BookServices {
         }
     }
 
+    // Search A Book By Title,Author, Category
     public Page<RetrieveBookDTO> searchBookByTerm(
             String field,
             String value,
@@ -137,6 +141,7 @@ public class BookServices {
         }
     }
 
+    // Save New Book In Database
     public CreateBookDTO saveBook(String bookJson, MultipartFile file) {
 
         CreateBookDTO bookDTO;
@@ -177,6 +182,7 @@ public class BookServices {
         return bookDTO;
     }
 
+    // Update Book Details, Cover Image Not Required
     public RetrieveBookDTO updateBook(String bookJson, MultipartFile file) {
 
         UpdateBookDTO bookDTO;
@@ -228,13 +234,15 @@ public class BookServices {
         }
     }
 
-    public DeleteBookDTO deleteBook(String id) {
+    // Delete Book By bookId
+    public DeleteBookDTO deleteBook(String bookId) {
 
-        Book book = bookRepo.findById(id).orElseThrow(
+        Book book = bookRepo.findById(bookId).orElseThrow(
                 ()-> new ProductNotFoundException("Book not found")
         );
 
         try {
+            inventoryClient.deleteInventory(bookId);
 
             // Delete file from Azure
             if (book.getImgUrl() != null && !book.getImgUrl().isEmpty()) {
@@ -242,10 +250,11 @@ public class BookServices {
             }
 
             // Delete book from database
-            bookRepo.deleteById(id);
-            log.info("### Book deleted successfully with ID: {}", id);
+            bookRepo.deleteById(bookId);
+
+            log.info("### Book deleted successfully with ID: {}", bookId);
         } catch (Exception e){
-            log.error("### Error deleting book with ID: {}", id, e);
+            log.error("### Error deleting book with ID: {}", bookId, e);
             throw new ServiceUnavailableException("Something went wrong in server");
         }
 

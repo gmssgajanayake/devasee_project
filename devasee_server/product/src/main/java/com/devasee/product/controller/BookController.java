@@ -38,7 +38,7 @@ public class BookController {
         return new CustomResponse<>(true, "Books found", bookPage);
     }
 
-    // Get book by book id
+    // Get book by bookId
     @GetMapping("/public/bookId/{bookId}")
     public CustomResponse<RetrieveBookDTO> getBookById(@PathVariable String bookId) {
         RetrieveBookDTO bookDTO = bookServices.getBookById(bookId);
@@ -50,7 +50,7 @@ public class BookController {
     // GET /public/search?field=author&value=J.K.%20Rowling&page=0&size=10
     // GET /public/search?field=title&value=Harry%20Potter
     // GET /public/search?field=category&value=Fantasy
-    // Search book by field
+    // Search book by title, author, category
     @GetMapping("/public/search")
     public CustomResponse<Page<RetrieveBookDTO>> getBookByTerm(
             @RequestParam String field,
@@ -93,9 +93,9 @@ public class BookController {
     }
 
     // Delete book by id
-    @DeleteMapping("/admin/deleteId/{id}")
-    public CustomResponse<DeleteBookDTO> deleteBook(@PathVariable String id) {
-        DeleteBookDTO bookDTO = bookServices.deleteBook(id);
+    @DeleteMapping("/admin/deleteId/{bookId}")
+    public CustomResponse<DeleteBookDTO> deleteBook(@PathVariable String bookId) {
+        DeleteBookDTO bookDTO = bookServices.deleteBook(bookId);
         return new CustomResponse<>(true, "Book deleted success", bookDTO);
     }
 
