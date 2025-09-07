@@ -7,12 +7,7 @@ import FilterBar from "@/app/(router)/products/_components/FilterBar";
 import Container from "@/app/(router)/products/_components/Container";
 
 import book1 from "@/assets/items image/img.png";
-import book2 from "@/assets/items image/img_1.png";
-import book3 from "@/assets/items image/img_2.png";
-import book4 from "@/assets/items image/img_3.png";
-import book5 from "@/assets/items image/img_1.png";
-import book6 from "@/assets/items image/img_2.png";
-import book7 from "@/assets/items image/img_3.png";
+
 
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {
@@ -25,22 +20,11 @@ import {
 import {useCart} from "@/app/context/CartContext";
 import {Book} from "@/types/types";
 import Head from "@/app/(router)/products/head";
+import {getAllBooks} from "@/lib/actions";
 
 
-const allBooks: Book[] = Array.from({length: 35}, (_, i) => ({
-    id: `book-${i + 1}`,
-    image: [book1, book2, book3, book4, book5, book6, book7][i % 7],
-    title: `Book ${i + 1}`,
-    author: `Author ${i + 1}`,
-    price: 1000 + (i % 7) * 100,
-    type: i % 2 === 0 ? "Books" : "Stationery",
-    brand: i % 3 === 0 ? "Devasee" : "Other",
-    stock: 10 + (i % 5),
-    quantity: 1,
-}));
 
-
-export default function Page() {
+export default function  Page() {
     const [priceRange, setPriceRange] = useState<[number, number]>([0, 5000]);
     const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
     const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
@@ -51,6 +35,24 @@ export default function Page() {
     const filterRef = useRef<HTMLDivElement>(null);
 
     const {addToCart, removeFromCart, cartItems} = useCart();
+
+    const [books, setBooks] = useState<Book[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [isMounted, setIsMounted] = useState(false);
+
+
+
+    useEffect(() => {
+        async function fetchBooks() {
+            setLoading(true);
+            const data = await getAllBooks();
+            setBooks(data);
+            setLoading(false);
+            console.log(data)
+        }
+        fetchBooks();
+    }, []);
+
 
     useEffect(() => {
         if (filterRef.current) {
@@ -76,7 +78,15 @@ export default function Page() {
         };
     }, [showMobileFilter, showSortModal]);
 
-    const filteredBooks = allBooks
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
+
+    if (!isMounted) {
+        return null; // or a loading placeholder
+    }
+
+    const filteredBooks = books
         .filter((book) => {
             const inPriceRange = book.price >= priceRange[0] && book.price <= priceRange[1];
             const matchesType = selectedTypes.length === 0 || selectedTypes.includes(book.type);
@@ -91,6 +101,15 @@ export default function Page() {
             if (sortBy === "author") return a.author.localeCompare(b.author);
             return a.price - b.price;
         });
+
+    if (!isMounted || loading) {
+        return (
+            <div className="w-full h-[calc(100vh-80px)] flex justify-center items-center">
+                <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+            </div>
+        );
+    }
+
 
     return (
         <>
@@ -147,7 +166,10 @@ export default function Page() {
                     </div>
                     <div className="flex-1 overflow-y-auto h-full hide-scrollbar">
                         <Container
-                            books={filteredBooks}
+                            books={filteredBooks.map((book) => ({
+                                ...book,
+                                image: book.image || book1, // fallback to placeholder if image is missing
+                            }))}
                             sortBy={sortBy}
                             setSortBy={setSortBy}
                             addToCart={addToCart}

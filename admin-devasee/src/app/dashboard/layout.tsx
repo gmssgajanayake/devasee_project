@@ -1,55 +1,30 @@
-// app/dashboard/layout.tsx
-
 'use client';
 
-import { useState } from 'react';
-import { navItems } from '@/lib/dashboard-data';
-import { Sidebar } from '@/components/dashboard/Sidebar';
-import { Header } from '@/components/dashboard/Header';
+import {useEffect} from "react";
+import {UserButton, useUser} from "@clerk/nextjs";
+import {useRouter} from "next/navigation";
+import {PropsWithChildren} from "react";
 
-// Import the new pages we will create
-import DashboardPage from './pages/DashboardPage';
-import BooksPage from './pages/BooksPage';
-import SettingsPage from './pages/SettingsPage';
+export default function DashboardLayout({children}: PropsWithChildren) {
+    const {isSignedIn, isLoaded} = useUser();
+    const router = useRouter();
 
-export default function DashboardLayout() {
-    const [activeTab, setActiveTab] = useState('dashboard');
-    const [sidebarOpen, setSidebarOpen] = useState(false);
-    const [searchQuery, setSearchQuery] = useState('');
-
-    // A simple router to render the correct page based on the active tab
-    const renderActivePage = () => {
-        switch (activeTab) {
-            case 'books':
-                return <BooksPage searchQuery={searchQuery} />;
-            case 'settings':
-                return <SettingsPage />;
-            // Add cases for 'members' and 'reports' here
-            case 'dashboard':
-            default:
-                return <DashboardPage searchQuery={searchQuery} />;
+    useEffect(() => {
+        if (isLoaded && !isSignedIn) {
+            router.replace("/sign-in");
         }
-    };
+    }, [isLoaded, isSignedIn, router]);
+
+    if (!isLoaded) {
+        return <div className="flex items-center justify-center h-screen">Loading...</div>;
+    }
 
     return (
-        <div className="flex h-screen w-full bg-muted/40">
-            <Sidebar
-                isOpen={sidebarOpen}
-                onClose={() => setSidebarOpen(false)}
-                navItems={navItems}
-                activeTab={activeTab}
-                setActiveTab={setActiveTab}
+        <div className="">
+            {children}
+            <UserButton
+                afterSignOutUrl="/sign-in"
             />
-
-            <div className="flex-1 flex flex-col overflow-hidden">
-                <Header
-                    onMenuClick={() => setSidebarOpen(true)}
-                    searchQuery={searchQuery}
-                    setSearchQuery={setSearchQuery}
-                />
-                {/* The main content area now renders the active page */}
-                {renderActivePage()}
-            </div>
         </div>
     );
 }

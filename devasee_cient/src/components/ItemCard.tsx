@@ -2,7 +2,7 @@ import Image, { StaticImageData } from "next/image";
 
 interface ItemCardProps {
     isHovered: boolean;
-    image: StaticImageData;
+    image: string | StaticImageData;
     title: string;
     author: string;
     price: number;
@@ -35,6 +35,8 @@ export default function ItemCard({
         <div className="flex items-center  justify-center flex-col gap-6">
             <div className="group w-42 h-64 sm:w-56 sm:h-72 relative flex justify-center items-center bg-white shadow-md overflow-hidden">
                 <Image
+                    width={200}   // set your desired width
+                    height={300}
                     src={image}
                     alt={title}
                     className="absolute w-full h-full z-10 object-contain"
