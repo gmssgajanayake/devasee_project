@@ -13,7 +13,6 @@ public class RetrieveInventoryDTO {
     private String id;
     private String productId;
     private int availableQuantity;
-    private String warehouseLocation;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

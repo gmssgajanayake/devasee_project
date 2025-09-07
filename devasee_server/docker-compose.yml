@@ -1,27 +1,5 @@
 services:
 
-#  # PostgreSQL for Product Service
-#  product-db:
-#    image: postgres:15
-#    container_name: product-db
-#    environment:
-#      POSTGRES_DB: devasee_product_db
-#      POSTGRES_USER: postgres
-#      POSTGRES_PASSWORD: postgres
-#    ports:
-#      - "5432:5432"
-#
-#  # PostgreSQL for Product Service
-#  users-db:
-#    image: postgres:15
-#    container_name: users-db
-#    environment:
-#      POSTGRES_DB: devasee_users_db
-#      POSTGRES_USER: postgres
-#      POSTGRES_PASSWORD: postgres
-#    ports:
-#      - "5433:5432"
-
   # Single PostgreSQL for all services
   db:
     image: postgres:15
@@ -52,6 +30,8 @@ services:
       - eureka
     extra_hosts:
       - "clerk.devasee.lk:172.64.153.110"
+#    volumes:
+#      - ./pem:/keys   # <-- Mount PEM files
 
   # User
   users:
@@ -92,6 +72,8 @@ services:
     depends_on:
       - eureka
       - db
+#    volumes:
+#      - ./pem:/keys   # <-- Mount PEM files
 
   # Delivery
   delivery:
@@ -144,3 +126,26 @@ services:
     depends_on:
       - eureka
       - db
+
+
+#  # PostgreSQL for Product Service
+#  product-db:
+#    image: postgres:15
+#    container_name: product-db
+#    environment:
+#      POSTGRES_DB: devasee_product_db
+#      POSTGRES_USER: postgres
+#      POSTGRES_PASSWORD: postgres
+#    ports:
+#      - "5432:5432"
+#
+#  # PostgreSQL for Product Service
+#  users-db:
+#    image: postgres:15
+#    container_name: users-db
+#    environment:
+#      POSTGRES_DB: devasee_users_db
+#      POSTGRES_USER: postgres
+#      POSTGRES_PASSWORD: postgres
+#    ports:
+#      - "5433:5432"

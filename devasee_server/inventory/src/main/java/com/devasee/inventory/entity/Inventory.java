@@ -20,8 +20,6 @@ public class Inventory {
     private String id;
     private String productId;
     private int reservedQuantity;
-    private String warehouseLocation;
-
     private int availableQuantity;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
