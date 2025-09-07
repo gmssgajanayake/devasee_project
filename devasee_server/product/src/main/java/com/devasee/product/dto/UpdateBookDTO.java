@@ -7,7 +7,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CreateBookDTO {
+public class UpdateBookDTO {
+    private String id;
     private String title;
     private String author;
     private String publisher;
@@ -15,6 +16,5 @@ public class CreateBookDTO {
     private String description;
     private String language;
     private double price;
-    private int initialQuantity;
     private long isbn;
 }

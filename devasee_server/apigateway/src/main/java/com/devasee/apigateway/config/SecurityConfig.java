@@ -22,6 +22,7 @@ import org.springframework.security.web.server.authorization.ServerAccessDeniedH
 import reactor.core.publisher.Mono;
 
 import java.util.Collections;
+import java.util.List;
 
 @Configuration
 @EnableWebFluxSecurity // This is the reactive version
@@ -32,8 +33,10 @@ public class SecurityConfig {
     @Value("${clerk.issuer-uri}")
     private String clerkIssuerUri;
 
-    @Value("${clerk.expected-audience}")
-    private String expectedAudience;
+    @Value("${clerk.expected-audience-customer}")
+    private String expectedAudienceCustomer;
+    @Value("${clerk.expected-audience-admin}")
+    private String expectedAudienceAdmin;
 
     // Inject your user service here (Reactive)
     private final ReactiveUserService reactiveUserService;
@@ -112,7 +115,8 @@ public class SecurityConfig {
         OAuth2TokenValidator<Jwt> withIssuer = JwtValidators.createDefaultWithIssuer(clerkIssuerUri);
         OAuth2TokenValidator<Jwt> withAudience = new JwtClaimValidator<String>(
                 "azp",
-                azp -> azp != null && azp.equals(expectedAudience)
+                azp -> azp != null &&
+                        (azp.equals(expectedAudienceCustomer) || azp.equals(expectedAudienceAdmin))
         );
 
         jwtDecoder.setJwtValidator(new DelegatingOAuth2TokenValidator<>(withIssuer, withAudience)); // (withIssuer,withAudience)

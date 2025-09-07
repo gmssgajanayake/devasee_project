@@ -13,8 +13,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
-import java.util.UUID;
+import java.time.format.DateTimeFormatter;
 
 @Service
 public class AzureBlobService {
@@ -35,23 +36,28 @@ public class AzureBlobService {
     public String uploadFile(MultipartFile file) throws IOException {
         String originalFilename  = file.getOriginalFilename();
         assert originalFilename != null;
+
+        String namePart = "";
         String extension = "";
 
         int dotIndex  = originalFilename.lastIndexOf('.');
 
         if (dotIndex  >= 0) {
+            namePart = originalFilename.substring(0, dotIndex); // part before the dot
             extension = originalFilename.substring(dotIndex);
         }
 
-        // Generate random name with UUID
-        String randomFilename = UUID.randomUUID().toString() + extension;
+        // Add current date/time as string
+        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
 
-        BlobClient blobClient = containerClient.getBlobClient(randomFilename);
+        String newFilename = namePart + "_" + timestamp + extension;
+
+        BlobClient blobClient = containerClient.getBlobClient(newFilename);
         blobClient.upload(file.getInputStream(), file.getSize(), true); // overwrite if exists
 
         // Return blob name
-        log.info("### File uploading successfully : {}", randomFilename);
-        return randomFilename;
+        log.info("### File uploading successfully : {}", newFilename);
+        return newFilename;
     }
 
     // Generate SAS URL for a blob

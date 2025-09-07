@@ -48,7 +48,8 @@ spring:
           jwk-set-uri: https://clerk.devasee.lk/.well-known/jwks.json
 clerk:
   issuer-uri: https://clerk.devasee.lk
-  expected-audience: https://www.devasee.lk
+  expected-audience-customer: https://www.devasee.lk
+  expected-audience-admin: https://admin.devasee.lk
 
 eureka:
   client:

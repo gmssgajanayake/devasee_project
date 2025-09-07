@@ -1,6 +1,6 @@
 package com.devasee.inventory;
 
-import com.devasee.inventory.dto.CreateInventoryDTO;
+import com.devasee.inventory.dto.CreateUpdateInventoryDTO;
 import com.devasee.inventory.entity.Inventory;
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.SpringApplication;
@@ -19,8 +19,8 @@ public class InventoryApplication {
 
 		ModelMapper modelMapper = new ModelMapper();
 
-		// Skip mapping 'id' when mapping CreateInventoryDTO -> Inventory
-		modelMapper.typeMap(CreateInventoryDTO.class, Inventory.class)
+		// Skip mapping 'id' when mapping CreateUpdateInventoryDTO -> Inventory
+		modelMapper.typeMap(CreateUpdateInventoryDTO.class, Inventory.class)
 				.addMappings(mapper
 						-> mapper.skip(Inventory::setId));
 		return  modelMapper;

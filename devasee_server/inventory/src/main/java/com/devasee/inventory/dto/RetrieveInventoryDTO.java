@@ -14,5 +14,6 @@ public class RetrieveInventoryDTO {
     private String productId;
     private int availableQuantity;
     private String warehouseLocation;
+    private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

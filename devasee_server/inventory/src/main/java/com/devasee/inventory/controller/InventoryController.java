@@ -1,6 +1,6 @@
 package com.devasee.inventory.controller;
 
-import com.devasee.inventory.dto.CreateInventoryDTO;
+import com.devasee.inventory.dto.CreateUpdateInventoryDTO;
 import com.devasee.inventory.dto.DeleteInventoryDTO;
 import com.devasee.inventory.dto.RetrieveInventoryDTO;
 import com.devasee.inventory.response.CustomResponse;
@@ -34,17 +34,25 @@ public class InventoryController {
         return new CustomResponse<>(true, "Inventory found", inventoryDTO);
     }
 
+    // Get item quantity by productId
+    @GetMapping("/admin/productId/{productId}")
+    public Integer getInventoryQuantityById(@PathVariable String productId) {
+        return inventoryServices.getInventoryQuantityById(productId);
+    }
+
     // Save inventory
     @PostMapping("/admin/addInventory")
-    public CustomResponse<CreateInventoryDTO> saveInventory(@RequestBody CreateInventoryDTO inventoryDTO) {
-        CreateInventoryDTO responseDTO = inventoryServices.saveInventory(inventoryDTO);
+    public CustomResponse<CreateUpdateInventoryDTO> saveInventory(@RequestBody CreateUpdateInventoryDTO inventoryDTO) {
+        CreateUpdateInventoryDTO responseDTO = inventoryServices.saveInventory(inventoryDTO);
         return new CustomResponse<>(true, "Inventory saved successfully", responseDTO);
     }
 
     // Update inventory
     @PutMapping("/admin/updateInventory")
-    public CustomResponse<RetrieveInventoryDTO> updateInventory(@RequestBody RetrieveInventoryDTO inventoryDTO) {
-        RetrieveInventoryDTO updatedInventory = inventoryServices.updateInventory(inventoryDTO);
+    public CustomResponse<RetrieveInventoryDTO> updateInventory(
+            @RequestBody CreateUpdateInventoryDTO createUpdateInventoryDTO
+    ) {
+        RetrieveInventoryDTO updatedInventory = inventoryServices.updateInventory(createUpdateInventoryDTO);
         return new CustomResponse<>(true, "Inventory updated successfully", updatedInventory);
     }
 

@@ -11,5 +11,5 @@ public class DeleteBookDTO {
     private String id;
     private String title;
     private long isbn;
-    private int stockQuantity;
+    private int initialQuantity;
 }
