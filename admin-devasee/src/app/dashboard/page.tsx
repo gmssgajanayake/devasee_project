@@ -1,11 +1,3 @@
-'use client';
-
-import AddBookForm from "@/app/(router)/books/AddBookForm";
-
-export default function BookDashboard() {
-    return (
-        <div className="flex justify-center items-center h-screen w-full bg-muted/40">
-           <AddBookForm/>
-        </div>
-    );
+export default function AnalyticsPage() {
+    return <h2 className="text-2xl font-bold">📊 Analytics Dashboard</h2>;
 }

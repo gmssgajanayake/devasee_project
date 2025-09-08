@@ -33,7 +33,6 @@ export async function getAllBooks(): Promise<Book[]> {
     try {
         const apiUrl = `http://api.devasee.lk/api/v1/product/book/public/books?page=0&size=20`;
 
-        console.log(apiUrl)
         const res = await fetch(apiUrl, {
             cache: "no-store",
         });
@@ -43,7 +42,6 @@ export async function getAllBooks(): Promise<Book[]> {
         }
 
         const json: ApiResponse = await res.json();
-
 
         const books: Book[] = json.data.content.map((b) => ({
             id: b.id,
