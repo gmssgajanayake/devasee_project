@@ -64,7 +64,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: { sidebarOpen: boolean; setSid
                 <div className="flex items-center justify-between p-4 border-b">
                     <div className="flex items-center gap-3">
                         <Image src={Logo} alt="Logo" width={40} height={40} />
-                        <h1 className="font-bold text-xl text-blue-800">Devasee&nbsp;Admin</h1>
+                        <h1 className="font-bold text-xl text-gray-800/90">Devasee&nbsp;Admin</h1>
                     </div>
                     <button
                         onClick={() => setSidebarOpen(false)}
@@ -119,7 +119,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: { sidebarOpen: boolean; setSid
 // --- Main Header Component ---
 const Header = ({ onMenuToggle }: { onMenuToggle: () => void; }) => {
     return (
-        <header className="flex items-center justify-between md:justify-end h-16 p-4 bg-white border-b shadow-sm sticky top-0 z-20">
+        <header className="flex items-center justify-between md:justify-end h-18 p-4 bg-white border-b shadow-sm sticky top-0 z-20">
             {/* Mobile Menu Button */}
             <button
                 onClick={onMenuToggle}
