@@ -19,10 +19,11 @@ export default function InventoryPage() {
             {/* Content Section */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Left: Add Book Form */}
+
                 <div className="lg:col-span-2">
                     <div className="bg-white rounded-2xl shadow-md p-6">
-                        <h3 className="text-xl font-semibold text-gray-700 mb-4">➕ Add a New Book</h3>
                         <AddBookForm />
+
                     </div>
                 </div>
                 <div className="bg-white rounded-2xl shadow-md p-6">
