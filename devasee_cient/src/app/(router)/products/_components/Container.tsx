@@ -60,7 +60,7 @@ export default function Container({
         <div className="w-full  py-10 px-6 sm:px-12">
             <SortOptions sortBy={sortBy} setSortBy={setSortBy} />
 
-            <div className="grid  gap-3 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+            <div className="grid  gap-2 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7">
                 {currentBooks.map((book) => (
                     <div key={book.id} className="w-full ">
                         <ItemCard

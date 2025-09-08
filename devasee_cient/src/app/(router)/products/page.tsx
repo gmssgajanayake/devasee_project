@@ -163,7 +163,7 @@ export default function  Page() {
                             setSelectedBrands={setSelectedBrands}
                         />
                     </div>
-                    <div className="flex-1 overflow-y-auto h-full hide-scrollbar">
+                    <div className="flex-1 overflow-y-auto h-full  hide-scrollbar">
                         <Container
                             books={filteredBooks.map((book) => ({
                                 ...book,
