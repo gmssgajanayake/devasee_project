@@ -7,13 +7,13 @@ import org.springframework.web.bind.annotation.*;
 @FeignClient(name = "inventory")
 public interface InventoryClient {
 
-    @GetMapping("/api/v1/inventory/admin/productId/{productId}")
+    @GetMapping("/api/v1/inventory/product/{productId}/quantity")
     Integer getStockQuantity (@PathVariable("productId") String productId);
 
-    @PostMapping("/api/v1/inventory/admin/addInventory")
+    @PostMapping("/api/v1/inventory")
     void createInventory(@RequestBody InventoryRequestDTO request);
 
-    @DeleteMapping("/api/v1/inventory/admin/deleteByProductId/{productId}")
+    @DeleteMapping("/api/v1/inventory/product/{productId}")
     void deleteInventory(@PathVariable String productId);
 
 }

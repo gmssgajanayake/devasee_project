@@ -68,3 +68,7 @@ logging:
 services:
   user-service:
     base-url: lb://users/api/v1/users/auth
+
+security:
+  internal-jwt:
+    secret: devasee-e7b8c2d1-1b6f-4e1f-88b3-9a4f5e1a2cde
