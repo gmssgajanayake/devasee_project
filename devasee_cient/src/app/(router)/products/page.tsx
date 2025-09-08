@@ -48,8 +48,6 @@ export default function  Page() {
             const data = await getAllBooks();
             setBooks(data);
             setLoading(false);
-            console.log("ewind")
-            console.log(data)
         }
         fetchBooks();
     }, []);
