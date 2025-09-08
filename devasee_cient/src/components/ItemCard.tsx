@@ -32,14 +32,14 @@ export default function ItemCard({
                                      isInCart = false,
                                  }: ItemCardProps) {
     return (
-        <div className="flex  items-center  justify-center flex-col gap-6">
-            <div className="group w-42 h-64 sm:w-56 sm:h-72 relative flex justify-center items-center bg-white shadow-md overflow-hidden">
+        <div className="flex    items-center  justify-center flex-col gap-6">
+            <div className="group  w-42 h-64 relative flex justify-center items-center bg-white shadow-md overflow-hidden">
                 <Image
                     width={200}   // set your desired width
                     height={300}
                     src={image}
                     alt={title}
-                    className="absolute w-full bg-gray-100 h-full z-10 object-cover"
+                    className="absolute w-40 bg-gray-100 h-60 z-10 object-cover"
                 />
                 <div className="w-full h-full p-4 bg-white relative flex-col flex justify-end items-center">
                     <button
