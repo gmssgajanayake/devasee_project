@@ -40,6 +40,7 @@ export default function Home() {
             <OffersSlides />
             <NewsSubscribe />
             <Article />
+        {/*    test*/}
         </div>
     );
 }
