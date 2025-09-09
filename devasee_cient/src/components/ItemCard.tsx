@@ -43,10 +43,10 @@ export default function ItemCard({
                                  }: ItemCardProps) {
     return (
         // Set a fixed width for the entire card component for consistency.
-        <div className="flex w-52 flex-col items-center justify-center gap-4">
+        <div className="flex  w-52 flex-col items-center justify-center gap-4">
 
             {/* --- IMAGE CONTAINER --- */}
-            <div className="group relative h-64 w-48 flex justify-center items-center bg-white shadow-md overflow-hidden">
+            <div className="group relative  h-64 w-48 flex justify-center items-center bg-white shadow-md overflow-hidden">
                 <Image
                     width={200}
                     height={300}
