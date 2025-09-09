@@ -163,7 +163,7 @@ export default function  Page() {
                             setSelectedBrands={setSelectedBrands}
                         />
                     </div>
-                    <div className="flex-1 overflow-y-auto h-full  hide-scrollbar">
+                    <div className="flex-1  overflow-y-auto h-full  hide-scrollbar">
                         <Container
                             books={filteredBooks.map((book) => ({
                                 ...book,
@@ -206,7 +206,7 @@ export default function  Page() {
                 {/* Sort Modal */}
                 {showSortModal && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 lg:hidden">
-                        <div className="bg-white w-[60%] max-w-sm rounded-xl shadow-xl p-6 relative">
+                        <div className="w-[60%] max-w-sm rounded-xl shadow-xl p-6 relative">
                             <div className="flex justify-between items-center mb-4">
                                 <h2 className="font-bold text-lg text-[#2b216d]">Sort Options</h2>
                                 <FontAwesomeIcon
