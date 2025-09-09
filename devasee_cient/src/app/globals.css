@@ -63,3 +63,10 @@ input[type="range"]::-moz-range-thumb {
   cursor: pointer;
 }
 
+/* Add this to your globals.css file */
+.line-clamp-2 {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+}
