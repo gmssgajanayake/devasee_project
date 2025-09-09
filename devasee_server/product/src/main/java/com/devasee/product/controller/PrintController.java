@@ -18,37 +18,53 @@ public class PrintController {
         this.printServices = printServices;
     }
 
-    // --------------------------------- Public ---------------------------------
+    // --------------------- Public ---------------------
 
-    // Get all print types
     @GetMapping("/public/allPrints")
     public CustomResponse<List<PrintDTO>> getAllPrints() {
-        List<PrintDTO> printList = printServices.getPrintType();
-        return new CustomResponse<>(true, "Print types found", printList);
+        return new CustomResponse<>(true, "Print types found", printServices.getAllPrints());
     }
 
-    // Get print by ID
     @GetMapping("/public/printId/{printId}")
     public CustomResponse<PrintDTO> getPrintById(@PathVariable int printId) {
-        PrintDTO printDTO = printServices.getPrintById(printId);
-        return new CustomResponse<>(true, "Print found", printDTO);
+        return new CustomResponse<>(true, "Print found", printServices.getPrintById(printId));
     }
 
+    @GetMapping("/public/byType/{type}")
+    public CustomResponse<List<PrintDTO>> getPrintsByType(@PathVariable String type) {
+        return new CustomResponse<>(true, "Prints found by type", printServices.getPrintsByType(type));
+    }
 
-    // --------------------------------- Admin ---------------------------------
+    @GetMapping("/public/search")
+    public CustomResponse<List<PrintDTO>> searchPrints(@RequestParam String keyword) {
+        return new CustomResponse<>(true, "Prints matching search", printServices.searchPrintsByTitle(keyword));
+    }
 
-    // Save new print type
+    @GetMapping("/public/byMaterial/{material}")
+    public CustomResponse<List<PrintDTO>> getPrintsByMaterial(@PathVariable String material) {
+        return new CustomResponse<>(true, "Prints found by material", printServices.getPrintsByMaterial(material));
+    }
+
+    @GetMapping("/public/cheaperThan/{price}")
+    public CustomResponse<List<PrintDTO>> getPrintsCheaperThan(@PathVariable double price) {
+        return new CustomResponse<>(true, "Prints cheaper than " + price, printServices.getPrintsCheaperThan(price));
+    }
+
+    @GetMapping("/public/availableStock/{minStock}")
+    public CustomResponse<List<PrintDTO>> getAvailableStock(@PathVariable int minStock) {
+        return new CustomResponse<>(true, "Prints with stock greater than " + minStock, printServices.getAvailableStock(minStock));
+    }
+
+    // --------------------- Admin ---------------------
+
     @PostMapping("/admin/addPrint")
     public CustomResponse<PrintDTO> savePrint(@RequestBody PrintDTO printDTO) {
-        PrintDTO dtoResponse = printServices.savePrint(printDTO);
-        return new CustomResponse<>(true, "Print type saved successfully", dtoResponse);
+        return new CustomResponse<>(true, "Print type saved successfully", printServices.savePrint(printDTO));
     }
 
-    // Update print details
     @PutMapping("/admin/updatePrint")
     public CustomResponse<PrintDTO> updatePrint(@RequestBody PrintDTO printDTO) {
-        PrintDTO updatedPrint = printServices.updatePrint(printDTO);
-        return new CustomResponse<>(true, "Print type updated successfully", updatedPrint);
+        return new CustomResponse<>(true, "Print type updated successfully", printServices.updatePrint(printDTO));
     }
 
     @DeleteMapping("/admin/deletePrint/{id}")
@@ -56,5 +72,4 @@ public class PrintController {
         boolean deleted = printServices.deletePrint(id);
         return new CustomResponse<>(deleted, deleted ? "Print type deleted successfully" : "Failed to delete print type", deleted);
     }
-
 }

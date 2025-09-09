@@ -3,7 +3,6 @@ package com.devasee.product.services;
 import com.devasee.product.dto.PrintDTO;
 import com.devasee.product.entity.Printing;
 import com.devasee.product.exception.ProductNotFoundException;
-import com.devasee.product.exception.ProductAlreadyExistsException;
 import com.devasee.product.exception.ServiceUnavailableException;
 import com.devasee.product.repo.PrintRepo;
 import jakarta.transaction.Transactional;
@@ -33,7 +32,7 @@ public class PrintServices {
 
     // --------------------- Public ---------------------
 
-    public List<PrintDTO> getPrintType() {
+    public List<PrintDTO> getAllPrints() {
         try {
             return modelMapper.map(printRepo.findAll(), new TypeToken<List<PrintDTO>>() {}.getType());
         } catch (DataException e) {
@@ -53,13 +52,63 @@ public class PrintServices {
         }
     }
 
+    public List<PrintDTO> getPrintsByType(String type) {
+        try {
+            return modelMapper.map(printRepo.findByType(type), new TypeToken<List<PrintDTO>>() {}.getType());
+        } catch (Exception e) {
+            log.error("### Error fetching prints by type: {}", type, e);
+            throw new ServiceUnavailableException("Something went wrong on the server. Please try again later.");
+        }
+    }
+
+    public List<PrintDTO> searchPrintsByTitle(String keyword) {
+        try {
+            return modelMapper.map(printRepo.findByTitleContainingIgnoreCase(keyword), new TypeToken<List<PrintDTO>>() {}.getType());
+        } catch (Exception e) {
+            log.error("### Error searching prints by title: {}", keyword, e);
+            throw new ServiceUnavailableException("Something went wrong on the server. Please try again later.");
+        }
+    }
+
+    public List<PrintDTO> getPrintsByMaterial(String material) {
+        try {
+            return modelMapper.map(printRepo.findByMaterial(material), new TypeToken<List<PrintDTO>>() {}.getType());
+        } catch (Exception e) {
+            log.error("### Error fetching prints by material: {}", material, e);
+            throw new ServiceUnavailableException("Something went wrong on the server. Please try again later.");
+        }
+    }
+
+    public List<PrintDTO> getPrintsCheaperThan(double price) {
+        try {
+            return modelMapper.map(printRepo.findByPriceLessThan(price), new TypeToken<List<PrintDTO>>() {}.getType());
+        } catch (Exception e) {
+            log.error("### Error fetching prints cheaper than {}", price, e);
+            throw new ServiceUnavailableException("Something went wrong on the server. Please try again later.");
+        }
+    }
+
+    public List<PrintDTO> getAvailableStock(int minStock) {
+        try {
+            return modelMapper.map(printRepo.findByStockQuantityGreaterThan(minStock), new TypeToken<List<PrintDTO>>() {}.getType());
+        } catch (Exception e) {
+            log.error("### Error fetching prints with stock greater than {}", minStock, e);
+            throw new ServiceUnavailableException("Something went wrong on the server. Please try again later.");
+        }
+    }
+
     // --------------------- Admin ---------------------
 
     public PrintDTO savePrint(PrintDTO printDTO) {
-        // you can add a uniqueness check like for ISBN if needed, e.g. by title/type
         try {
-            Printing savedPrint = printRepo.save(modelMapper.map(printDTO, Printing.class));
+            if (printRepo.existsByTitleAndType(printDTO.getTitle(), printDTO.getType())) {
+                throw new ServiceUnavailableException("Print with same title and type already exists.");
+            }
+
+            Printing entityToSave = modelMapper.map(printDTO, Printing.class);
+            Printing savedPrint = printRepo.save(entityToSave);
             log.info("### Print saved successfully with ID: {}", savedPrint.getId());
+
             return modelMapper.map(savedPrint, PrintDTO.class);
         } catch (Exception e) {
             log.error("### Error saving print: {}", printDTO, e);
@@ -72,11 +121,12 @@ public class PrintServices {
             Printing existingPrint = printRepo.findById(printDTO.getId())
                     .orElseThrow(() -> new ProductNotFoundException("Print not found with ID: " + printDTO.getId()));
 
-            Printing updatedPrint = modelMapper.map(printDTO, Printing.class);
-            updatedPrint.setId(existingPrint.getId()); // ensure ID is preserved
+            Printing updatedEntity = modelMapper.map(printDTO, Printing.class);
+            updatedEntity.setId(existingPrint.getId());
 
-            Printing savedPrint = printRepo.save(updatedPrint);
+            Printing savedPrint = printRepo.save(updatedEntity);
             log.info("### Print updated successfully with ID: {}", savedPrint.getId());
+
             return modelMapper.map(savedPrint, PrintDTO.class);
         } catch (DataAccessException e) {
             log.error("### Error updating print with ID: {}", printDTO.getId(), e);
@@ -84,7 +134,6 @@ public class PrintServices {
         }
     }
 
-    // Service
     public boolean deletePrint(int id) {
         if (!printRepo.existsById(id)) {
             throw new ProductNotFoundException("Print not found with ID: " + id);
@@ -98,5 +147,4 @@ public class PrintServices {
             throw new ServiceUnavailableException("Something went wrong on the server. Please try again later.");
         }
     }
-
 }
