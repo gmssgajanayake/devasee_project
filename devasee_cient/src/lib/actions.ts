@@ -31,8 +31,9 @@ interface ApiResponse {
 
 export async function getAllBooks(): Promise<Book[]> {
     try {
-        const apiUrl = `http://api.devasee.lk/api/v1/product/book/public/books?page=0&size=20`;
+        //const apiUrl = `http://api.devasee.lk/api/v1/product/book/public/books?page=0&size=20`;
 
+        const apiUrl = `http://api.devasee.lk/api/v1/product/book/public/books?page=0&size=1000`;
         const res = await fetch(apiUrl, {
             cache: "no-store",
         });
