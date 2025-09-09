@@ -1,11 +1,10 @@
-package com.devasee.inventory.config;
+package com.devasee.users.config;
 
-import com.devasee.inventory.filter.InternalJWTFilter;
-import com.devasee.inventory.services.InternalJWTService;
 
+import com.devasee.users.filter.InternalJWTFilter;
+import com.devasee.users.service.InternalJWTService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -28,9 +27,8 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                HttpMethod.GET,
-                                "/api/v1/inventory/product/*/quantity"
-                        ).permitAll()
+                                "api/v1/users/admin/**"
+                        ).hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .addFilterBefore(internalJWTFilter(), UsernamePasswordAuthenticationFilter.class);
 
@@ -42,3 +40,4 @@ public class SecurityConfig {
         return new InternalJWTFilter(internalJWTService);
     }
 }
+

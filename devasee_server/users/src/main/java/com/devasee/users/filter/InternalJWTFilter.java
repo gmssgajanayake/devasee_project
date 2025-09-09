@@ -1,6 +1,6 @@
-package com.devasee.inventory.filter;
+package com.devasee.users.filter;
 
-import com.devasee.inventory.services.InternalJWTService;
+import com.devasee.users.service.InternalJWTService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import jakarta.servlet.FilterChain;
@@ -37,15 +37,28 @@ public class InternalJWTFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
 
-        String token = request.getHeader(INTERNAL_JWT_HEADER);
-        log.info("### INV Incoming X-Internal-JWT: {}", token);
+        String path = request.getRequestURI();
 
-        if (token != null && !token.isEmpty()){
+        String internalJwt = request.getHeader(INTERNAL_JWT_HEADER);
+        log.info("### User Incoming X-Internal-JWT: {}", internalJwt);
+
+        // Skip for internal roles endpoint (validate only internal JWT if present)\
+        if (path.startsWith("/api/v1/users/auth/") && path.endsWith("/roles")) {
+            log.info("### Dummy Authentication Creating");
+            var auth = new UsernamePasswordAuthenticationToken("internal-service", null, List.of());
+            SecurityContextHolder.getContext().setAuthentication(auth);
+
+            // allow request to pass
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        if (internalJwt != null && !internalJwt.isEmpty()) {
             try {
                 Claims claims = Jwts.parserBuilder()
                         .setSigningKey(internalJWTService.getSecret())
                         .build()
-                        .parseClaimsJws(token)
+                        .parseClaimsJws(internalJwt)
                         .getBody();
 
                 String userId = claims.getSubject();
@@ -55,7 +68,7 @@ public class InternalJWTFilter extends OncePerRequestFilter {
                 if (rolesObj instanceof List<?>) {
                     for (Object role : (List<?>) rolesObj) {
                         if (role instanceof String) {
-                            log.info("### role in inv : {}", role);
+                            log.info("### role in user : {}", role);
                             roles.add((String) role);
                         }
                     }
@@ -68,7 +81,7 @@ public class InternalJWTFilter extends OncePerRequestFilter {
                 var auth = new UsernamePasswordAuthenticationToken(userId, null, authorities);
                 SecurityContextHolder.getContext().setAuthentication(auth);
 
-            } catch (Exception e){
+            } catch (Exception e) {
                 log.error("### INV Invalid internal JWT: {}", e.getMessage());
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid internal JWT");
                 return;

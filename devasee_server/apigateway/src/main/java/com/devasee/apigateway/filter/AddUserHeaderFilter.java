@@ -29,14 +29,18 @@ public class AddUserHeaderFilter implements GlobalFilter, Ordered {
         this.internalJWTService = internalJWTService;
     }
 
-
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         String path = exchange.getRequest().getURI().getPath();
-        log.info("### Incoming request to {}", exchange.getRequest().getURI());
+        log.info("### Incoming request getURI {}", exchange.getRequest().getURI());
+        log.info("### Incoming request getMethod {}", exchange.getRequest().getMethod());
+        log.info("### Incoming request path {}", path);
 
         // Skip adding header for public endpoints like /api/v1/users/customer/public/save
-        if (path.contains("/public/")) {
+        if (
+                "GET".equalsIgnoreCase(exchange.getRequest().getMethod().toString()) &&
+                        path.startsWith("/api/v1/product/books")
+        ) {
             log.info("### Skipping header for public endpoint {}", path);
             return chain.filter(exchange);
         }
