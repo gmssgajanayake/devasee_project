@@ -30,7 +30,11 @@ public class SecurityConfig {
                         .requestMatchers(
                                 HttpMethod.GET,
                                 "/api/v1/product/books/**",
-                                "/api/v1/product/books"
+                                "/api/v1/product/books",
+                                "/api/v1/product/stationery/**",
+                                "/api/v1/product/stationery",
+                                "/api/v1/product/printing/**",
+                                "/api/v1/product/printing"
                                 ).permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(internalJWTFilter(), UsernamePasswordAuthenticationFilter.class);
