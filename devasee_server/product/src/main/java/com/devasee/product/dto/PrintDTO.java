@@ -11,7 +11,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PrintDTO {
-    private int id;
+    private String id;  // Changed from int → String (UUID)
+
     private String title;
     private String type;
     private String material;

@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.UuidGenerator;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -13,9 +14,12 @@ import java.util.List;
 @AllArgsConstructor
 @Data
 public class Printing {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    @GeneratedValue
+    @UuidGenerator
+    @Column(updatable = false, nullable = false, length = 36)
+    private String id;
 
     // Basic product info
     private String title;

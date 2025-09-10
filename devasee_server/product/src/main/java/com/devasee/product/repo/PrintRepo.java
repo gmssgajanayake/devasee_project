@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface PrintRepo extends JpaRepository<Printing, Integer> {
+public interface PrintRepo extends JpaRepository<Printing, String> { // Changed Integer → String
 
     // Check if a print with the same title & type already exists (uniqueness check)
     boolean existsByTitleAndType(String title, String type);
