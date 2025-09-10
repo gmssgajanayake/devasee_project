@@ -1,6 +1,6 @@
-package com.devasee.inventory.filter;
+package com.devasee.product.filter;
 
-import com.devasee.inventory.services.InternalJWTService;
+import com.devasee.product.services.InternalJWTService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import jakarta.servlet.FilterChain;
@@ -40,7 +40,7 @@ public class InternalJWTFilter extends OncePerRequestFilter {
         String token = request.getHeader(INTERNAL_JWT_HEADER);
         log.info("### INV Incoming X-Internal-JWT: {}", token);
 
-        if (token != null && !token.isEmpty()){
+        if (token != null && !token.isEmpty()) {
             try {
                 Claims claims = Jwts.parserBuilder()
                         .setSigningKey(internalJWTService.getSecret())
@@ -68,7 +68,7 @@ public class InternalJWTFilter extends OncePerRequestFilter {
                 var auth = new UsernamePasswordAuthenticationToken(userId, null, authorities);
                 SecurityContextHolder.getContext().setAuthentication(auth);
 
-            } catch (Exception e){
+            } catch (Exception e) {
                 log.error("### INV Invalid internal JWT: {}", e.getMessage());
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid internal JWT");
                 return;

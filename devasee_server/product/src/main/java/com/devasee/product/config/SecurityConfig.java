@@ -1,7 +1,7 @@
-package com.devasee.inventory.config;
+package com.devasee.product.config;
 
-import com.devasee.inventory.filter.InternalJWTFilter;
-import com.devasee.inventory.services.InternalJWTService;
+import com.devasee.product.filter.InternalJWTFilter;
+import com.devasee.product.services.InternalJWTService;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,8 +29,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 HttpMethod.GET,
-                                "/api/v1/inventory/product/*/quantity"
-                        ).permitAll()
+                                "/api/v1/product/books/**",
+                                "/api/v1/product/books"
+                                ).permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(internalJWTFilter(), UsernamePasswordAuthenticationFilter.class);
 

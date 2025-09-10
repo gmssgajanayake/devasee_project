@@ -6,12 +6,13 @@ import com.devasee.product.dto.RetrieveBookDTO;
 import com.devasee.product.response.CustomResponse;
 import com.devasee.product.services.BookServices;
 import org.springframework.data.domain.Page;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @CrossOrigin
 @RestController
-@RequestMapping(value = "api/v1/product/book")
+@RequestMapping(value = "api/v1/product/books")
 public class BookController {
 
     private final BookServices bookServices;
@@ -26,41 +27,34 @@ public class BookController {
 
     ///  Just make sure callers know that Spring’s pages are 0-based (page=0 is first page).
 
-    //public/books?page=0&size=20
+    // GET /api/v1/product/books?page=0&size=20
     // Get paginated books
-    @GetMapping("/public/books")
+    @GetMapping
     public CustomResponse<Page<RetrieveBookDTO>> getAllBooks(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size
     ) {
-
         Page<RetrieveBookDTO> bookPage  = bookServices.getAllBooks(page, size);
         return new CustomResponse<>(true, "Books found", bookPage);
     }
 
     // Get book by bookId
-    @GetMapping("/public/bookId/{bookId}")
+    @GetMapping("/{bookId}")
     public CustomResponse<RetrieveBookDTO> getBookById(@PathVariable String bookId) {
         RetrieveBookDTO bookDTO = bookServices.getBookById(bookId);
         return new CustomResponse<>(true, "Book found", bookDTO);
     }
 
-
-
-    // GET /public/search?field=author&value=J.K.%20Rowling&page=0&size=10
-    // GET /public/search?field=title&value=Harry%20Potter
-    // GET /public/search?field=category&value=Fantasy
+    // GET /search?field=author&value=J.K.%20Rowling&page=0&size=10
     // Search book by title, author, category
-    @GetMapping("/public/search")
+    @GetMapping("/search")
     public CustomResponse<Page<RetrieveBookDTO>> getBookByTerm(
             @RequestParam String field,
             @RequestParam String value,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-
         Page<RetrieveBookDTO> bookDTOS = bookServices.searchBookByTerm(field, value, page, size);
-
         return new CustomResponse<>(
                 true,
                 "Books by " + field + " : " + value,
@@ -73,7 +67,8 @@ public class BookController {
     // --------------------------------- Admin ---------------------------------
 
     // Save the book in database
-    @PostMapping("/admin/addBook")
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping
     public CustomResponse<CreateBookDTO> saveBook(
             @RequestParam("book") String bookJson,
             @RequestParam("file") MultipartFile file
@@ -83,7 +78,8 @@ public class BookController {
     }
 
     // Update book details (price, quantity, ...)
-    @PutMapping("/admin/updateBook")
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping
     public CustomResponse<RetrieveBookDTO> updateBook(
             @RequestParam("book") String bookJson,
             @RequestParam("file") MultipartFile file
@@ -93,7 +89,8 @@ public class BookController {
     }
 
     // Delete book by id
-    @DeleteMapping("/admin/deleteId/{bookId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/{bookId}")
     public CustomResponse<DeleteBookDTO> deleteBook(@PathVariable String bookId) {
         DeleteBookDTO bookDTO = bookServices.deleteBook(bookId);
         return new CustomResponse<>(true, "Book deleted success", bookDTO);

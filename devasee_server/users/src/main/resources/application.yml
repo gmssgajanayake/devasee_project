@@ -29,3 +29,9 @@ eureka:
 app:
   super-admin:
     email: npathumdilhara@gmail.com
+
+
+
+security:
+  internal-jwt:
+    secret: ZGV2YXNlZS1lN2I4YzJkMS0xYjZmLTRlMWYtODhiMy05YTRmNWUxYTJjZGU=

@@ -37,7 +37,7 @@ public class InventoryController {
         return new CustomResponse<>(true, "Inventory found", inventoryDTO);
     }
 
-    // For Product Service : Get item quantity by productId
+    // For Product Public Service : Get item quantity by productId
     @GetMapping("/product/{productId}/quantity")
     public Integer getInventoryQuantityById(@PathVariable String productId) {
         return inventoryServices.getInventoryQuantityById(productId);
@@ -53,7 +53,7 @@ public class InventoryController {
 
     // Update inventory
     @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("/admin/updateInventory")
+    @PutMapping
     public CustomResponse<RetrieveInventoryDTO> updateInventory(
             @RequestBody CreateUpdateInventoryDTO createUpdateInventoryDTO
     ) {

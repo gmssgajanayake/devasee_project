@@ -6,6 +6,7 @@ import com.devasee.users.service.AdminService;
 import com.devasee.users.service.CustomerService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -28,7 +29,8 @@ public class AuthController {
     }
 
     // Saving an user after registering in frontend, default role returning and assigning as CUSTOMER
-    @PostMapping("/register")
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping
     public CustomResponse<Object> createUser(
             HttpServletRequest request
     ) {
@@ -39,20 +41,23 @@ public class AuthController {
         return new CustomResponse<>(true, "Customer created successfully", dto);
     }
 
-    // TODO : update user by user
-    @PutMapping("/update")
+    // TODO : No way in clerk
+    @PreAuthorize("isAuthenticated()")
+    @PutMapping
     public String updateUser(){
         return "updating user";
     }
 
-    // Delete user by user
-    @DeleteMapping("/delete")
+    // TODO : No way in clerk
+    // Delete user by user using token, this request header added by apigateway
+    @PreAuthorize("isAuthenticated()")
+    @DeleteMapping
     public ResponseEntity<Void> deleteCustomer(@RequestHeader("X-User-Id") String customerId) {
         customerService.deleteUser(customerId);
         return ResponseEntity.noContent().build(); // 204 No Content
     }
 
-    // Return actual role or if not there return default role CUSTOMER
+    // For api service : Return actual role or if not there return default role CUSTOMER
     @GetMapping("/{userId}/roles")
     public ResponseEntity<List<String>> getUserRole(@PathVariable String userId) {
         List<String> roles = adminService.getUserRole(userId);
@@ -61,6 +66,7 @@ public class AuthController {
 
     // Delete user by id by user
     // TODO :  testing
+    @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/deleteTest/{customerId}")
     public ResponseEntity<Void> deleteCustomerTesting(@PathVariable String customerId) {
         customerService.deleteUser(customerId);

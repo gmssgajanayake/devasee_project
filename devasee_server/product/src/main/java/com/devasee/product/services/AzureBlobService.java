@@ -25,11 +25,11 @@ public class AzureBlobService {
     private final BlobContainerClient containerClient;
 
     public AzureBlobService() {
-        String connectStr = "DefaultEndpointsProtocol=https;EndpointSuffix=core.windows.net;AccountName=devaseebookstoreimages;AccountKey=pAjow61U0YsxPRwz+mZ+ihb3k4+KMrLHverA9Z4TY4nIwBS/MRjUDKUqD4EHQVGLhHmW2+/r/qGG+AStCiH9Kg==;BlobEndpoint=https://devaseebookstoreimages.blob.core.windows.net/;FileEndpoint=https://devaseebookstoreimages.file.core.windows.net/;QueueEndpoint=https://devaseebookstoreimages.queue.core.windows.net/;TableEndpoint=https://devaseebookstoreimages.table.core.windows.net/"; // replace with your Azure connection string
+        String connectStr = "DefaultEndpointsProtocol=https;EndpointSuffix=core.windows.net;AccountName=devaseebookstoreimages;AccountKey=pAjow61U0YsxPRwz+mZ+ihb3k4+KMrLHverA9Z4TY4nIwBS/MRjUDKUqD4EHQVGLhHmW2+/r/qGG+AStCiH9Kg==;BlobEndpoint=https://devaseebookstoreimages.blob.core.windows.net/;FileEndpoint=https://devaseebookstoreimages.file.core.windows.net/;QueueEndpoint=https://devaseebookstoreimages.queue.core.windows.net/;TableEndpoint=https://devaseebookstoreimages.table.core.windows.net/"; // Azure connection string
         BlobServiceClient serviceClient = new BlobServiceClientBuilder()
                 .connectionString(connectStr)
                 .buildClient();
-        containerClient = serviceClient.getBlobContainerClient("product-book-images");
+        containerClient = serviceClient.getBlobContainerClient("product-book-images"); // todo
     }
 
     // Method to store files in azure blob storage
