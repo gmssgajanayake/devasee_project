@@ -5,12 +5,15 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * DTO for deleting Stationery
+ * DTO for updating Stationery
+ * ID is required
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class DeleteStationeryDTO {
+public class UpdateStationeryDTO {
     private String id;
     private String name;
+    private String description;
+    private double price;
 }

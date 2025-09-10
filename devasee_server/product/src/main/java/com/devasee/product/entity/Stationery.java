@@ -1,28 +1,39 @@
 package com.devasee.product.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.UuidGenerator;
 
 import java.time.LocalDateTime;
 
+/**
+ * ✅ Entity representing Stationery in DB
+ */
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
 public class Stationery {
-    @Id
-    private int id;
 
+    @Id
+    @GeneratedValue()
+    @UuidGenerator
+    @Column(updatable = false, nullable = false, length = 36)
+    private String id;
+
+    @Column(nullable = false)
     private String name;
+
+    @Column(length = 2000)
     private String description;
+
+    @Column(nullable = false)
     private double price;
-    private int stockQuantity;
+
     private String imgUrl;
+
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
