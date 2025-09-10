@@ -4,7 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-// For creation
+/**
+ * DTO for creating a new Stationery
+ * Includes initialQuantity to create Inventory
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -12,6 +15,5 @@ public class CreateStationeryDTO {
     private String name;
     private String description;
     private double price;
-    private int stockQuantity;
-    private String imgUrl;
+    private int initialQuantity; // used for inventory creation
 }
