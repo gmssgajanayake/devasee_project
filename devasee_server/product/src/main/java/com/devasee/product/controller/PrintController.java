@@ -26,7 +26,7 @@ public class PrintController {
     }
 
     @GetMapping("/public/printId/{printId}")
-    public CustomResponse<PrintDTO> getPrintById(@PathVariable int printId) {
+    public CustomResponse<PrintDTO> getPrintById(@PathVariable String printId) {
         return new CustomResponse<>(true, "Print found", printServices.getPrintById(printId));
     }
 
@@ -68,7 +68,7 @@ public class PrintController {
     }
 
     @DeleteMapping("/admin/deletePrint/{id}")
-    public CustomResponse<Boolean> deletePrint(@PathVariable int id) {
+    public CustomResponse<Boolean> deletePrint(@PathVariable String id) {
         boolean deleted = printServices.deletePrint(id);
         return new CustomResponse<>(deleted, deleted ? "Print type deleted successfully" : "Failed to delete print type", deleted);
     }

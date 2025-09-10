@@ -41,7 +41,7 @@ public class PrintServices {
         }
     }
 
-    public PrintDTO getPrintById(int printId) {
+    public PrintDTO getPrintById(String printId) {
         try {
             Printing printing = printRepo.findById(printId)
                     .orElseThrow(() -> new ProductNotFoundException("Print not found with ID: " + printId));
@@ -134,7 +134,7 @@ public class PrintServices {
         }
     }
 
-    public boolean deletePrint(int id) {
+    public boolean deletePrint(String id) {
         if (!printRepo.existsById(id)) {
             throw new ProductNotFoundException("Print not found with ID: " + id);
         }
