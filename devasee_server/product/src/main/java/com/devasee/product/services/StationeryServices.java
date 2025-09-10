@@ -2,6 +2,7 @@ package com.devasee.product.services;
 
 import com.devasee.product.dto.*;
 import com.devasee.product.entity.Stationery;
+import com.devasee.product.enums.ContainerType;
 import com.devasee.product.exception.ProductAlreadyExistsException;
 import com.devasee.product.exception.ProductNotFoundException;
 import com.devasee.product.exception.ServiceUnavailableException;
@@ -53,7 +54,7 @@ public class StationeryServices {
         RetrieveStationeryDTO dto = modelMapper.map(stationery, RetrieveStationeryDTO.class);
 
         if (dto.getImgUrl() != null && !dto.getImgUrl().isEmpty()) {
-            dto.setImgUrl(azureBlobService.generateSasUrl(dto.getImgUrl()));
+            dto.setImgUrl(azureBlobService.generateSasUrl(dto.getImgUrl(),ContainerType.STATIONERY));
         }
 
         dto.setStockQuantity(getStockQuantity(dto.getId()));
@@ -115,7 +116,7 @@ public class StationeryServices {
         }
 
         try {
-            String fileName = (file != null) ? azureBlobService.uploadFile(file) : null;
+            String fileName = (file != null) ? azureBlobService.uploadFile(file, ContainerType.STATIONERY) : null;
 
             Stationery stationery = modelMapper.map(dto, Stationery.class);
             stationery.setImgUrl(fileName);
@@ -145,8 +146,8 @@ public class StationeryServices {
             modelMapper.map(dto, existing);
 
             if(file != null && !file.isEmpty()){
-                if(existingImgUrl != null) azureBlobService.deleteFile(existingImgUrl);
-                existing.setImgUrl(azureBlobService.uploadFile(file));
+                if(existingImgUrl != null) azureBlobService.deleteFile(existingImgUrl,ContainerType.STATIONERY);
+                existing.setImgUrl(azureBlobService.uploadFile(file,ContainerType.STATIONERY));
             }
 
             Stationery saved = stationeryRepo.save(existing);
@@ -168,7 +169,7 @@ public class StationeryServices {
 
         try {
             if(stationery.getImgUrl() != null) {
-                azureBlobService.deleteFile(stationery.getImgUrl());
+                azureBlobService.deleteFile(stationery.getImgUrl(),ContainerType.STATIONERY);
             }
             stationeryRepo.deleteById(id);
             return modelMapper.map(stationery, DeleteStationeryDTO.class);
