@@ -20,7 +20,7 @@ import java.util.List;
 public class AddUserHeaderFilter implements GlobalFilter, Ordered {
 
     private static final Logger log = LoggerFactory.getLogger(AddUserHeaderFilter.class);
-    private static final String HEADER_NAME = "X-User-Id";
+    private static final String USER_ID_HEADER = "X-User-Id";
     private static final String INTERNAL_JWT_HEADER = "X-Internal-JWT";
 
     private final InternalJWTService internalJWTService; // inject your internal JWT generator
@@ -38,8 +38,10 @@ public class AddUserHeaderFilter implements GlobalFilter, Ordered {
 
         // Skip adding header for public endpoints like /api/v1/users/customer/public/save
         if (
-                "GET".equalsIgnoreCase(exchange.getRequest().getMethod().toString()) &&
-                        path.startsWith("/api/v1/product/books")
+            "GET".equalsIgnoreCase(exchange.getRequest().getMethod().toString()) &&
+            (path.startsWith("/api/v1/product") ||
+            path.startsWith("/api/v1/promo") ||
+            path.matches("/api/v1/product/[^/]+/quantity"))
         ) {
             log.info("### Skipping header for public endpoint {}", path);
             return chain.filter(exchange);
@@ -65,8 +67,8 @@ public class AddUserHeaderFilter implements GlobalFilter, Ordered {
                                 ServerHttpRequest.Builder mutatedRequestBuilder = exchange.getRequest().mutate();
 
                                 if (userId != null && !userId.isEmpty()) {
-                                    mutatedRequestBuilder.header(HEADER_NAME, userId);
-                                    log.info("### Added header {}: {}", HEADER_NAME, userId);
+                                    mutatedRequestBuilder.header(USER_ID_HEADER, userId);
+                                    log.info("### Added header {}: {}", USER_ID_HEADER, userId);
                                 }
 
                                 // Add internal JWT header
@@ -74,9 +76,14 @@ public class AddUserHeaderFilter implements GlobalFilter, Ordered {
                                 log.info("### Added internal JWT header {}: {}", INTERNAL_JWT_HEADER, internalJwt);
 
                                 // For user save endpoint, also add the full Authorization header with token
-                                if (path.endsWith("/save") && originalAuthHeader != null) {
+                                if ("POST".equalsIgnoreCase(exchange.getRequest().getMethod().toString()) &&
+                                        path.equals("/api/v1/users/auth") && originalAuthHeader != null) {
                                     mutatedRequestBuilder.header("Authorization", originalAuthHeader);
-                                    log.info("### Added Authorization header for /save endpoint");
+                                    log.info("### Keep Original Authorization header for user create endpoint");
+                                } else {
+                                    // Remove Authorization header for all other endpoints
+                                    mutatedRequestBuilder.headers(headers -> headers.remove("Authorization"));
+                                    log.info("### Removed original Authorization header for non-user-save endpoints");
                                 }
 
                                 ServerHttpRequest mutatedRequest = mutatedRequestBuilder.build();

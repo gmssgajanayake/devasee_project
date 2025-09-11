@@ -81,8 +81,8 @@ public class BookServices {
             Page<Book> bookPage = bookRepo.findAll(pageable);
 
             // Convert Book → DTO and replace blob names with SAS URLs
+// Convert Book → DTO and replace blob names with SAS URLs
             Page<RetrieveBookDTO> dtoPage = bookPage.map(this::sasUrlAdderAndQuantitySetter);
-
             if (dtoPage.isEmpty()) {
                 throw new ProductNotFoundException("No books found");
             }

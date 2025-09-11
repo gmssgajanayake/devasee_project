@@ -1,9 +1,11 @@
 package org.devasee.promo.controller;
 
-import org.devasee.promo.dto.CreateAdsDTO;
 import org.devasee.promo.dto.RetrieveAdsDTO;
+import org.devasee.promo.response.CustomResponse;
 import org.devasee.promo.service.AdsService;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -20,13 +22,19 @@ public class PromoController {
         this.adsService = adsService;
     }
 
-    @GetMapping("/public/ads")
-    public List<RetrieveAdsDTO> getAllAds(){
-        return adsService.getAllAds();
+    @GetMapping
+    public CustomResponse<List<RetrieveAdsDTO>> getAllAds(){
+        List<RetrieveAdsDTO> promoAds = adsService.getAllAds();
+        return new CustomResponse<>(true, "Promo Advertisements Retrieved Successfully", promoAds);
     }
 
-    @PostMapping("/createAds")
-    public CreateAdsDTO createAds(@RequestBody CreateAdsDTO adDTO){
-        return adsService.scheduleAds(adDTO);
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping
+    public CustomResponse<RetrieveAdsDTO> createAds(
+            @RequestParam("advertisement") String adsJson,
+            @RequestParam("file") MultipartFile file
+    ){
+        RetrieveAdsDTO dto = adsService.scheduleAds(adsJson, file);
+        return new CustomResponse<>(true, "Promo Advertisement Saved Successfully", dto);
     }
 }
