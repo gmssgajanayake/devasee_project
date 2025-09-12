@@ -4,6 +4,7 @@ import com.devasee.product.dto.*;
 import com.devasee.product.response.CustomResponse;
 import com.devasee.product.services.StationeryServices;
 import org.springframework.data.domain.Page;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,7 +22,7 @@ public class StationeryController {
     /**
      * Retrieve all stationery with pagination
      */
-    @GetMapping("/public/all")
+    @GetMapping
     public CustomResponse<Page<RetrieveStationeryDTO>> getAllStationery(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size
@@ -33,7 +34,7 @@ public class StationeryController {
     /**
      *  Retrieve stationery by ID
      */
-    @GetMapping("/public/{id}")
+    @GetMapping("/{id}")
     public CustomResponse<RetrieveStationeryDTO> getStationeryById(@PathVariable String id){
         return new CustomResponse<>(true,"Stationery found",
                 service.getStationeryById(id));
@@ -42,7 +43,7 @@ public class StationeryController {
     /**
      * Search stationery by name
      */
-    @GetMapping("/public/search")
+    @GetMapping("/search")
     public CustomResponse<Page<RetrieveStationeryDTO>> searchByName(
             @RequestParam String name,
             @RequestParam(defaultValue = "0") int page,
@@ -56,7 +57,8 @@ public class StationeryController {
     /**
      *  Create new stationery (with optional image upload)
      */
-    @PostMapping("/admin/addStationery")
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping
     public CustomResponse<CreateStationeryDTO> addStationery(
             @RequestParam("stationery") String stationeryJson,
             @RequestParam(value = "file", required = false) MultipartFile file
@@ -68,7 +70,8 @@ public class StationeryController {
     /**
      *  Update existing stationery
      */
-    @PutMapping("/admin/updateStationery")
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping
     public CustomResponse<RetrieveStationeryDTO> updateStationery(
             @RequestParam("stationery") String stationeryJson,
             @RequestParam(value = "file", required = false) MultipartFile file
@@ -80,7 +83,8 @@ public class StationeryController {
     /**
      * Delete stationery by ID
      */
-    @DeleteMapping("/admin/deleteID/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/{id}")
     public CustomResponse<DeleteStationeryDTO> deleteStationery(@PathVariable String id){
         return new CustomResponse<>(true,"Stationery deleted successfully",
                 service.deleteStationery(id));
