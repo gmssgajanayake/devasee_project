@@ -13,53 +13,102 @@
   <url>http://maven.apache.org</url>
 
   <dependencies>
+      <!-- web starter -->
+      <dependency>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-web</artifactId>
+      </dependency>
 
-    <!-- web starter -->
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-web</artifactId>
-    </dependency>
+      <!-- default -->
+      <dependency>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-test</artifactId>
+          <scope>test</scope>
+      </dependency>
 
-    <!-- default -->
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-test</artifactId>
-      <scope>test</scope>
-    </dependency>
+      <!-- jpa -->
+      <dependency>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-data-jpa</artifactId>
+      </dependency>
 
-    <!-- jpa -->
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-data-jpa</artifactId>
-    </dependency>
+      <!-- lombok -->
+      <dependency>
+          <groupId>org.projectlombok</groupId>
+          <artifactId>lombok</artifactId>
+          <optional>true</optional>
+      </dependency>
 
-    <!-- lombok -->
-    <dependency>
-      <groupId>org.projectlombok</groupId>
-      <artifactId>lombok</artifactId>
-      <optional>true</optional>
-    </dependency>
+      <!-- model mapper from maven -->
+      <dependency>
+          <groupId>org.modelmapper</groupId>
+          <artifactId>modelmapper</artifactId>
+          <version>3.2.3</version>
+      </dependency>
 
-    <!-- model mapper from maven -->
-    <dependency>
-      <groupId>org.modelmapper</groupId>
-      <artifactId>modelmapper</artifactId>
-      <version>3.2.3</version>
-    </dependency>
+      <!-- PostgresSQL connector -->
+      <dependency>
+          <groupId>org.postgresql</groupId>
+          <artifactId>postgresql</artifactId>
+          <version>42.7.3</version>
+          <scope>runtime</scope>
+      </dependency>
 
-    <!-- PostgresSQL connector -->
-    <dependency>
-      <groupId>org.postgresql</groupId>
-      <artifactId>postgresql</artifactId>
-      <version>42.7.3</version>
-      <scope>runtime</scope>
-    </dependency>
+      <!-- Eureka client-->
+      <dependency>
+          <groupId>org.springframework.cloud</groupId>
+          <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+      </dependency>
 
-    <!-- Eureka client-->
-    <dependency>
-      <groupId>org.springframework.cloud</groupId>
-      <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
-    </dependency>
+      <!-- Azure blob container-->
+      <dependency>
+          <groupId>com.azure</groupId>
+          <artifactId>azure-storage-blob</artifactId>
+          <version>12.30.0</version>
+          <exclusions>
+              <exclusion>
+                  <groupId>jakarta.ws.rs</groupId>
+                  <artifactId>jakarta.ws.rs-api</artifactId>
+              </exclusion>
+          </exclusions>
+      </dependency>
+
+      <!-- JWT (using JJWT library) -->
+      <dependency>
+          <groupId>io.jsonwebtoken</groupId>
+          <artifactId>jjwt-api</artifactId>
+          <version>0.11.5</version>
+      </dependency>
+      <dependency>
+          <groupId>io.jsonwebtoken</groupId>
+          <artifactId>jjwt-impl</artifactId>
+          <version>0.11.5</version>
+          <scope>runtime</scope>
+      </dependency>
+      <dependency>
+          <groupId>io.jsonwebtoken</groupId>
+          <artifactId>jjwt-jackson</artifactId> <!-- for JSON parsing -->
+          <version>0.11.5</version>
+          <scope>runtime</scope>
+      </dependency>
+
+      <dependency>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-security</artifactId>
+      </dependency>
+
+      <!-- JAX-RS implementation (Jersey) -->
+      <dependency>
+          <groupId>org.glassfish.jersey.core</groupId>
+          <artifactId>jersey-common</artifactId>
+          <version>3.1.5</version> <!-- match Jakarta 3.1.x -->
+      </dependency>
+
+      <!-- Enable Java 8+ Date/Time (LocalDate, LocalDateTime) support for Jackson -->
+      <dependency>
+          <groupId>com.fasterxml.jackson.datatype</groupId>
+          <artifactId>jackson-datatype-jsr310</artifactId>
+      </dependency>
 
   </dependencies>
 </project>

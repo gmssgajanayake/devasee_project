@@ -28,7 +28,6 @@ public class SecurityConfig {
                                 "/api/v1/product/books",  // Spring Security treats /books and /books/ differently
                                 "/api/v1/product/books/**",
                                 "/api/v1/product/stationery",
-                                "/api/v1/product/stationery/",
                                 "/api/v1/product/stationery/**",
                                 "/api/v1/promo",
                                 "/api/v1/promo/**",
@@ -46,21 +45,27 @@ public class SecurityConfig {
                                 "/api/v1/product/books",
                                 "/api/v1/product/stationery",
                                 "/api/v1/product/printing",
-                                "/api/v1/inventory"
+                                "/api/v1/inventory",
+                                "/api/v1/promo/**",
+                                "/api/v1/promo"
                         ).hasRole("ADMIN")
                         .pathMatchers(
                                 HttpMethod.PUT,
                                 "/api/v1/product/books",
                                 "/api/v1/product/stationery",
                                 "/api/v1/product/printing",
-                                "api/v1/inventory"
+                                "api/v1/inventory",
+                                "/api/v1/promo/**",
+                                "/api/v1/promo"
                         ).hasRole("ADMIN")
                         .pathMatchers(
                                 HttpMethod.DELETE,
                                 "/api/v1/product/books/**",
                                 "/api/v1/product/stationery/**",
                                 "/api/v1/product/printing/**",
-                                "/api/v1/inventory/**"
+                                "/api/v1/inventory/**",
+                                "/api/v1/promo/**",
+                                "/api/v1/promo"
                         ).hasRole("ADMIN")
                         .pathMatchers(
                                 "/api/v1/users/admin/**",
