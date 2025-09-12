@@ -25,3 +25,9 @@ eureka:
       defaultZone: http://eureka:8761/eureka
   instance:
     prefer-ip-address: true
+
+
+
+security:
+  internal-jwt:
+    secret: ZGV2YXNlZS1lN2I4YzJkMS0xYjZmLTRlMWYtODhiMy05YTRmNWUxYTJjZGU=  # Base64 of original

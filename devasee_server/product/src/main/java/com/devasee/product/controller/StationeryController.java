@@ -1,52 +1,92 @@
 package com.devasee.product.controller;
 
-import com.devasee.product.dto.CreateStationeryDTO;
-import com.devasee.product.dto.DeleteStationeryDTO;
-import com.devasee.product.dto.RetrieveStationeryDTO;
+import com.devasee.product.dto.*;
 import com.devasee.product.response.CustomResponse;
 import com.devasee.product.services.StationeryServices;
+import org.springframework.data.domain.Page;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.multipart.MultipartFile;
 
 @CrossOrigin
 @RestController
-@RequestMapping("api/v1/product/stationery")
+@RequestMapping(value = "api/v1/product/stationery")
 public class StationeryController {
 
-    private final StationeryServices stationeryServices;
+    private final StationeryServices service;
 
-    public StationeryController(StationeryServices stationeryServices) {
-        this.stationeryServices = stationeryServices;
+    public StationeryController(StationeryServices service){
+        this.service = service;
+    }
+        //-------------------------------------public-----------------------------------------------
+    /**
+     * Retrieve all stationery with pagination
+     */
+    @GetMapping
+    public CustomResponse<Page<RetrieveStationeryDTO>> getAllStationery(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+    ){
+        return new CustomResponse<>(true,"Stationery list retrieved successfully",
+                service.getAllStationery(page,size));
     }
 
-    @GetMapping("/public/allStationery")
-    public CustomResponse<List<RetrieveStationeryDTO>> getAllStationery() {
-        List<RetrieveStationeryDTO> list = stationeryServices.getAllStationery();
-        return new CustomResponse<>(true, "Stationery items found", list);
+    /**
+     *  Retrieve stationery by ID
+     */
+    @GetMapping("/{id}")
+    public CustomResponse<RetrieveStationeryDTO> getStationeryById(@PathVariable String id){
+        return new CustomResponse<>(true,"Stationery found",
+                service.getStationeryById(id));
     }
 
-    @GetMapping("/public/{id}")
-    public CustomResponse<RetrieveStationeryDTO> getStationeryById(@PathVariable int id) {
-        RetrieveStationeryDTO dto = stationeryServices.getStationeryById(id);
-        return new CustomResponse<>(true, "Stationery item found", dto);
+    /**
+     * Search stationery by name
+     */
+    @GetMapping("/search")
+    public CustomResponse<Page<RetrieveStationeryDTO>> searchByName(
+            @RequestParam String name,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ){
+        return new CustomResponse<>(true,"Stationery search results",
+                service.searchStationeryByName(name,page,size));
     }
 
-    @PostMapping("/addStationery")
-    public CustomResponse<CreateStationeryDTO> saveStationery(@RequestBody CreateStationeryDTO dto) {
-        CreateStationeryDTO saved = stationeryServices.saveStationery(dto);
-        return new CustomResponse<>(true, "Stationery item saved successfully", saved);
+    //-------------------------------------Admin-----------------------------------------------
+    /**
+     *  Create new stationery (with optional image upload)
+     */
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping
+    public CustomResponse<CreateStationeryDTO> addStationery(
+            @RequestParam("stationery") String stationeryJson,
+            @RequestParam(value = "file", required = false) MultipartFile file
+    ){
+        return new CustomResponse<>(true,"Stationery created successfully",
+                service.saveStationery(stationeryJson,file));
     }
 
-    @PutMapping("/updateStationery")
-    public CustomResponse<RetrieveStationeryDTO> updateStationery(@RequestBody RetrieveStationeryDTO dto) {
-        RetrieveStationeryDTO updated = stationeryServices.updateStationery(dto);
-        return new CustomResponse<>(true, "Stationery item updated successfully", updated);
+    /**
+     *  Update existing stationery
+     */
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping
+    public CustomResponse<RetrieveStationeryDTO> updateStationery(
+            @RequestParam("stationery") String stationeryJson,
+            @RequestParam(value = "file", required = false) MultipartFile file
+    ){
+        return new CustomResponse<>(true,"Stationery updated successfully",
+                service.updateStationery(stationeryJson,file));
     }
 
-    @DeleteMapping("/deleteStationery/{id}")
-    public CustomResponse<DeleteStationeryDTO> deleteStationery(@PathVariable int id) {
-        DeleteStationeryDTO deleted = stationeryServices.deleteStationery(id);
-        return new CustomResponse<>(true, "Stationery item deleted successfully", deleted);
+    /**
+     * Delete stationery by ID
+     */
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/{id}")
+    public CustomResponse<DeleteStationeryDTO> deleteStationery(@PathVariable String id){
+        return new CustomResponse<>(true,"Stationery deleted successfully",
+                service.deleteStationery(id));
     }
 }

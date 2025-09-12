@@ -12,7 +12,6 @@ import java.time.LocalDate;
 public class CreateAdsDTO {
     private String title;
     private String description;
-    private String imgUrl;
     private LocalDate startDate;
     private LocalDate endDate;
 }

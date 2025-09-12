@@ -4,13 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
+/**
+ * DTO for deleting Stationery
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-
 public class DeleteStationeryDTO {
-    private int id;
+    private String id;
     private String name;
-    private int stockQuantity;
 }

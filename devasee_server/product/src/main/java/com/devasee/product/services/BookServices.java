@@ -2,6 +2,7 @@ package com.devasee.product.services;
 
 import com.devasee.product.dto.*;
 import com.devasee.product.entity.Book;
+import com.devasee.product.enums.ContainerType;
 import com.devasee.product.interfaces.InventoryClient;
 import com.devasee.product.repo.BookRepo;
 import com.devasee.product.exception.ProductAlreadyExistsException;
@@ -55,7 +56,7 @@ public class BookServices {
 
             String blobName = dto.getImgUrl(); // stored as filename
             if (blobName != null && !blobName.isEmpty()) {
-                String sasUrl = azureBlobService.generateSasUrl(blobName);
+                String sasUrl = azureBlobService.generateSasUrl(blobName, ContainerType.BOOK);
                 dto.setImgUrl(sasUrl);
             }
 
@@ -80,8 +81,8 @@ public class BookServices {
             Page<Book> bookPage = bookRepo.findAll(pageable);
 
             // Convert Book → DTO and replace blob names with SAS URLs
+// Convert Book → DTO and replace blob names with SAS URLs
             Page<RetrieveBookDTO> dtoPage = bookPage.map(this::sasUrlAdderAndQuantitySetter);
-
             if (dtoPage.isEmpty()) {
                 throw new ProductNotFoundException("No books found");
             }
@@ -160,7 +161,7 @@ public class BookServices {
 
         try {
             // Upload the image to Azure Blob Storage
-            String fileName = (file!=null)? azureBlobService.uploadFile(file) : null;
+            String fileName = (file!=null)? azureBlobService.uploadFile(file, ContainerType.BOOK) : null;
 
             Book newBook = modelMapper.map(bookDTO, Book.class);
             newBook.setImgUrl(fileName); // Set uploaded saved file's name as url
@@ -206,11 +207,11 @@ public class BookServices {
                 try {
                     // Delete existing file from Azure
                     if (existingImgUrl != null && !existingImgUrl.isEmpty()) {
-                        azureBlobService.deleteFile(existingImgUrl);
+                        azureBlobService.deleteFile(existingImgUrl, ContainerType.BOOK);
                     }
 
                     // Upload the new image to Azure Blob Storage
-                    String fileName = azureBlobService.uploadFile(file);
+                    String fileName = azureBlobService.uploadFile(file, ContainerType.BOOK);
                     existingBook.setImgUrl(fileName); // Set uploaded image file name in DTO
                 } catch (Exception exception){
                     throw new InternalServerErrorException("Something went wrong when uploading images");
@@ -246,7 +247,7 @@ public class BookServices {
 
             // Delete file from Azure
             if (book.getImgUrl() != null && !book.getImgUrl().isEmpty()) {
-                azureBlobService.deleteFile(book.getImgUrl());
+                azureBlobService.deleteFile(book.getImgUrl(), ContainerType.BOOK);
             }
 
             // Delete book from database

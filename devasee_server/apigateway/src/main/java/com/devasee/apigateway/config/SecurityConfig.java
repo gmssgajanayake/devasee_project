@@ -2,6 +2,7 @@ package com.devasee.apigateway.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.oauth2.jwt.*;
@@ -23,18 +24,53 @@ public class SecurityConfig {
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .authorizeExchange(exchanges -> exchanges
                         .pathMatchers(
-                                "/api/v1/promo/public/**",
-                                "/api/v1/product/book/public/**",
-                                "/api/v1/product/stationery/public/**",
-                                "/api/v1/product/printing/public/**",
-                                "/api/v1/inventory/public/**"
+                                HttpMethod.GET,
+                                "/api/v1/product/books",  // Spring Security treats /books and /books/ differently
+                                "/api/v1/product/books/**",
+                                "/api/v1/product/stationery",
+                                "/api/v1/product/stationery/**",
+                                "/api/v1/promo",
+                                "/api/v1/promo/**",
+                                "/api/v1/inventory/product/*/quantity",
+                                "/api/v1/product/printing",
+                                "/api/v1/product/printing/**"
                         ).permitAll()
                         .pathMatchers(
-                                "/api/v1/analytics/admin/**",
-                                "/api/v1/inventory/admin/**",
-                                "/api/v1/product/book/admin/**",
-                                "/api/v1/inventory/admin/**",
-                                "/api/v1/users/admin/**"
+                                HttpMethod.GET,
+                                "/api/v1/inventory",
+                                "/api/v1/inventory/*"
+                                ).hasRole("ADMIN")
+                        .pathMatchers(
+                                HttpMethod.POST,
+                                "/api/v1/product/books",
+                                "/api/v1/product/stationery",
+                                "/api/v1/product/printing",
+                                "/api/v1/inventory",
+                                "/api/v1/promo/**",
+                                "/api/v1/promo"
+                        ).hasRole("ADMIN")
+                        .pathMatchers(
+                                HttpMethod.PUT,
+                                "/api/v1/product/books",
+                                "/api/v1/product/stationery",
+                                "/api/v1/product/printing",
+                                "api/v1/inventory",
+                                "/api/v1/promo/**",
+                                "/api/v1/promo"
+                        ).hasRole("ADMIN")
+                        .pathMatchers(
+                                HttpMethod.DELETE,
+                                "/api/v1/product/books/**",
+                                "/api/v1/product/stationery/**",
+                                "/api/v1/product/printing/**",
+                                "/api/v1/inventory/**",
+                                "/api/v1/promo/**",
+                                "/api/v1/promo"
+                        ).hasRole("ADMIN")
+                        .pathMatchers(
+                                "/api/v1/users/admin/**",
+                                "/api/v1/analytics",
+                                "/api/v1/analytics/**"
                         ).hasRole("ADMIN")
                         .anyExchange().authenticated()
                 )
