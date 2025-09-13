@@ -12,7 +12,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
-@EnableMethodSecurity
+@EnableMethodSecurity // Allows us to use annotations like @PreAuthorize
 public class SecurityConfig {
 
     private final InternalJWTService internalJWTService;
@@ -21,6 +21,7 @@ public class SecurityConfig {
         this.internalJWTService = internalJWTService;
     }
 
+    // Define Security Filter Chain
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
@@ -29,8 +30,9 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "api/v1/users/admin/**"
                         ).hasRole("ADMIN")
-                        .anyRequest().authenticated())
+                        .anyRequest().authenticated()) // All other requests → must be authenticated (internal JWT must exist)
                 .addFilterBefore(internalJWTFilter(), UsernamePasswordAuthenticationFilter.class);
+                // Above adding custom filter (InternalJWTFilter) before UsernamePasswordAuthenticationFilter
 
         return http.build();
     }

@@ -21,7 +21,7 @@ public class SecurityConfig {
             CustomJwtAuthenticationConverter customJwtAuthenticationConverter
     ) {
         http
-                .csrf(ServerHttpSecurity.CsrfSpec::disable)
+                .csrf(ServerHttpSecurity.CsrfSpec::disable) // don’t checking CSRF
                 .authorizeExchange(exchanges -> exchanges
                         .pathMatchers(
                                 HttpMethod.GET,
@@ -34,7 +34,7 @@ public class SecurityConfig {
                                 "/api/v1/inventory/product/*/quantity",
                                 "/api/v1/product/printing",
                                 "/api/v1/product/printing/**"
-                        ).permitAll()
+                        ).permitAll() // no token required
                         .pathMatchers(
                                 HttpMethod.GET,
                                 "/api/v1/inventory",
@@ -74,14 +74,20 @@ public class SecurityConfig {
                         ).hasRole("ADMIN")
                         .anyExchange().authenticated()
                 )
-                .oauth2ResourceServer(oauth2 -> oauth2
-                        .authenticationEntryPoint(jsonAuthEntryPoint)
-                        .accessDeniedHandler(jsonAccessDeniedHandler) // 403
+                .oauth2ResourceServer(oauth2 -> oauth2 // Authentication via OAuth2 Resource Server
+                        .authenticationEntryPoint(jsonAuthEntryPoint) // handles 401 Unauthorized
+                        .accessDeniedHandler(jsonAccessDeniedHandler) // handles 403 Forbidden
                         .jwt(jwt -> jwt
-                                .jwtDecoder(clerkJwtDecoderConfig.jwtDecoder())
-                                .jwtAuthenticationConverter(customJwtAuthenticationConverter)
+                                .jwtDecoder(clerkJwtDecoderConfig.jwtDecoder()) // custom JWT decoder
+                                .jwtAuthenticationConverter(customJwtAuthenticationConverter) // map JWT claims → Spring Security Authentication
                         )
                 );
+
+                // When a request has an Authorization: Bearer <token> header, The token is decoded by
+                // clerkJwtDecoderConfig.jwtDecoder(), Claims are converted into Spring Authentication using
+                // customJwtAuthenticationConverter
+                    // If decoding fails → jsonAuthEntryPoint is triggered (401 Unauthorized)
+                    // If decoding works but user lacks authority → jsonAccessDeniedHandler is triggered (403 Forbidden)
 
         return http.build();
     }
