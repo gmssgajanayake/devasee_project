@@ -36,7 +36,7 @@ public class AddUserHeaderFilter implements GlobalFilter, Ordered {
         log.info("### Incoming request getMethod {}", exchange.getRequest().getMethod());
         log.info("### Incoming request path {}", path);
 
-        // Skip adding header for public endpoints like /api/v1/users/customer/public/save
+        // Skip adding header for public endpoints like
         if (
             "GET".equalsIgnoreCase(exchange.getRequest().getMethod().toString()) &&
             (path.startsWith("/api/v1/product") ||
@@ -47,25 +47,37 @@ public class AddUserHeaderFilter implements GlobalFilter, Ordered {
             return chain.filter(exchange);
         }
 
-        // Get Authentication from ReactiveSecurityContextHolder
+        // Get Authentication from ReactiveSecurityContextHolder(Get Authenticated User from Security Context)
+        // Accesses the current Authentication object reactively
+        // At this point, the authentication token is already validated (JwtAuthenticationToken)
         return ReactiveSecurityContextHolder.getContext()// Accesses the current security context reactively
                 .map(SecurityContext::getAuthentication) // Extracts the Authentication object from the security context
                 .flatMap(auth -> {
 
-                            if (auth instanceof JwtAuthenticationToken jwtAuth) {
-                                String userId = jwtAuth.getToken().getClaimAsString("userId"); // Extracts the userId claim from the JWT token
+                            if (auth instanceof JwtAuthenticationToken jwtAuthToken) {
+                                // Extract userId and Roles
+                                String userId = jwtAuthToken.getToken().getClaimAsString("userId"); // Extracts the userId claim from the JWT token
                                 String originalAuthHeader = exchange.getRequest().getHeaders().getFirst("Authorization");
                                 log.info("### Extracted userId = {}", userId);
 
-                                List<String> roles = jwtAuth.getAuthorities().stream()
+                                // Converts Spring authorities to simple role strings for internal JWT.
+                                List<String> roles = jwtAuthToken.getAuthorities().stream()
                                         .map(a -> a.getAuthority().replace("ROLE_", ""))
                                         .toList();
 
                                 // Generate internal JWT
+                                // Downstream services don’t need to know about Clerk, they just verify the internal token
                                 String internalJwt = internalJWTService.generateInternalToken(userId, roles);
 
+                                // In Spring Cloud Gateway, ServerWebExchange is the reactive HTTP request/response
+                                // context. It’s immutable, meaning you cannot modify the original request or response directly
+                                // if we want to add headers, change the path, or modify anything, you create a new
+                                // ServerWebExchange based on the original one.
+                                // This avoids race conditions and allows multiple requests to be processed concurrently
+                                // on the same thread.
                                 ServerHttpRequest.Builder mutatedRequestBuilder = exchange.getRequest().mutate();
 
+                                // Adds X-User-Id and X-Internal-JWT headers.
                                 if (userId != null && !userId.isEmpty()) {
                                     mutatedRequestBuilder.header(USER_ID_HEADER, userId);
                                     log.info("### Added header {}: {}", USER_ID_HEADER, userId);
@@ -76,16 +88,20 @@ public class AddUserHeaderFilter implements GlobalFilter, Ordered {
                                 log.info("### Added internal JWT header {}: {}", INTERNAL_JWT_HEADER, internalJwt);
 
                                 // For user save endpoint, also add the full Authorization header with token
+                                // Keeps the original Authorization only for the user save/login endpoint
                                 if ("POST".equalsIgnoreCase(exchange.getRequest().getMethod().toString()) &&
                                         path.equals("/api/v1/users/auth") && originalAuthHeader != null) {
                                     mutatedRequestBuilder.header("Authorization", originalAuthHeader);
                                     log.info("### Keep Original Authorization header for user create endpoint");
                                 } else {
-                                    // Remove Authorization header for all other endpoints
+                                    // Remove Authorization header for all other endpoints, Other downstream services rely only on internal JWT
                                     mutatedRequestBuilder.headers(headers -> headers.remove("Authorization"));
                                     log.info("### Removed original Authorization header for non-user-save endpoints");
                                 }
 
+                                // forwards the mutated request to the appropriate microservice registered in Eureka.
+                                // erverHttpRequest.Builder + mutatedExchange is a reactive pattern to safely modify
+                                // request/headers in non-blocking, shared-thread environments.
                                 ServerHttpRequest mutatedRequest = mutatedRequestBuilder.build();
                                 ServerWebExchange mutatedExchange = exchange.mutate()
                                         .request(mutatedRequest)
@@ -95,6 +111,7 @@ public class AddUserHeaderFilter implements GlobalFilter, Ordered {
                                 mutatedRequestBuilder.build().getHeaders().forEach((key, values)
                                         -> log.info("### Header: {} = {}", key, String.join(",", values)));
 
+                                // Spring Cloud Gateway filters pass the ServerWebExchange down the chain (chain.filter(exchange)).
                                 return chain.filter(mutatedExchange);
                             }
 
