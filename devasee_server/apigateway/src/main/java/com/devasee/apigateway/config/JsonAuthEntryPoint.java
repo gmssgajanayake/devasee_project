@@ -9,6 +9,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
+///  Handlers (Error Cases)
+/// 401 Unauthorized → JsonAuthEntryPoint writes a JSON error response.
+
 @Component // auto-detect and register the class as a bean in the application context.
 public class JsonAuthEntryPoint implements ServerAuthenticationEntryPoint {
 
@@ -19,19 +22,21 @@ public class JsonAuthEntryPoint implements ServerAuthenticationEntryPoint {
 
             log.error("### Authentication error: {} - {}", ex.getClass().getSimpleName(), ex.getMessage());
 
-            exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+            exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED); // Set Response Status & Headers
             exchange.getResponse().getHeaders().add("Content-Type", "application/json");
 
+            // Custom Json Response
             String body = """
                     {"success": false,
                     "message": "%s",
                     "data": "AUTH_ERROR"
                     }""".formatted(ex.getMessage());
 
+            // Write JSON to Response Body
             byte[] bytes = body.getBytes();
             return exchange.getResponse().writeWith(Mono.just(exchange.getResponse()
                             .bufferFactory()
                             .wrap(bytes)))
-                    .onErrorResume(Mono::error);
+                    .onErrorResume(Mono::error); // If writing fails, propagate the error
     }
 }

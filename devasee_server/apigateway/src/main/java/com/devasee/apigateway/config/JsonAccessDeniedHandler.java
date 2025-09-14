@@ -9,6 +9,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
+/// Handlers (Error Cases)
+///  403 Forbidden → JsonAccessDeniedHandler writes a JSON error response
+/// When an authenticated user tries to access an endpoint they’re not authorized for
+
 @Component
 public class JsonAccessDeniedHandler implements ServerAccessDeniedHandler {
 
@@ -19,9 +23,11 @@ public class JsonAccessDeniedHandler implements ServerAccessDeniedHandler {
 
         log.error("### Access denied error: {} - {}", denied.getClass().getSimpleName(), denied.getMessage());
 
+        // Set Response Status & Headers
         exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
         exchange.getResponse().getHeaders().add("Content-Type", "application/json");
 
+        // Custom Json Response
         String body = """
                     {
                         "success": false,
@@ -33,10 +39,11 @@ public class JsonAccessDeniedHandler implements ServerAccessDeniedHandler {
                     }
                     """;
 
+        // Write JSON to Response Body
         byte[] bytes = body.getBytes();
         return exchange.getResponse().writeWith(Mono.just(exchange.getResponse()
                         .bufferFactory()
                         .wrap(bytes)))
-                .onErrorResume(Mono::error);
+                .onErrorResume(Mono::error); // If writing fails, propagate the error
     }
 }
