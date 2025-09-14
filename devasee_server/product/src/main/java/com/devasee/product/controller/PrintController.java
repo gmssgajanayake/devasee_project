@@ -1,11 +1,14 @@
 package com.devasee.product.controller;
 
-import com.devasee.product.dto.PrintDTO;
+import com.devasee.product.dto.CreatePrintDTO;
+import com.devasee.product.dto.DeletePrintDTO;
+import com.devasee.product.dto.RetrievePrintDTO;
 import com.devasee.product.response.CustomResponse;
 import com.devasee.product.services.PrintServices;
+import org.springframework.data.domain.Page;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.multipart.MultipartFile;
 
 @CrossOrigin
 @RestController
@@ -20,56 +23,68 @@ public class PrintController {
 
     // --------------------- Public ---------------------
 
-    @GetMapping("/public/allPrints")
-    public CustomResponse<List<PrintDTO>> getAllPrints() {
-        return new CustomResponse<>(true, "Print types found", printServices.getAllPrints());
+    // GET /api/v1/product/printing?page=0&size=20
+    @GetMapping
+    public CustomResponse<Page<RetrievePrintDTO>> getAllPrints(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+    ) {
+        Page<RetrievePrintDTO> printPage = printServices.getAllPrints(page, size);
+        return new CustomResponse<>(true, "Prints found", printPage);
     }
 
-    @GetMapping("/public/printId/{printId}")
-    public CustomResponse<PrintDTO> getPrintById(@PathVariable String printId) {
-        return new CustomResponse<>(true, "Print found", printServices.getPrintById(printId));
+    // GET /api/v1/product/printing/{printId}
+    @GetMapping("/{printId}")
+    public CustomResponse<RetrievePrintDTO> getPrintById(@PathVariable String printId) {
+        RetrievePrintDTO printDTO = printServices.getPrintById(printId);
+        return new CustomResponse<>(true, "Print found", printDTO);
     }
 
-    @GetMapping("/public/byType/{type}")
-    public CustomResponse<List<PrintDTO>> getPrintsByType(@PathVariable String type) {
-        return new CustomResponse<>(true, "Prints found by type", printServices.getPrintsByType(type));
-    }
-
-    @GetMapping("/public/search")
-    public CustomResponse<List<PrintDTO>> searchPrints(@RequestParam String keyword) {
-        return new CustomResponse<>(true, "Prints matching search", printServices.searchPrintsByTitle(keyword));
-    }
-
-    @GetMapping("/public/byMaterial/{material}")
-    public CustomResponse<List<PrintDTO>> getPrintsByMaterial(@PathVariable String material) {
-        return new CustomResponse<>(true, "Prints found by material", printServices.getPrintsByMaterial(material));
-    }
-
-    @GetMapping("/public/cheaperThan/{price}")
-    public CustomResponse<List<PrintDTO>> getPrintsCheaperThan(@PathVariable double price) {
-        return new CustomResponse<>(true, "Prints cheaper than " + price, printServices.getPrintsCheaperThan(price));
-    }
-
-    @GetMapping("/public/availableStock/{minStock}")
-    public CustomResponse<List<PrintDTO>> getAvailableStock(@PathVariable int minStock) {
-        return new CustomResponse<>(true, "Prints with stock greater than " + minStock, printServices.getAvailableStock(minStock));
+    // GET /api/v1/product/printing/search?field=type&value=mug&page=0&size=10
+    @GetMapping("/search")
+    public CustomResponse<Page<RetrievePrintDTO>> searchPrintsByTerm(
+            @RequestParam String field,
+            @RequestParam String value,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Page<RetrievePrintDTO> printPage = printServices.searchPrintsByTerm(field, value, page, size);
+        return new CustomResponse<>(
+                true,
+                "Prints by " + field + " : " + value,
+                printPage
+        );
     }
 
     // --------------------- Admin ---------------------
 
-    @PostMapping("/admin/addPrint")
-    public CustomResponse<PrintDTO> savePrint(@RequestBody PrintDTO printDTO) {
-        return new CustomResponse<>(true, "Print type saved successfully", printServices.savePrint(printDTO));
+    // Save new print type
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping
+    public CustomResponse<CreatePrintDTO> savePrint(
+            @RequestParam("print") String printJson,
+            @RequestParam("file") MultipartFile file
+    ) {
+        CreatePrintDTO dtoResponse = printServices.savePrint(printJson, file);
+        return new CustomResponse<>(true, "Print saved successfully", dtoResponse);
     }
 
-    @PutMapping("/admin/updatePrint")
-    public CustomResponse<PrintDTO> updatePrint(@RequestBody PrintDTO printDTO) {
-        return new CustomResponse<>(true, "Print type updated successfully", printServices.updatePrint(printDTO));
+    // Update existing print type
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping
+    public CustomResponse<RetrievePrintDTO> updatePrint(
+            @RequestParam("print") String printJson,
+            @RequestParam("file") MultipartFile file
+    ) {
+        RetrievePrintDTO dtoResponse = printServices.updatePrint(printJson, file);
+        return new CustomResponse<>(true, "Print updated successfully", dtoResponse);
     }
 
-    @DeleteMapping("/admin/deletePrint/{id}")
-    public CustomResponse<Boolean> deletePrint(@PathVariable String id) {
-        boolean deleted = printServices.deletePrint(id);
-        return new CustomResponse<>(deleted, deleted ? "Print type deleted successfully" : "Failed to delete print type", deleted);
+    // Delete print type by ID
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/{printId}")
+    public CustomResponse<DeletePrintDTO> deletePrint(@PathVariable String printId) {
+        DeletePrintDTO dtoResponse = printServices.deletePrint(printId);
+        return new CustomResponse<>(true, "Print deleted successfully", dtoResponse);
     }
 }
