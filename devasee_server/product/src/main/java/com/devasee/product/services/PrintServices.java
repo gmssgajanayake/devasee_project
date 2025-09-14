@@ -1,20 +1,29 @@
 package com.devasee.product.services;
 
-import com.devasee.product.dto.PrintDTO;
+import com.devasee.product.dto.*;
 import com.devasee.product.entity.Printing;
+import com.devasee.product.enums.ContainerType;
+import com.devasee.product.interfaces.InventoryClient;
+import com.devasee.product.repo.PrintRepo;
+import com.devasee.product.exception.ProductAlreadyExistsException;
 import com.devasee.product.exception.ProductNotFoundException;
 import com.devasee.product.exception.ServiceUnavailableException;
-import com.devasee.product.repo.PrintRepo;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.InternalServerErrorException;
 import org.hibernate.exception.DataException;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @Transactional
@@ -24,127 +33,206 @@ public class PrintServices {
 
     private final PrintRepo printRepo;
     private final ModelMapper modelMapper;
+    private final AzureBlobService azureBlobService;
+    private final InventoryClient inventoryClient;
 
-    public PrintServices(PrintRepo printRepo, ModelMapper modelMapper) {
+    public PrintServices(PrintRepo printRepo, ModelMapper modelMapper,
+                         AzureBlobService azureBlobService, InventoryClient inventoryClient) {
         this.printRepo = printRepo;
         this.modelMapper = modelMapper;
+        this.azureBlobService = azureBlobService;
+        this.inventoryClient = inventoryClient;
     }
 
-    // --------------------- Public ---------------------
+    private RetrievePrintDTO sasUrlAndQuantitySetter(Printing printing) {
+        RetrievePrintDTO dto = modelMapper.map(printing, RetrievePrintDTO.class);
 
-    public List<PrintDTO> getAllPrints() {
+        String blobName = dto.getImgUrl();
+        if (blobName != null && !blobName.isEmpty()) {
+            String sasUrl = azureBlobService.generateSasUrl(blobName, ContainerType.PRINTING);
+            dto.setImgUrl(sasUrl);
+        }
+
+        dto.setStockQuantity(getStockQuantity(dto.getId()));
+        return dto;
+    }
+
+    private int getStockQuantity(String productId) {
         try {
-            return modelMapper.map(printRepo.findAll(), new TypeToken<List<PrintDTO>>() {}.getType());
+            return inventoryClient.getStockQuantity(productId);
+        } catch (Exception e) {
+            throw new InternalServerErrorException("Error fetching quantity from inventory");
+        }
+    }
+
+    // ------------------ Public ------------------
+
+    public Page<RetrievePrintDTO> getAllPrints(int page, int size) {
+        try {
+            Pageable pageable = PageRequest.of(page, size, Sort.by("title").ascending());
+            Page<Printing> printPage = printRepo.findAll(pageable);
+
+            Page<RetrievePrintDTO> dtoPage = printPage.map(this::sasUrlAndQuantitySetter);
+            if (dtoPage.isEmpty()) {
+                throw new ProductNotFoundException("No prints found");
+            }
+            return dtoPage;
         } catch (DataException e) {
             log.error("### Error fetching all prints", e);
             throw new ServiceUnavailableException("Something went wrong on the server. Please try again later.");
         }
     }
 
-    public PrintDTO getPrintById(String printId) {
+    public RetrievePrintDTO getPrintById(String printId) {
         try {
             Printing printing = printRepo.findById(printId)
                     .orElseThrow(() -> new ProductNotFoundException("Print not found with ID: " + printId));
-            return modelMapper.map(printing, PrintDTO.class);
+            return sasUrlAndQuantitySetter(printing);
         } catch (DataAccessException e) {
             log.error("### Error fetching print by ID: {}", printId, e);
             throw new ServiceUnavailableException("Something went wrong on the server. Please try again later.");
         }
     }
 
-    public List<PrintDTO> getPrintsByType(String type) {
+    // ------------------ Admin ------------------
+
+    public CreatePrintDTO savePrint(String printJson, MultipartFile file) {
+        CreatePrintDTO createDTO;
         try {
-            return modelMapper.map(printRepo.findByType(type), new TypeToken<List<PrintDTO>>() {}.getType());
+            ObjectMapper mapper = new ObjectMapper();
+            createDTO = mapper.readValue(printJson, CreatePrintDTO.class);
+
+            if (printRepo.existsByTitleAndType(createDTO.getTitle(), createDTO.getType())) {
+                throw new ProductAlreadyExistsException("Print with same title and type already exists.");
+            }
         } catch (Exception e) {
-            log.error("### Error fetching prints by type: {}", type, e);
+            throw new ServiceUnavailableException("Error mapping JSON to DTO: " + e.getMessage());
+        }
+
+        try {
+            String fileName = (file != null && !file.isEmpty()) ?
+                    azureBlobService.uploadFile(file, ContainerType.PRINTING) : null;
+            Printing newPrint = modelMapper.map(createDTO, Printing.class);
+            newPrint.setImgUrl(fileName);
+
+            Printing savedPrint = printRepo.save(newPrint);
+
+            // Add inventory
+           InventoryRequestDTO inventoryRequestDTO = new InventoryRequestDTO(
+                    savedPrint.getId(),
+                    createDTO.getStockQuantity()
+            );
+            inventoryClient.createInventory(inventoryRequestDTO);//
+
+            log.info("### Print saved successfully with ID: {}", savedPrint.getId());
+            return createDTO;
+        } catch (Exception e) {
+            log.error("### Error saving print", e);
             throw new ServiceUnavailableException("Something went wrong on the server. Please try again later.");
         }
     }
 
-    public List<PrintDTO> searchPrintsByTitle(String keyword) {
-        try {
-            return modelMapper.map(printRepo.findByTitleContainingIgnoreCase(keyword), new TypeToken<List<PrintDTO>>() {}.getType());
-        } catch (Exception e) {
-            log.error("### Error searching prints by title: {}", keyword, e);
-            throw new ServiceUnavailableException("Something went wrong on the server. Please try again later.");
-        }
-    }
+    // Update Print Details, Cover Image Not Required
+    public RetrievePrintDTO updatePrint(String printJson, MultipartFile file) {
 
-    public List<PrintDTO> getPrintsByMaterial(String material) {
-        try {
-            return modelMapper.map(printRepo.findByMaterial(material), new TypeToken<List<PrintDTO>>() {}.getType());
-        } catch (Exception e) {
-            log.error("### Error fetching prints by material: {}", material, e);
-            throw new ServiceUnavailableException("Something went wrong on the server. Please try again later.");
-        }
-    }
+        UpdatePrintDTO printDTO;
 
-    public List<PrintDTO> getPrintsCheaperThan(double price) {
         try {
-            return modelMapper.map(printRepo.findByPriceLessThan(price), new TypeToken<List<PrintDTO>>() {}.getType());
-        } catch (Exception e) {
-            log.error("### Error fetching prints cheaper than {}", price, e);
-            throw new ServiceUnavailableException("Something went wrong on the server. Please try again later.");
-        }
-    }
+            // Convert JSON string to DTO
+            ObjectMapper mapper = new ObjectMapper();
+            printDTO = mapper.readValue(printJson, UpdatePrintDTO.class);
 
-    public List<PrintDTO> getAvailableStock(int minStock) {
-        try {
-            return modelMapper.map(printRepo.findByStockQuantityGreaterThan(minStock), new TypeToken<List<PrintDTO>>() {}.getType());
-        } catch (Exception e) {
-            log.error("### Error fetching prints with stock greater than {}", minStock, e);
-            throw new ServiceUnavailableException("Something went wrong on the server. Please try again later.");
-        }
-    }
+            // Find existing print or throw custom exception
+            Printing existingPrint = printRepo.findById(printDTO.getId())
+                    .orElseThrow(() -> new ProductNotFoundException("Print not found"));
 
-    // --------------------- Admin ---------------------
+            String existingImgUrl = existingPrint.getImgUrl();
 
-    public PrintDTO savePrint(PrintDTO printDTO) {
-        try {
-            if (printRepo.existsByTitleAndType(printDTO.getTitle(), printDTO.getType())) {
-                throw new ServiceUnavailableException("Print with same title and type already exists.");
+            // Map only non-null fields from DTO into existing entity
+            modelMapper.map(printDTO, existingPrint);
+
+            log.info("########## file : {}", file);
+
+            if (file != null && !file.isEmpty()) {
+                log.info("############### file not null : {}", existingPrint.getImgUrl());
+                try {
+                    // Delete old image from Azure if exists
+                    if (existingImgUrl != null && !existingImgUrl.isEmpty()) {
+                        azureBlobService.deleteFile(existingImgUrl, ContainerType.PRINTING);
+                    }
+                    // Upload new image to Azure Blob Storage
+                    String fileName = azureBlobService.uploadFile(file, ContainerType.PRINTING);
+                    existingPrint.setImgUrl(fileName);
+                } catch (Exception ex) {
+                    throw new InternalServerErrorException("Something went wrong when uploading images");
+                }
+            } else {
+                log.info("############### current url : {}", existingPrint.getImgUrl());
+                existingPrint.setImgUrl(existingImgUrl);
             }
 
-            Printing entityToSave = modelMapper.map(printDTO, Printing.class);
-            Printing savedPrint = printRepo.save(entityToSave);
-            log.info("### Print saved successfully with ID: {}", savedPrint.getId());
-
-            return modelMapper.map(savedPrint, PrintDTO.class);
-        } catch (Exception e) {
-            log.error("### Error saving print: {}", printDTO, e);
-            throw new ServiceUnavailableException("Something went wrong on the server. Please try again later.");
-        }
-    }
-
-    public PrintDTO updatePrint(PrintDTO printDTO) {
-        try {
-            Printing existingPrint = printRepo.findById(printDTO.getId())
-                    .orElseThrow(() -> new ProductNotFoundException("Print not found with ID: " + printDTO.getId()));
-
-            Printing updatedEntity = modelMapper.map(printDTO, Printing.class);
-            updatedEntity.setId(existingPrint.getId());
-
-            Printing savedPrint = printRepo.save(updatedEntity);
+            Printing savedPrint = printRepo.save(existingPrint);
             log.info("### Print updated successfully with ID: {}", savedPrint.getId());
 
-            return modelMapper.map(savedPrint, PrintDTO.class);
+            return sasUrlAndQuantitySetter(savedPrint);
+
+        } catch (JsonProcessingException e) {
+            log.error("### Invalid JSON : {}", e.getMessage());
+            throw new BadRequestException("Invalid JSON: " + e.getMessage());
         } catch (DataAccessException e) {
-            log.error("### Error updating print with ID: {}", printDTO.getId(), e);
+            log.error("### Error updating print with ID: {}", e.getMessage());
             throw new ServiceUnavailableException("Something went wrong on the server. Please try again later.");
         }
     }
 
-    public boolean deletePrint(String id) {
-        if (!printRepo.existsById(id)) {
-            throw new ProductNotFoundException("Print not found with ID: " + id);
+    public Page<RetrievePrintDTO> searchPrintsByTerm(String field, String value, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Printing> printPage;
+
+        switch (field.toLowerCase()) {
+            case "title":
+                printPage = printRepo.findByTitleContainingIgnoreCase(value, pageable);
+                break;
+            case "type":
+                printPage = printRepo.findByTypeContainingIgnoreCase(value, pageable);
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid search field: " + field);
         }
-        try {
-            printRepo.deleteById(id);
-            log.info("### Print deleted successfully with ID: {}", id);
-            return true;
-        } catch (Exception e) {
-            log.error("### Error deleting print with ID: {}", id, e);
-            throw new ServiceUnavailableException("Something went wrong on the server. Please try again later.");
-        }
+
+        if (printPage.isEmpty()) throw new ProductNotFoundException("No prints found for " + field + " : " + value);
+        return printPage.map(this::sasUrlAndQuantitySetter);
     }
+
+
+    // Delete Print Details
+    public DeletePrintDTO deletePrint(String printId) {
+
+        // Find existing print or throw exception
+        Printing print = printRepo.findById(printId).orElseThrow(
+                () -> new ProductNotFoundException("Print not found")
+        );
+
+        try {
+            // Delete inventory first
+            inventoryClient.deleteInventory(printId);
+
+            // Delete image from Azure if exists
+            if (print.getImgUrl() != null && !print.getImgUrl().isEmpty()) {
+                azureBlobService.deleteFile(print.getImgUrl(), ContainerType.PRINTING);
+            }
+
+            // Delete print from database
+            printRepo.deleteById(printId);
+
+            log.info("### Print deleted successfully with ID: {}", printId);
+        } catch (Exception e) {
+            log.error("### Error deleting print with ID: {}", printId, e);
+            throw new ServiceUnavailableException("Something went wrong in server");
+        }
+
+        // Map deleted entity to DeletePrintDTO for response
+        return modelMapper.map(print, DeletePrintDTO.class);
+    }
+
 }

@@ -1,27 +1,19 @@
 package com.devasee.product.repo;
 
 import com.devasee.product.entity.Printing;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
 
-public interface PrintRepo extends JpaRepository<Printing, String> { // Changed Integer → String
 
-    // Check if a print with the same title & type already exists (uniqueness check)
-    boolean existsByTitleAndType(String title, String type);
+    public interface PrintRepo extends JpaRepository<Printing, String> {
 
-    // Find all by type (e.g., "Mug", "T-Shirt")
-    List<Printing> findByType(String type);
+        boolean existsByTitleAndType(String title, String type);
 
-    // Search by title containing keyword (case-insensitive)
-    List<Printing> findByTitleContainingIgnoreCase(String keyword);
+        Page<Printing> findByTitleContainingIgnoreCase(String title, Pageable pageable);
 
-    // Filter by material (e.g., "Ceramic", "Cotton")
-    List<Printing> findByMaterial(String material);
+        Page<Printing> findByTypeContainingIgnoreCase(String type, Pageable pageable);
+    }
 
-    // Get items cheaper than a certain price
-    List<Printing> findByPriceLessThan(double price);
 
-    // Get items with stock available
-    List<Printing> findByStockQuantityGreaterThan(int quantity);
-}
