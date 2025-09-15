@@ -11,9 +11,17 @@ public class DeliveryStatsDTO {
         this.pendingDeliveries = pendingDeliveries;
     }
 
-    public int getTotalDeliveries() { return totalDeliveries; }
-    public void setTotalDeliveries(int totalDeliveries) { this.totalDeliveries = totalDeliveries; }
+    public int getTotalDeliveries() {
+        return totalDeliveries;
+    }
+    public void setTotalDeliveries(int totalDeliveries) {
+        this.totalDeliveries = totalDeliveries;
+    }
 
-    public int getPendingDeliveries() { return pendingDeliveries; }
-    public void setPendingDeliveries(int pendingDeliveries) { this.pendingDeliveries = pendingDeliveries; }
+    public int getPendingDeliveries() {
+        return pendingDeliveries;
+    }
+    public void setPendingDeliveries(int pendingDeliveries) {
+        this.pendingDeliveries = pendingDeliveries;
+    }
 }
