@@ -2,8 +2,14 @@ package com.devasee.product.services;
 
 import com.devasee.product.dto.*;
 import com.devasee.product.entity.Book;
+import com.devasee.product.entity.BookCategory;
+import com.devasee.product.entity.BookGenre;
+import com.devasee.product.entity.BookLanguage;
 import com.devasee.product.enums.ContainerType;
 import com.devasee.product.interfaces.InventoryClient;
+import com.devasee.product.repo.BookCategoryRepo;
+import com.devasee.product.repo.BookGenreRepo;
+import com.devasee.product.repo.BookLanguageRepo;
 import com.devasee.product.repo.BookRepo;
 import com.devasee.product.exception.ProductAlreadyExistsException;
 import com.devasee.product.exception.ProductNotFoundException;
@@ -40,17 +46,26 @@ public class BookServices {
     private final ModelMapper modelMapper;
     private final AzureBlobService azureBlobService;
     private final InventoryClient inventoryClient;
+    private final BookCategoryRepo bookCategoryRepo;
+    private final BookGenreRepo bookGenreRepo;
+    private final BookLanguageRepo bookLanguageRepo;
 
     public BookServices(
             BookRepo bookRepo,
             ModelMapper modelMapper,
             AzureBlobService azureBlobService,
-            InventoryClient inventoryClient
+            InventoryClient inventoryClient,
+            BookCategoryRepo bookCategoryRepo,
+            BookGenreRepo bookGenreRepo,
+            BookLanguageRepo bookLanguageRepo
     ){
         this.bookRepo = bookRepo;
         this.modelMapper = modelMapper;
         this.azureBlobService = azureBlobService;
         this.inventoryClient = inventoryClient;
+        this.bookCategoryRepo = bookCategoryRepo;
+        this.bookGenreRepo = bookGenreRepo;
+        this.bookLanguageRepo = bookLanguageRepo;
     }
 
     // Due to image original url is private generate new SAS url
@@ -66,8 +81,11 @@ public class BookServices {
             }
 
             dto.setStockQuantity(stockQuantityGetter(dto.getId()));
+            dto.setCategory(book.getCategory() != null ? book.getCategory().getName() : null);
+            dto.setGenre(book.getGenre() != null ? book.getGenre().getName() : null);
+            dto.setLanguage(book.getLanguage() != null ? book.getLanguage().getName() : null);
 
-            return dto;
+        return dto;
     }
 
     // Get available product item quantity from Inventory
@@ -86,7 +104,7 @@ public class BookServices {
             Page<Book> bookPage = bookRepo.findAll(pageable);
 
             // Convert Book → DTO and replace blob names with SAS URLs
-// Convert Book → DTO and replace blob names with SAS URLs
+            // Convert Book → DTO and replace blob names with SAS URLs
             Page<RetrieveBookDTO> dtoPage = bookPage.map(this::sasUrlAdderAndQuantitySetter);
             if (dtoPage.isEmpty()) {
                 throw new ProductNotFoundException("No books found");
@@ -150,6 +168,7 @@ public class BookServices {
             String category,
             String publisher,
             String genre,
+            String language,
             Double minPrice,
             Double maxPrice,
             int page,
@@ -162,13 +181,16 @@ public class BookServices {
                 List<Predicate> predicates = new ArrayList<>();
 
                 if (category != null) {
-                    predicates.add(cb.like(cb.lower(root.get("category")), "%" + category.toLowerCase() + "%"));
+                    predicates.add(cb.like(cb.lower(root.get("category").get("name")), "%" + category.toLowerCase() + "%"));
                 }
                 if (publisher != null) {
                     predicates.add(cb.like(cb.lower(root.get("publisher")), "%" + publisher.toLowerCase() + "%"));
                 }
                 if (genre != null) {
-                    predicates.add(cb.like(cb.lower(root.get("genre")), "%" + genre.toLowerCase() + "%"));
+                    predicates.add(cb.like(cb.lower(root.get("genre").get("name")), "%" + genre.toLowerCase() + "%"));
+                }
+                if (language != null) {
+                    predicates.add(cb.like(cb.lower(root.get("language").get("name")), "%" + language.toLowerCase() + "%"));
                 }
                 if (minPrice != null) {
                     predicates.add(cb.greaterThanOrEqualTo(root.get("price"), minPrice));
@@ -218,8 +240,47 @@ public class BookServices {
             // Upload the image to Azure Blob Storage
             String fileName = (file!=null)? azureBlobService.uploadFile(file, ContainerType.BOOK) : null;
 
+            // Handle Category
+            BookCategory category = null;
+            if (bookDTO.getCategory() != null && !bookDTO.getCategory().isBlank()) {
+                category = bookCategoryRepo.findByNameIgnoreCase(bookDTO.getCategory())
+                        .orElseGet(() -> {
+                            // Create new category if not exists
+                            BookCategory newCategory = new BookCategory();
+                            newCategory.setName(bookDTO.getCategory());
+                            return bookCategoryRepo.save(newCategory);
+                        });
+            }
+
+            // Handle Category
+            BookGenre genre = null;
+            if (bookDTO.getGenre() != null && !bookDTO.getGenre().isBlank()) {
+                genre = bookGenreRepo.findByNameIgnoreCase(bookDTO.getGenre())
+                        .orElseGet(() -> {
+                            // Create new category if not exists
+                            BookGenre newGenre = new BookGenre();
+                            newGenre.setName(bookDTO.getGenre());
+                            return bookGenreRepo.save(newGenre);
+                        });
+            }
+
+            // Handle Category
+            BookLanguage language = null;
+            if (bookDTO.getLanguage() != null && !bookDTO.getLanguage().isBlank()) {
+                language = bookLanguageRepo.findByNameIgnoreCase(bookDTO.getLanguage())
+                        .orElseGet(() -> {
+                            // Create new category if not exists
+                            BookLanguage newLanguage = new BookLanguage();
+                            newLanguage.setName(bookDTO.getLanguage());
+                            return bookLanguageRepo.save(newLanguage);
+                        });
+            }
+
             Book newBook = modelMapper.map(bookDTO, Book.class);
             newBook.setImgUrl(fileName); // Set uploaded saved file's name as url
+            newBook.setCategory(category);
+            newBook.setGenre(genre);
+            newBook.setLanguage(language);
 
             Book savedBook = bookRepo.save(newBook);
 

@@ -28,17 +28,22 @@ public class Book {
     @Column(nullable = false)
     private String publisher;
 
-    @Column(nullable = false)
-    private String category;
+    // book belongs to exactly one category
+    // Each category can contain many books
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private BookCategory category;
 
-    @Column(nullable = false)
-    private String genre;
+    @ManyToOne
+    @JoinColumn(name = "genre_id")
+    private BookGenre genre;
 
     @Column(nullable = false)
     private String description;
 
-    @Column(nullable = false)
-    private String language;
+    @ManyToOne
+    @JoinColumn(name = "language_id")
+    private BookLanguage language;
 
     @Column(nullable = false)
     private double price;
