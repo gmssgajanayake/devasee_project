@@ -46,9 +46,9 @@ public class BookController {
     }
 
     // GET /search?field=author&value=J.K.%20Rowling&page=0&size=10
-    // Search book by title, author, category
+    // Search book by title, author, isbn
     @GetMapping("/search")
-    public CustomResponse<Page<RetrieveBookDTO>> getBookByTerm(
+    public CustomResponse<Page<RetrieveBookDTO>> searchBookByTerm(
             @RequestParam String field,
             @RequestParam String value,
             @RequestParam(defaultValue = "0") int page,
@@ -57,7 +57,44 @@ public class BookController {
         Page<RetrieveBookDTO> bookDTOS = bookServices.searchBookByTerm(field, value, page, size);
         return new CustomResponse<>(
                 true,
-                "Books by " + field + " : " + value,
+                "Books by " + field.toLowerCase() + " : " + value,
+                bookDTOS
+        );
+    }
+
+    // GET /filter?category=Academic&page=0&size=20
+    // GET /filter?category=CATEGORY&publisher=PUBLISHER&page=0&size=20
+    // GET /filter?category=CATEGORY&publisher=PUBLISHER&genre=GENRE&minPrice=100&maxPrice=300&page=0&size=20
+    // GET /filter?minPrice=50&maxPrice=150&page=0&size=20
+
+    // Search book by category, publisher
+    @GetMapping("/filter")
+    public CustomResponse<Page<RetrieveBookDTO>> filterBookByTerm(
+            @RequestParam(required = false) String category, // the column name in database
+            @RequestParam(required = false) String publisher, // the column name in database
+            @RequestParam(required = false) String genre, // the column name in database
+            @RequestParam(required = false) Double minPrice,
+            @RequestParam(required = false) Double maxPrice,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+    ) {
+        Page<RetrieveBookDTO> bookDTOS = bookServices.filterBookByTerm(
+                category,
+                publisher,
+                genre,
+                minPrice,
+                maxPrice,
+                page,
+                size
+        );
+        return new CustomResponse<>(
+                true,
+                "Filtered Books by : " +
+                        (category != null ? "category : "+category : "") + ", " +
+                        (publisher != null ? "publisher : "+publisher : "") + ", " +
+                        (genre != null ? "genre : "+genre : "") + ", "+
+                        (minPrice != null ? "minPrice : "+minPrice : "") + ", " +
+                        (maxPrice!= null ? "maxPrice : "+maxPrice : ""),
                 bookDTOS
         );
     }

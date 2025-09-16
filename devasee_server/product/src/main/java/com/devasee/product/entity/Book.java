@@ -16,18 +16,38 @@ public class Book {
     @Id
     @GeneratedValue()
     @UuidGenerator
-    @Column(updatable = false, nullable = false, length = 36)
+    @Column(updatable = false, nullable = false, length = 36, unique = true)
     private String id;
-    // @Column(nullable = false,length = 255)
+
+    @Column(nullable = false)
     private String title;
+
+    @Column(nullable = false)
     private String author;
+
+    @Column(nullable = false)
     private String publisher;
+
+    @Column(nullable = false)
     private String category;
+
+    @Column(nullable = false)
+    private String genre;
+
+    @Column(nullable = false)
     private String description;
+
+    @Column(nullable = false)
     private String language;
+
+    @Column(nullable = false)
     private double price;
+
+    @Column(nullable = false, unique = true)
     private long isbn;
+
     private String imgUrl;
+
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 

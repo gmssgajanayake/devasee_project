@@ -10,6 +10,7 @@ import com.devasee.product.exception.ProductNotFoundException;
 import com.devasee.product.exception.ServiceUnavailableException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.criteria.Predicate;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.InternalServerErrorException;
@@ -22,8 +23,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @Transactional
@@ -116,20 +121,18 @@ public class BookServices {
             int page,
             int size
     ) {
-        Page<Book> bookPage;
         Pageable pageable = PageRequest.of(page, size);
 
        try {
-           bookPage = switch (field.toLowerCase()) {
+           Page<Book> bookPage = switch (field.toLowerCase()) {
                case "title" -> bookRepo.findByTitleContainingIgnoreCase(value, pageable);
                case "author" -> bookRepo.findByAuthorContainingIgnoreCase(value, pageable);
-               case "publisher" -> bookRepo.findByPublisherContainingIgnoreCase(value, pageable);
-               case "category" -> bookRepo.findByCategoryContainingIgnoreCase(value, pageable);
+               case "isbn" -> bookRepo.findByIsbnContainingIgnoreCase(value, pageable);
                default -> throw new IllegalArgumentException("Invalid search field: " + field);
            };
 
            if (bookPage.isEmpty()) {
-               throw new ProductNotFoundException("No books found for " + field + " : " + value);
+               throw new ProductNotFoundException("No books found for " + field.toLowerCase() + " : " + value);
            }
 
            return bookPage.map(this::sasUrlAdderAndQuantitySetter);
@@ -138,6 +141,58 @@ public class BookServices {
            throw exception;
        } catch (Exception e){
             log.error("### Error fetching books by {} : {}", field, value, e);
+            throw new ServiceUnavailableException("Something went wrong in server");
+        }
+    }
+
+    // Filter Books By Category, Publisher
+    public Page<RetrieveBookDTO> filterBookByTerm(
+            String category,
+            String publisher,
+            String genre,
+            Double minPrice,
+            Double maxPrice,
+            int page,
+            int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        try  {
+            Specification<Book> specification = (root, query, cb) -> {
+                List<Predicate> predicates = new ArrayList<>();
+
+                if (category != null) {
+                    predicates.add(cb.like(cb.lower(root.get("category")), "%" + category.toLowerCase() + "%"));
+                }
+                if (publisher != null) {
+                    predicates.add(cb.like(cb.lower(root.get("publisher")), "%" + publisher.toLowerCase() + "%"));
+                }
+                if (genre != null) {
+                    predicates.add(cb.like(cb.lower(root.get("genre")), "%" + genre.toLowerCase() + "%"));
+                }
+                if (minPrice != null) {
+                    predicates.add(cb.greaterThanOrEqualTo(root.get("price"), minPrice));
+                }
+                if (maxPrice != null) {
+                    predicates.add(cb.lessThanOrEqualTo(root.get("price"), maxPrice));
+                }
+
+                return cb.and(predicates.toArray(new Predicate[0]));
+
+            };
+
+            Page<Book> bookPage = bookRepo.findAll(specification, pageable);
+
+            if (bookPage.isEmpty()) {
+                throw new ProductNotFoundException("No books found for given filter criteria");
+            }
+
+            return bookPage.map(this::sasUrlAdderAndQuantitySetter);
+
+        } catch (ProductNotFoundException exception){
+            throw exception;
+        } catch (Exception e){
+            log.error("### Error fetching books by filter {}", e.getMessage());
             throw new ServiceUnavailableException("Something went wrong in server");
         }
     }
@@ -262,3 +317,13 @@ public class BookServices {
         return modelMapper.map(book, DeleteBookDTO.class);
     }
 }
+
+
+
+//            Page<Book> bookPage = switch (field) {
+//                case PUBLISHER -> bookRepo.findByPublisherContainingIgnoreCase(value, pageable);
+//                case CATEGORY -> bookRepo.findByCategoryContainingIgnoreCase(value, pageable);
+//                case GENRE -> bookRepo.findByCategoryContainingIgnoreCase(value, pageable);
+//                case PRICE -> bookRepo.findByCategoryContainingIgnoreCase(value, pageable);
+//                // default -> throw new IllegalArgumentException("Invalid filter field: " + value);
+//            };

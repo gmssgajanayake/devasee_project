@@ -3,6 +3,7 @@ package com.devasee.product.repo;
 import com.devasee.product.entity.Book;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface BookRepo extends JpaRepository<Book, String> {
@@ -14,11 +15,11 @@ public interface BookRepo extends JpaRepository<Book, String> {
 
     boolean existsByIsbn(long isbn);
 
+    // Search by author, title, isbn
     Page<Book> findByAuthorContainingIgnoreCase(String value, Pageable pageable);
-
     Page<Book> findByTitleContainingIgnoreCase(String value, Pageable pageable);
+    Page<Book> findByIsbnContainingIgnoreCase(String isbn, Pageable pageable);
 
-    Page<Book> findByPublisherContainingIgnoreCase(String value, Pageable pageable);
-
-    Page<Book> findByCategoryContainingIgnoreCase(String value, Pageable pageable);
+    // Filter by publisher, category, genre, price
+    Page<Book> findAll(Specification<Book> specification, Pageable pageable);
 }
