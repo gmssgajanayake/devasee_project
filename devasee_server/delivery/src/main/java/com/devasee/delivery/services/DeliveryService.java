@@ -126,7 +126,7 @@ public class DeliveryService {
     // GET all couriers
     public List<String> getAllCourierServices() {
         try {
-            return List.of("DHL", "FEDEX", "UPS", "LOCAL_COURIER");
+            return List.of("KOOBIYO", "DOMEX");
         } catch (Exception e) {
             throw new RuntimeException("Error while fetching courier services: " + e.getMessage(), e);
         }
