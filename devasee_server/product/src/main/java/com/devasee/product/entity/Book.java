@@ -16,18 +16,43 @@ public class Book {
     @Id
     @GeneratedValue()
     @UuidGenerator
-    @Column(updatable = false, nullable = false, length = 36)
+    @Column(updatable = false, nullable = false, length = 36, unique = true)
     private String id;
-    // @Column(nullable = false,length = 255)
+
+    @Column(nullable = false)
     private String title;
+
+    @Column(nullable = false)
     private String author;
+
+    @Column(nullable = false)
     private String publisher;
-    private String category;
+
+    // book belongs to exactly one category
+    // Each category can contain many books
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private BookCategory category;
+
+    @ManyToOne
+    @JoinColumn(name = "genre_id")
+    private BookGenre genre;
+
+    @Column(nullable = false)
     private String description;
-    private String language;
+
+    @ManyToOne
+    @JoinColumn(name = "language_id")
+    private BookLanguage language;
+
+    @Column(nullable = false)
     private double price;
+
+    @Column(nullable = false, unique = true)
     private long isbn;
+
     private String imgUrl;
+
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 

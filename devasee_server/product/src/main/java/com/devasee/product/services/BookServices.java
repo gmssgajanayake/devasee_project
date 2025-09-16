@@ -2,14 +2,21 @@ package com.devasee.product.services;
 
 import com.devasee.product.dto.*;
 import com.devasee.product.entity.Book;
+import com.devasee.product.entity.BookCategory;
+import com.devasee.product.entity.BookGenre;
+import com.devasee.product.entity.BookLanguage;
 import com.devasee.product.enums.ContainerType;
 import com.devasee.product.interfaces.InventoryClient;
+import com.devasee.product.repo.BookCategoryRepo;
+import com.devasee.product.repo.BookGenreRepo;
+import com.devasee.product.repo.BookLanguageRepo;
 import com.devasee.product.repo.BookRepo;
 import com.devasee.product.exception.ProductAlreadyExistsException;
 import com.devasee.product.exception.ProductNotFoundException;
 import com.devasee.product.exception.ServiceUnavailableException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.criteria.Predicate;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.InternalServerErrorException;
@@ -22,8 +29,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @Transactional
@@ -35,17 +46,26 @@ public class BookServices {
     private final ModelMapper modelMapper;
     private final AzureBlobService azureBlobService;
     private final InventoryClient inventoryClient;
+    private final BookCategoryRepo bookCategoryRepo;
+    private final BookGenreRepo bookGenreRepo;
+    private final BookLanguageRepo bookLanguageRepo;
 
     public BookServices(
             BookRepo bookRepo,
             ModelMapper modelMapper,
             AzureBlobService azureBlobService,
-            InventoryClient inventoryClient
+            InventoryClient inventoryClient,
+            BookCategoryRepo bookCategoryRepo,
+            BookGenreRepo bookGenreRepo,
+            BookLanguageRepo bookLanguageRepo
     ){
         this.bookRepo = bookRepo;
         this.modelMapper = modelMapper;
         this.azureBlobService = azureBlobService;
         this.inventoryClient = inventoryClient;
+        this.bookCategoryRepo = bookCategoryRepo;
+        this.bookGenreRepo = bookGenreRepo;
+        this.bookLanguageRepo = bookLanguageRepo;
     }
 
     // Due to image original url is private generate new SAS url
@@ -61,8 +81,11 @@ public class BookServices {
             }
 
             dto.setStockQuantity(stockQuantityGetter(dto.getId()));
+            dto.setCategory(book.getCategory() != null ? book.getCategory().getName() : null);
+            dto.setGenre(book.getGenre() != null ? book.getGenre().getName() : null);
+            dto.setLanguage(book.getLanguage() != null ? book.getLanguage().getName() : null);
 
-            return dto;
+        return dto;
     }
 
     // Get available product item quantity from Inventory
@@ -81,7 +104,7 @@ public class BookServices {
             Page<Book> bookPage = bookRepo.findAll(pageable);
 
             // Convert Book → DTO and replace blob names with SAS URLs
-// Convert Book → DTO and replace blob names with SAS URLs
+            // Convert Book → DTO and replace blob names with SAS URLs
             Page<RetrieveBookDTO> dtoPage = bookPage.map(this::sasUrlAdderAndQuantitySetter);
             if (dtoPage.isEmpty()) {
                 throw new ProductNotFoundException("No books found");
@@ -116,20 +139,18 @@ public class BookServices {
             int page,
             int size
     ) {
-        Page<Book> bookPage;
         Pageable pageable = PageRequest.of(page, size);
 
        try {
-           bookPage = switch (field.toLowerCase()) {
+           Page<Book> bookPage = switch (field.toLowerCase()) {
                case "title" -> bookRepo.findByTitleContainingIgnoreCase(value, pageable);
                case "author" -> bookRepo.findByAuthorContainingIgnoreCase(value, pageable);
-               case "publisher" -> bookRepo.findByPublisherContainingIgnoreCase(value, pageable);
-               case "category" -> bookRepo.findByCategoryContainingIgnoreCase(value, pageable);
+               case "isbn" -> bookRepo.findByIsbnContainingIgnoreCase(value, pageable);
                default -> throw new IllegalArgumentException("Invalid search field: " + field);
            };
 
            if (bookPage.isEmpty()) {
-               throw new ProductNotFoundException("No books found for " + field + " : " + value);
+               throw new ProductNotFoundException("No books found for " + field.toLowerCase() + " : " + value);
            }
 
            return bookPage.map(this::sasUrlAdderAndQuantitySetter);
@@ -138,6 +159,62 @@ public class BookServices {
            throw exception;
        } catch (Exception e){
             log.error("### Error fetching books by {} : {}", field, value, e);
+            throw new ServiceUnavailableException("Something went wrong in server");
+        }
+    }
+
+    // Filter Books By Category, Publisher
+    public Page<RetrieveBookDTO> filterBookByTerm(
+            String category,
+            String publisher,
+            String genre,
+            String language,
+            Double minPrice,
+            Double maxPrice,
+            int page,
+            int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        try  {
+            Specification<Book> specification = (root, query, cb) -> {
+                List<Predicate> predicates = new ArrayList<>();
+
+                if (category != null) {
+                    predicates.add(cb.like(cb.lower(root.get("category").get("name")), "%" + category.toLowerCase() + "%"));
+                }
+                if (publisher != null) {
+                    predicates.add(cb.like(cb.lower(root.get("publisher")), "%" + publisher.toLowerCase() + "%"));
+                }
+                if (genre != null) {
+                    predicates.add(cb.like(cb.lower(root.get("genre").get("name")), "%" + genre.toLowerCase() + "%"));
+                }
+                if (language != null) {
+                    predicates.add(cb.like(cb.lower(root.get("language").get("name")), "%" + language.toLowerCase() + "%"));
+                }
+                if (minPrice != null) {
+                    predicates.add(cb.greaterThanOrEqualTo(root.get("price"), minPrice));
+                }
+                if (maxPrice != null) {
+                    predicates.add(cb.lessThanOrEqualTo(root.get("price"), maxPrice));
+                }
+
+                return cb.and(predicates.toArray(new Predicate[0]));
+
+            };
+
+            Page<Book> bookPage = bookRepo.findAll(specification, pageable);
+
+            if (bookPage.isEmpty()) {
+                throw new ProductNotFoundException("No books found for given filter criteria");
+            }
+
+            return bookPage.map(this::sasUrlAdderAndQuantitySetter);
+
+        } catch (ProductNotFoundException exception){
+            throw exception;
+        } catch (Exception e){
+            log.error("### Error fetching books by filter {}", e.getMessage());
             throw new ServiceUnavailableException("Something went wrong in server");
         }
     }
@@ -163,8 +240,47 @@ public class BookServices {
             // Upload the image to Azure Blob Storage
             String fileName = (file!=null)? azureBlobService.uploadFile(file, ContainerType.BOOK) : null;
 
+            // Handle Category
+            BookCategory category = null;
+            if (bookDTO.getCategory() != null && !bookDTO.getCategory().isBlank()) {
+                category = bookCategoryRepo.findByNameIgnoreCase(bookDTO.getCategory())
+                        .orElseGet(() -> {
+                            // Create new category if not exists
+                            BookCategory newCategory = new BookCategory();
+                            newCategory.setName(bookDTO.getCategory());
+                            return bookCategoryRepo.save(newCategory);
+                        });
+            }
+
+            // Handle Category
+            BookGenre genre = null;
+            if (bookDTO.getGenre() != null && !bookDTO.getGenre().isBlank()) {
+                genre = bookGenreRepo.findByNameIgnoreCase(bookDTO.getGenre())
+                        .orElseGet(() -> {
+                            // Create new category if not exists
+                            BookGenre newGenre = new BookGenre();
+                            newGenre.setName(bookDTO.getGenre());
+                            return bookGenreRepo.save(newGenre);
+                        });
+            }
+
+            // Handle Category
+            BookLanguage language = null;
+            if (bookDTO.getLanguage() != null && !bookDTO.getLanguage().isBlank()) {
+                language = bookLanguageRepo.findByNameIgnoreCase(bookDTO.getLanguage())
+                        .orElseGet(() -> {
+                            // Create new category if not exists
+                            BookLanguage newLanguage = new BookLanguage();
+                            newLanguage.setName(bookDTO.getLanguage());
+                            return bookLanguageRepo.save(newLanguage);
+                        });
+            }
+
             Book newBook = modelMapper.map(bookDTO, Book.class);
             newBook.setImgUrl(fileName); // Set uploaded saved file's name as url
+            newBook.setCategory(category);
+            newBook.setGenre(genre);
+            newBook.setLanguage(language);
 
             Book savedBook = bookRepo.save(newBook);
 
@@ -262,3 +378,13 @@ public class BookServices {
         return modelMapper.map(book, DeleteBookDTO.class);
     }
 }
+
+
+
+//            Page<Book> bookPage = switch (field) {
+//                case PUBLISHER -> bookRepo.findByPublisherContainingIgnoreCase(value, pageable);
+//                case CATEGORY -> bookRepo.findByCategoryContainingIgnoreCase(value, pageable);
+//                case GENRE -> bookRepo.findByCategoryContainingIgnoreCase(value, pageable);
+//                case PRICE -> bookRepo.findByCategoryContainingIgnoreCase(value, pageable);
+//                // default -> throw new IllegalArgumentException("Invalid filter field: " + value);
+//            };

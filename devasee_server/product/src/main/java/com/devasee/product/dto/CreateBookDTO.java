@@ -12,6 +12,7 @@ public class CreateBookDTO {
     private String author;
     private String publisher;
     private String category;
+    private String genre;
     private String description;
     private String language;
     private double price;
