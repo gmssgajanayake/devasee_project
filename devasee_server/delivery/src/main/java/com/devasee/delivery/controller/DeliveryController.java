@@ -24,7 +24,7 @@ public class DeliveryController {
     private final DeliveryService deliveryService;
 
     /**
-     * Fetch all deliveries (Accessible by ADMIN and USER)
+     * Fetch all deliveries (Accessible by ADMIN )
      */
     @PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping
@@ -34,7 +34,7 @@ public class DeliveryController {
     }
 
     /**
-     * Fetch a single delivery by ID (Accessible by ADMIN and USER)
+     * Fetch a single delivery by ID (Accessible by ADMIN)
      */
     @PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping("/{id}")
@@ -77,7 +77,7 @@ public class DeliveryController {
     }
 
     /**
-     * Fetch delivery statistics (Accessible by ADMIN and USER)
+     * Fetch delivery statistics (Accessible by ADMIN)
      */
     @PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping("/stats")
@@ -97,7 +97,7 @@ public class DeliveryController {
     }
 
     /**
-     * Fetch all courier services (Accessible by ADMIN and USER)
+     * Fetch all courier services (Accessible by ADMIN)
      */
     @PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping("/couriers")
