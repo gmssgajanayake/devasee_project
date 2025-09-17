@@ -1,5 +1,7 @@
 package com.devasee.delivery.entity;
 
+import com.devasee.delivery.enums.CourierName;
+import com.devasee.delivery.enums.DeliveryStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,12 +23,11 @@ public class Delivery {
 
     private String address;
 
-    private String status; // PENDING, IN_PROGRESS, DELIVERED, CANCELLED
+    @Enumerated(EnumType.STRING) // store enum name as string in DB
+    private DeliveryStatus status;
+
+    @Enumerated(EnumType.STRING)
+    private CourierName courier;
 
     private LocalDate deliveryDate;
-
-
-    }
-
-
-
+}
