@@ -7,7 +7,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
-@EnableFeignClients
+@EnableFeignClients(basePackages = "com.devasee.product.interfaces")
 public class ProductApplication {
 
 	public static void main(String[] args) {
@@ -17,7 +17,11 @@ public class ProductApplication {
 	@Bean
 	public ModelMapper modelMapper() {
         ModelMapper mapper = new ModelMapper();
-        mapper.getConfiguration().setSkipNullEnabled(true);
+        mapper.getConfiguration()
+                .setPropertyCondition(context ->
+                        context.getSource() != null &&
+                        !(context.getSource() instanceof String && ((String) context.getSource()).isEmpty())
+                );
         return mapper;
     }
 }

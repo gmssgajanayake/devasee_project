@@ -174,6 +174,7 @@ public class BookController {
     }
 
     // POST to create new book category
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/categories")
     public CustomResponse<BookCategory> createCategory(@RequestParam String name) {
         BookCategory category = bookCategoryService.createCategory(name);

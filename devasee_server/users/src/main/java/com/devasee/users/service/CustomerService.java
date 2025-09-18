@@ -6,23 +6,24 @@ import com.devasee.users.entity.Role;
 import com.devasee.users.enums.AccountStatus;
 import com.devasee.users.entity.AppUser;
 import com.devasee.users.enums.Roles;
-import com.devasee.users.exceptions.UserAlreadyExistsException;
-import com.devasee.users.exceptions.UserNotFoundException;
-import com.devasee.users.exceptions.InvalidAuthHeaderException;
-import com.devasee.users.exceptions.ServiceUnavailableException;
+import com.devasee.users.exceptions.*;
 import com.devasee.users.repository.RoleRepo;
 import com.devasee.users.repository.UserRepo;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -45,11 +46,21 @@ public class CustomerService {
     }
 
     // Get call users/customers
-    public List<RetrieveUserDTO> getAllUsers() {
+    public Page<RetrieveUserDTO> getAllUsers(int page, int size) {
         try {
+            Pageable pageable = PageRequest.of(page, size, Sort.by("firstName"));
+
             log.info("### Fetching all users/customers");
-            List<AppUser> appUsers = userRepo.findAll();
-            return modelMapper.map(appUsers, new TypeToken<List<RetrieveUserDTO>>(){}.getType());
+            Page<AppUser> userPage = userRepo.findAll(pageable);
+            return userPage.map(user-> new RetrieveUserDTO(
+                    user.getUserId(),
+                    user.getEmail(),
+                    user.getFirstName(),
+                    user.getLastName(),
+                    user.getUsername(),
+                    user.getImageUrl(),
+                    user.getCreatedAt()
+            ));
         } catch (Exception e) {
             log.error("### Failed to fetch customers: {}", e.getMessage(), e);
             throw new ServiceUnavailableException("Failed to fetch customers. Please try again later.");
@@ -65,7 +76,7 @@ public class CustomerService {
     }
 
     // Save sign in users
-    public CreateUserDTO saveCustomer(String authHeader) {
+    public CreateUserDTO saveUser(String authHeader) {
 
         if(authHeader == null || !authHeader.startsWith("Bearer ")){
             log.warn("### Missing or invalid Authorization header");
@@ -101,7 +112,7 @@ public class CustomerService {
 
         // Adding default role as ROLE_USER
         Role defaultRole = roleRepo.findByName(Roles.CUSTOMER.name())
-                .orElseThrow(() -> new RuntimeException("Default role USER not found"));
+                .orElseThrow(() -> new RoleNotFoundException("Default role USER not found"));
 
         appUser.getRoles().clear();  // Clear any roles to be safe
         appUser.getRoles().add(defaultRole);  // Assign only USER role

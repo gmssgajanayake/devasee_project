@@ -43,7 +43,7 @@ public class AddUserHeaderFilter implements GlobalFilter, Ordered {
             path.startsWith("/api/v1/promo") ||
             path.matches("/api/v1/product/[^/]+/quantity"))
         ) {
-            log.info("### Skipping header for public endpoint {}", path);
+            log.info("### Skipping header adding for public endpoint {}", path);
             return chain.filter(exchange);
         }
 

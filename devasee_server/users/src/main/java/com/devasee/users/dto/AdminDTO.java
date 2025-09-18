@@ -1,6 +1,5 @@
 package com.devasee.users.dto;
 
-import com.devasee.users.entity.Role;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -15,6 +14,6 @@ public class AdminDTO {
     private String lastName;
     private String email;
     private String imageUrl;
-    private Set<Role> roles;
+    private Set<String> roles;
     private LocalDateTime updatedAt;
 }

@@ -1,5 +1,7 @@
 package com.devasee.users.filter;
 
+import com.devasee.users.entity.AppUser;
+import com.devasee.users.enums.AccountStatus;
 import com.devasee.users.service.InternalJWTService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -82,6 +84,18 @@ public class InternalJWTFilter extends OncePerRequestFilter {
                     }
                 }
 
+                boolean isUserCreateUrl = request.getMethod().equalsIgnoreCase("POST") && path.equals("/api/v1/users/auth");
+                log.info("### isUserCreateUrl : {}",isUserCreateUrl);
+
+                // --- Fetch user from DB to check AccountStatus ---
+                if (!isUserCreateUrl){
+                    AppUser user = internalJWTService.getUserById(userId);
+                    if (user.getAccountStatus() != AccountStatus.ACTIVE) {
+                        response.sendError(HttpServletResponse.SC_FORBIDDEN, "Your account is not active");
+                        return;
+                    }
+                }
+
                 // Convert roles to Spring authorities
                 var authorities = roles.stream()
                         .map(r -> new SimpleGrantedAuthority("ROLE_" + r))
@@ -95,7 +109,7 @@ public class InternalJWTFilter extends OncePerRequestFilter {
 
             } catch (Exception e) {
                 // Handle invalid JWT
-                log.error("### INV Invalid internal JWT: {}", e.getMessage());
+                log.error("### User Invalid internal JWT: {}", e.getMessage());
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid internal JWT");
                 return;
             }

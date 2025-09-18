@@ -10,11 +10,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @CrossOrigin
 @RestController
-@RequestMapping(value = "api/v1/users/admin")
+@RequestMapping(value = "api/v1/users/admins")
 public class AdminController {
 
     private final AdminService adminService;
@@ -31,8 +29,9 @@ public class AdminController {
     // --------------------- Manage Admins Info ------------------------------
 
     // Get all admins by page
+    // /api/v1/admins?page=0&size=20
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/allAdmins")
+    @GetMapping
     public CustomResponse<Page<AdminDTO>> getAllAdmin(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size
@@ -45,10 +44,28 @@ public class AdminController {
         );
     }
 
-    // Promote existing user as admin or create a new admin
+    // Get admin by id
+    // /api/v1/users/admins/{userId}
     @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/promote")
-    public CustomResponse<AdminDTO> promoteAsAdmin(@RequestBody PromoteAsAdminDTO promoteDemoteAdminDTO) {
+    @GetMapping("/{userId}")
+    public CustomResponse<AdminDTO> getAdminById(
+            @PathVariable String userId
+    ) {
+        AdminDTO admin = adminService.getAdminById(userId);
+        return new CustomResponse<>(
+                true,
+                "Admin returned successfully",
+                admin
+        );
+    }
+
+    // Promote/Create existing user as admin or create a new admin
+    // /api/v1/users/admins
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping
+    public CustomResponse<AdminDTO> promoteAsAdmin(
+            @RequestBody PromoteAsAdminDTO promoteDemoteAdminDTO
+            ) {
         AdminDTO adminDTO = adminService.promoteAsAdmin(promoteDemoteAdminDTO);
         return new CustomResponse<>(
                 true,
@@ -57,15 +74,16 @@ public class AdminController {
         );
     }
 
-    // Demote an admin as user by email
+    // Demote an admin as user by email, remove admin role
+    // /api/v1/users/admins?email=abc@gmail.com
     @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/demote/{email}")
-    public CustomResponse<Object> demoteAdmin(@RequestBody PromoteAsAdminDTO promoteDemoteAdminDTO) {
+    @DeleteMapping
+    public CustomResponse<Object> demoteAdmin(@RequestParam String email) {
 
-        AdminDTO dto = adminService.demoteAdmin(promoteDemoteAdminDTO.getEmail());
+        AdminDTO dto = adminService.demoteAdmin(email);
         return new CustomResponse<>(
                 true,
-                "Admin deleted successfully.",
+                "Admin demoted successfully.",
                 dto
         );
     }
@@ -73,38 +91,56 @@ public class AdminController {
     // ------------------------------- User Management By Admin -------------------------------
 
     // Get all users both customers, admins
+    // /api/v1/users/admins/all
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/allUsers")
-    public CustomResponse<List<RetrieveUserDTO>> getAllUsers() {
-        List<RetrieveUserDTO> customers = customerService.getAllUsers();
+    @GetMapping("/all")
+    public CustomResponse<Page<RetrieveUserDTO>> getAllUsers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+    ) {
+        Page<RetrieveUserDTO> users = customerService.getAllUsers(page, size);
         return new CustomResponse<>(
                 true,
-                "All users retrieved successfully, No of users : "+customers.toArray().length,
-                customers
+                "All users retrieved successfully",
+                users
         );
     }
 
     // Get user by user id
+    // /api/v1/users/admins/any/{userId}
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/{userId}")
+    @GetMapping("/user/{userId}")
     public CustomResponse<RetrieveUserDTO> getCustomerById(@PathVariable String userId) {
         RetrieveUserDTO customer = customerService.getUserById(userId);
-        return new CustomResponse<>(true, "Customer retrieved successfully", customer);
+        return new CustomResponse<>(true, "User retrieved successfully", customer);
     }
 
-    // Search user by a term email, first name, last name
+    // Search user by a term email
+    // /api/v1/users/admins/search?email=abc@gmail.com&page=0&size=20
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/search/{term}")
-    public CustomResponse<Object> findUser(@PathVariable String term) {
-        return new CustomResponse<>(true, term, null);
+    @GetMapping("/search")
+    public CustomResponse<Page<AdminDTO>> searchUser(
+            @RequestParam String email,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+    ) {
+        Page<AdminDTO> users = adminService.searchUserByEmail(email, page, size);
+        return new CustomResponse<>(true, email, users);
     }
 
-    // Suspend an user by account status
+    // Suspend a user by account status
+    // /api/v1/users/admins/suspend
     @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/suspend/{userId}")
-    public CustomResponse<RetrieveUserDTO> suspendUserByEmail(@PathVariable String userId){
+    @PostMapping("/suspend")
+    public CustomResponse<RetrieveUserDTO> suspendUserByEmail(@RequestParam String userId){
         RetrieveUserDTO retrieveUserDTO = customerService.suspendUser(userId);
         return new CustomResponse<>(true, "User suspended successful", retrieveUserDTO);
+    }
+
+    // TODO : should be private
+    @GetMapping("/internal/{userId}/status")
+    public String getUserAccountStatus(@PathVariable String userId){
+       return adminService.getUserAccountStatus(userId);
     }
 }
 

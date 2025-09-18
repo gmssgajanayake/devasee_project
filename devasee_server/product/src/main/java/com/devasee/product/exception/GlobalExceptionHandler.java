@@ -28,12 +28,12 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND); // 404
     }
 
-    // Similarly, this method handles any RuntimeException
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<CustomResponse<Object>> handleRuntimeException(RuntimeException ex) {
-        CustomResponse<Object> response = new CustomResponse<>(false, ex.getMessage(), null);
-        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+//    // Similarly, this method handles any RuntimeException
+//    @ExceptionHandler(RuntimeException.class)
+//    public ResponseEntity<CustomResponse<Object>> handleRuntimeException(RuntimeException ex) {
+//        CustomResponse<Object> response = new CustomResponse<>(false, ex.getMessage(), null);
+//        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+//    }
 
     // Handle Product already exist error when saving
     @ExceptionHandler(ProductAlreadyExistsException.class)
@@ -54,13 +54,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<CustomResponse<Object>> handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
         String message = "Invalid input. Please check your request parameters.";
         CustomResponse<Object> response = new CustomResponse<>(false, message, null);
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST); // 400
     }
 
     // Handling Database error (inbuilt)
     @ExceptionHandler(DataAccessException.class)
     public ResponseEntity<CustomResponse<Object>> handleDatabaseException(DataAccessException ex){
         CustomResponse<Object> response = new CustomResponse<>(false, ex.getMessage(), null);
-        return new ResponseEntity<>(response, HttpStatus.SERVICE_UNAVAILABLE);
+        return new ResponseEntity<>(response, HttpStatus.SERVICE_UNAVAILABLE); // 503
     }
 }

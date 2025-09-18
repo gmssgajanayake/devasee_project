@@ -1,5 +1,7 @@
 package com.devasee.product.filter;
 
+import com.devasee.product.enums.AccountStatus;
+import com.devasee.product.interfaces.UserClient;
 import com.devasee.product.services.InternalJWTService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -25,9 +27,14 @@ public class InternalJWTFilter extends OncePerRequestFilter {
     private static final Logger log = LoggerFactory.getLogger(InternalJWTFilter.class);
     private static final String INTERNAL_JWT_HEADER = "X-Internal-JWT";
     private final InternalJWTService internalJWTService;
+    private final UserClient userClient;
 
-    public InternalJWTFilter(InternalJWTService internalJWTService) {
+    public InternalJWTFilter(
+            InternalJWTService internalJWTService,
+            UserClient userClient
+    ) {
         this.internalJWTService = internalJWTService;
+        this.userClient = userClient;
     }
 
     @Override
@@ -38,7 +45,7 @@ public class InternalJWTFilter extends OncePerRequestFilter {
     ) throws ServletException, IOException {
 
         String token = request.getHeader(INTERNAL_JWT_HEADER);
-        log.info("### INV Incoming X-Internal-JWT: {}", token);
+        log.info("### Product Incoming X-Internal-JWT: {}", token);
 
         if (token != null && !token.isEmpty()) {
             try {
@@ -59,6 +66,14 @@ public class InternalJWTFilter extends OncePerRequestFilter {
                             roles.add((String) role);
                         }
                     }
+                }
+
+                // --- Fetch user from DB to check AccountStatus ---
+                String accountStatus = userClient.getUseAccountStatus(userId);
+                log.info("### accountStatus : {}", accountStatus);
+                if (!accountStatus.equals(AccountStatus.ACTIVE.name())) {
+                    response.sendError(HttpServletResponse.SC_FORBIDDEN, "Your account is not active");
+                    return;
                 }
 
                 var authorities = roles.stream()

@@ -88,6 +88,47 @@ public class BookServices {
         return dto;
     }
 
+    // Convert String attributes pass in request to relevant entity
+    private Book categoryGenreLanguageAdder(Book book, String category, String genre, String language){
+
+        // Handle Category
+        if (category != null && !category.isBlank()) {
+            BookCategory categoryEntity = bookCategoryRepo.findByNameIgnoreCase(category)
+                    .orElseGet(() -> {
+                        // Create new category if not exists
+                        BookCategory newCategory = new BookCategory();
+                        newCategory.setName(category);
+                        return bookCategoryRepo.save(newCategory);
+                    });
+            book.setCategory(categoryEntity);
+        }
+
+        // Handle Genre
+        if (genre != null && !genre.isBlank()) {
+            BookGenre genreEntity = bookGenreRepo.findByNameIgnoreCase(genre)
+                    .orElseGet(() -> {
+                        // Create new category if not exists
+                        BookGenre newGenre = new BookGenre();
+                        newGenre.setName(genre);
+                        return bookGenreRepo.save(newGenre);
+                    });
+            book.setGenre(genreEntity);
+        }
+
+        // Handle Language
+        if (language != null && !language.isBlank()) {
+            BookLanguage languageEntity = bookLanguageRepo.findByNameIgnoreCase(language)
+                    .orElseGet(() -> {
+                        // Create new category if not exists
+                        BookLanguage newLanguage = new BookLanguage();
+                        newLanguage.setName(language);
+                        return bookLanguageRepo.save(newLanguage);
+                    });
+            book.setLanguage(languageEntity);
+        }
+        return book;
+    }
+
     // Get available product item quantity from Inventory
     private int stockQuantityGetter(String productId){
         try {
@@ -240,49 +281,17 @@ public class BookServices {
             // Upload the image to Azure Blob Storage
             String fileName = (file!=null)? azureBlobService.uploadFile(file, ContainerType.BOOK) : null;
 
-            // Handle Category
-            BookCategory category = null;
-            if (bookDTO.getCategory() != null && !bookDTO.getCategory().isBlank()) {
-                category = bookCategoryRepo.findByNameIgnoreCase(bookDTO.getCategory())
-                        .orElseGet(() -> {
-                            // Create new category if not exists
-                            BookCategory newCategory = new BookCategory();
-                            newCategory.setName(bookDTO.getCategory());
-                            return bookCategoryRepo.save(newCategory);
-                        });
-            }
-
-            // Handle Category
-            BookGenre genre = null;
-            if (bookDTO.getGenre() != null && !bookDTO.getGenre().isBlank()) {
-                genre = bookGenreRepo.findByNameIgnoreCase(bookDTO.getGenre())
-                        .orElseGet(() -> {
-                            // Create new category if not exists
-                            BookGenre newGenre = new BookGenre();
-                            newGenre.setName(bookDTO.getGenre());
-                            return bookGenreRepo.save(newGenre);
-                        });
-            }
-
-            // Handle Category
-            BookLanguage language = null;
-            if (bookDTO.getLanguage() != null && !bookDTO.getLanguage().isBlank()) {
-                language = bookLanguageRepo.findByNameIgnoreCase(bookDTO.getLanguage())
-                        .orElseGet(() -> {
-                            // Create new category if not exists
-                            BookLanguage newLanguage = new BookLanguage();
-                            newLanguage.setName(bookDTO.getLanguage());
-                            return bookLanguageRepo.save(newLanguage);
-                        });
-            }
-
             Book newBook = modelMapper.map(bookDTO, Book.class);
             newBook.setImgUrl(fileName); // Set uploaded saved file's name as url
-            newBook.setCategory(category);
-            newBook.setGenre(genre);
-            newBook.setLanguage(language);
 
-            Book savedBook = bookRepo.save(newBook);
+            Book updatedNewBook = categoryGenreLanguageAdder(
+                    newBook,
+                    bookDTO.getCategory(),
+                    bookDTO.getGenre(),
+                    bookDTO.getLanguage()
+            );
+
+            Book savedBook = bookRepo.save(updatedNewBook);
 
             InventoryRequestDTO inventoryRequestDTO = new InventoryRequestDTO(
                     savedBook.getId(),
@@ -337,7 +346,14 @@ public class BookServices {
                 existingBook.setImgUrl(existingImgUrl);
             }
 
-            Book savedBook = bookRepo.save(existingBook);
+            Book updatedExistenceBook = categoryGenreLanguageAdder(
+                    existingBook,
+                    bookDTO.getCategory(),
+                    bookDTO.getGenre(),
+                    bookDTO.getLanguage()
+            );
+
+            Book savedBook = bookRepo.save(updatedExistenceBook);
             log.info("### Book updated successfully with ID: {}", savedBook.getId());
 
             return sasUrlAdderAndQuantitySetter(savedBook);
