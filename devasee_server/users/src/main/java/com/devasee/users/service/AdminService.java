@@ -1,7 +1,7 @@
 package com.devasee.users.service;
 
 import com.devasee.users.dto.AdminDTO;
-import com.devasee.users.dto.PromoteAsAdminDTO;
+import com.devasee.users.dto.PromoteDemoteAsAdminDTO;
 import com.devasee.users.entity.AppUser;
 import com.devasee.users.entity.Role;
 import com.devasee.users.enums.AccountStatus;
@@ -66,11 +66,11 @@ public class AdminService {
         }
     }
 
-    public AdminDTO promoteAsAdmin(PromoteAsAdminDTO promoteAsAdminDTO) {
+    public AdminDTO promoteAsAdmin(PromoteDemoteAsAdminDTO promoteDemoteAsAdminDTO) {
         try {
-            log.info("### Promoting user as admin: {}", promoteAsAdminDTO.getEmail());
+            log.info("### Promoting user as admin: {}", promoteDemoteAsAdminDTO.getEmail());
 
-            Optional<AppUser> existingUser =  userRepo.findByEmail(promoteAsAdminDTO.getEmail());
+            Optional<AppUser> existingUser =  userRepo.findByEmail(promoteDemoteAsAdminDTO.getEmail());
 
             log.info("*** existingUser  : {}", existingUser);
 
@@ -105,9 +105,9 @@ public class AdminService {
                 existingUser.get().getRoles().add(adminRole);
 
                 safeSaveUser(existingUser.get());
-                log.info("### ADMIN role added to user: {}", promoteAsAdminDTO.getEmail());
+                log.info("### ADMIN role added to user: {}", promoteDemoteAsAdminDTO.getEmail());
             }else {
-                log.warn("### Cannot promote non-registered user: {}", promoteAsAdminDTO.getEmail());
+                log.warn("### Cannot promote non-registered user: {}", promoteDemoteAsAdminDTO.getEmail());
                 throw new InvalidOperationException("Before promoting ad admin you must be registered");
             }
 

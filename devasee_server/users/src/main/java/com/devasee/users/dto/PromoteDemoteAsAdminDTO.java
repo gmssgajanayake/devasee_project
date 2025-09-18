@@ -7,6 +7,6 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class PromoteAsAdminDTO {
+public class PromoteDemoteAsAdminDTO {
     private String email;
 }

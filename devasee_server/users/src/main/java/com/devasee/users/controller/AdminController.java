@@ -1,7 +1,7 @@
 package com.devasee.users.controller;
 
 import com.devasee.users.dto.AdminDTO;
-import com.devasee.users.dto.PromoteAsAdminDTO;
+import com.devasee.users.dto.PromoteDemoteAsAdminDTO;
 import com.devasee.users.dto.RetrieveUserDTO;
 import com.devasee.users.response.CustomResponse;
 import com.devasee.users.service.AdminService;
@@ -64,7 +64,7 @@ public class AdminController {
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public CustomResponse<AdminDTO> promoteAsAdmin(
-            @RequestBody PromoteAsAdminDTO promoteDemoteAdminDTO
+            @RequestBody PromoteDemoteAsAdminDTO promoteDemoteAdminDTO
             ) {
         AdminDTO adminDTO = adminService.promoteAsAdmin(promoteDemoteAdminDTO);
         return new CustomResponse<>(
@@ -75,12 +75,12 @@ public class AdminController {
     }
 
     // Demote an admin as user by email, remove admin role
-    // /api/v1/users/admins?email=abc@gmail.com
+    // /api/v1/users/admins
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping
-    public CustomResponse<Object> demoteAdmin(@RequestParam String email) {
+    public CustomResponse<Object> demoteAdmin(@RequestBody PromoteDemoteAsAdminDTO promoteDemoteAsAdminDTO) {
 
-        AdminDTO dto = adminService.demoteAdmin(email);
+        AdminDTO dto = adminService.demoteAdmin(promoteDemoteAsAdminDTO.getEmail());
         return new CustomResponse<>(
                 true,
                 "Admin demoted successfully.",
