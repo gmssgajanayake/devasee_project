@@ -25,6 +25,7 @@ public class PrintController {
 
     // GET /api/v1/product/printing?page=0&size=20
     @GetMapping
+    @PreAuthorize("isAuthenticated()")
     public CustomResponse<Page<RetrievePrintDTO>> getAllPrints(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size
@@ -34,6 +35,7 @@ public class PrintController {
     }
 
     // GET /api/v1/product/printing/{printId}
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/{printId}")
     public CustomResponse<RetrievePrintDTO> getPrintById(@PathVariable String printId) {
         RetrievePrintDTO printDTO = printServices.getPrintById(printId);
@@ -42,6 +44,7 @@ public class PrintController {
 
     // GET /api/v1/product/printing/search?field=type&value=mug&page=0&size=10
     @GetMapping("/search")
+    @PreAuthorize("isAuthenticated()")
     public CustomResponse<Page<RetrievePrintDTO>> searchPrintsByTerm(
             @RequestParam String field,
             @RequestParam String value,

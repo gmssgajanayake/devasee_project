@@ -3,6 +3,7 @@ package com.devasee.orders.services;
 import com.devasee.orders.dto.CreateOrderDTO;
 import com.devasee.orders.dto.DeleteOrderDTO;
 import com.devasee.orders.dto.RetrieveOrderDTO;
+import com.devasee.orders.dto.UpdateOrderDTO;
 import com.devasee.orders.entity.OrderEntity;
 import com.devasee.orders.exception.OrderAlreadyExistsException;
 import com.devasee.orders.exception.OrderNotFoundException;
@@ -11,30 +12,37 @@ import com.devasee.orders.repo.OrderRepo;
 import jakarta.transaction.Transactional;
 import org.hibernate.exception.DataException;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeToken;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
-
-import java.util.List;
 
 @Service
 @Transactional
 public class OrderServices {
 
-    private  final WebClient webClient;
+    private static final Logger logger = LoggerFactory.getLogger(OrderServices.class);
+
     private final OrderRepo orderRepo;
     private final ModelMapper modelMapper;
 
-    public OrderServices(WebClient webClient,OrderRepo orderRepo, ModelMapper modelMapper) {
-        this.webClient  = webClient;
+    public OrderServices(OrderRepo orderRepo, ModelMapper modelMapper) {
         this.orderRepo = orderRepo;
         this.modelMapper = modelMapper;
     }
 
-    public List<RetrieveOrderDTO> getAllOrders() {
+    // --------------------- Retrieve ---------------------
+
+    public Page<RetrieveOrderDTO> getAllOrders(int page, int size) {
         try {
-            return modelMapper.map(orderRepo.findAll(), new TypeToken<List<RetrieveOrderDTO>>() {}.getType());
-        } catch (DataException exception) {
+            Pageable pageable = PageRequest.of(page, size, Sort.by("orderDate").descending());
+            return orderRepo.findAll(pageable).map(order -> modelMapper.map(order, RetrieveOrderDTO.class));
+        } catch (DataException | DataAccessException e) {
+            logger.error("Database error while fetching all orders", e);
             throw new ServiceUnavailableException("Something went wrong on the server. Please try again later.");
         }
     }
@@ -46,54 +54,47 @@ public class OrderServices {
         return modelMapper.map(order, RetrieveOrderDTO.class);
     }
 
-    public List<RetrieveOrderDTO> getOrdersByCustomerName(String customerName) {
-        List<OrderEntity> orderList = orderRepo.findByCustomerName(customerName);
-        if (orderList.isEmpty()) {
-            throw new OrderNotFoundException("No orders found for customer: " + customerName);
-        }
-        return modelMapper.map(orderList, new TypeToken<List<RetrieveOrderDTO>>() {}.getType());
+    public Page<RetrieveOrderDTO> getOrdersByCustomerName(String customerName, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("orderDate").descending());
+        return orderRepo.findByCustomerNameContainingIgnoreCase(customerName, pageable)
+                .map(order -> modelMapper.map(order, RetrieveOrderDTO.class));
     }
 
-   // public CreateOrderDTO saveOrder(CreateOrderDTO orderDTO) {
-      //  if (orderRepo.existsByOrderNumber(orderDTO.getOrderNumber())) {
-        //    throw new OrderAlreadyExistsException("Order with number: " + orderDTO.getOrderNumber() + " already exists");
-       // }
-      //  orderRepo.save(modelMapper.map(orderDTO, OrderEntity.class));
-      //  return orderDTO;
-   // }
-
+    // --------------------- Create ---------------------
 
     public CreateOrderDTO saveOrder(CreateOrderDTO orderDTO) {
-        // Optional duplicate check
         if (orderRepo.existsByOrderNumber(orderDTO.getOrderNumber())) {
             throw new OrderAlreadyExistsException(
                     "Order with number: " + orderDTO.getOrderNumber() + " already exists"
             );
         }
-
-        // Save entity
         OrderEntity orderEntity = modelMapper.map(orderDTO, OrderEntity.class);
         OrderEntity savedEntity = orderRepo.save(orderEntity);
-
-        // Return DTO with saved values
         return modelMapper.map(savedEntity, CreateOrderDTO.class);
     }
 
-    public RetrieveOrderDTO updateOrder(RetrieveOrderDTO orderDTO) {
-        OrderEntity existingOrder = orderRepo.findById(orderDTO.getId()).orElseThrow(
-                () -> new OrderNotFoundException("Order not found with ID: " + orderDTO.getId())
+    // --------------------- Update ---------------------
+
+    public RetrieveOrderDTO updateOrder(UpdateOrderDTO updateOrderDTO) {
+        OrderEntity existingOrder = orderRepo.findById(updateOrderDTO.getId()).orElseThrow(
+                () -> new OrderNotFoundException("Order not found with ID: " + updateOrderDTO.getId())
         );
-        OrderEntity updatedOrder = modelMapper.map(orderDTO, OrderEntity.class);
-        updatedOrder.setId(existingOrder.getId()); // Ensure ID is not changed
-        OrderEntity savedOrder = orderRepo.save(updatedOrder);
+
+        modelMapper.map(updateOrderDTO, existingOrder); // copy changes onto entity
+        OrderEntity savedOrder = orderRepo.save(existingOrder);
+
         return modelMapper.map(savedOrder, RetrieveOrderDTO.class);
     }
+
+    // --------------------- Delete ---------------------
 
     public DeleteOrderDTO deleteOrder(int id) {
         OrderEntity order = orderRepo.findById(id).orElseThrow(
                 () -> new OrderNotFoundException("Order not found with ID: " + id)
         );
-        orderRepo.deleteById(id);
-        return modelMapper.map(order, DeleteOrderDTO.class);
+
+        orderRepo.delete(order);
+
+        return new DeleteOrderDTO(order.getId(), "Order deleted successfully");
     }
 }
