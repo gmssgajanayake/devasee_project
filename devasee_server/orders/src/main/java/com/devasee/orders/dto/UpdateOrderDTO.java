@@ -10,7 +10,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UpdateOrderDTO {
-    private int id;
+    private String id;
     private String orderNumber;
     private String customerName;
     private LocalDate orderDate;

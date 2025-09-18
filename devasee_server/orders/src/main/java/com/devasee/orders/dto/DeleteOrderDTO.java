@@ -9,6 +9,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 
 public class DeleteOrderDTO {
-    private int id;
+    private String id;
     private String message;
 }

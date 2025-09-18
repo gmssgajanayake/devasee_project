@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.UuidGenerator;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -16,8 +17,9 @@ import java.time.LocalDateTime;
 public class OrderEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;  // Matches RetrieveOrderDTO.id
+    @GeneratedValue
+    @UuidGenerator
+    private String id;  // Matches RetrieveOrderDTO.id
 
     @Column(nullable = false, unique = true, length = 50)
     private String orderNumber;  // Matches CreateOrderDTO.orderNumber

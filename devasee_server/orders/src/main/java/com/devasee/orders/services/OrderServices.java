@@ -47,54 +47,86 @@ public class OrderServices {
         }
     }
 
-    public RetrieveOrderDTO getOrderById(int orderId) {
-        OrderEntity order = orderRepo.findById(orderId).orElseThrow(
-                () -> new OrderNotFoundException("Order not found with ID: " + orderId)
-        );
-        return modelMapper.map(order, RetrieveOrderDTO.class);
+    public RetrieveOrderDTO getOrderById(String orderId) {
+        try {
+            OrderEntity order = orderRepo.findById(orderId).orElseThrow(
+                    () -> new OrderNotFoundException("Order not found with ID: " + orderId)
+            );
+            return modelMapper.map(order, RetrieveOrderDTO.class);
+        } catch (DataAccessException e) {
+            logger.error("Database error while fetching order {}", orderId, e);
+            throw new ServiceUnavailableException("Unable to retrieve order at this time.");
+        }
     }
 
     public Page<RetrieveOrderDTO> getOrdersByCustomerName(String customerName, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("orderDate").descending());
-        return orderRepo.findByCustomerNameContainingIgnoreCase(customerName, pageable)
-                .map(order -> modelMapper.map(order, RetrieveOrderDTO.class));
+        try {
+            Pageable pageable = PageRequest.of(page, size, Sort.by("orderDate").descending());
+            return orderRepo.findByCustomerNameContainingIgnoreCase(customerName, pageable)
+                    .map(order -> modelMapper.map(order, RetrieveOrderDTO.class));
+        } catch (DataAccessException e) {
+            logger.error("Database error while fetching orders for customer {}", customerName, e);
+            throw new ServiceUnavailableException("Unable to retrieve customer orders at this time.");
+        }
     }
 
     // --------------------- Create ---------------------
 
-    public CreateOrderDTO saveOrder(CreateOrderDTO orderDTO) {
-        if (orderRepo.existsByOrderNumber(orderDTO.getOrderNumber())) {
-            throw new OrderAlreadyExistsException(
-                    "Order with number: " + orderDTO.getOrderNumber() + " already exists"
-            );
+    public RetrieveOrderDTO saveOrder(CreateOrderDTO orderDTO) {
+        try {
+            if (orderRepo.existsByOrderNumber(orderDTO.getOrderNumber())) {
+                throw new OrderAlreadyExistsException(
+                        "Order with number: " + orderDTO.getOrderNumber() + " already exists"
+                );
+            }
+            OrderEntity orderEntity = modelMapper.map(orderDTO, OrderEntity.class);
+            OrderEntity savedEntity = orderRepo.save(orderEntity);
+
+            logger.info("Order {} created successfully", savedEntity.getId());
+            return modelMapper.map(savedEntity, RetrieveOrderDTO.class);
+
+        } catch (DataAccessException e) {
+            logger.error("Database error while saving order {}", orderDTO.getOrderNumber(), e);
+            throw new ServiceUnavailableException("Unable to save order at this time.");
         }
-        OrderEntity orderEntity = modelMapper.map(orderDTO, OrderEntity.class);
-        OrderEntity savedEntity = orderRepo.save(orderEntity);
-        return modelMapper.map(savedEntity, CreateOrderDTO.class);
     }
 
     // --------------------- Update ---------------------
 
     public RetrieveOrderDTO updateOrder(UpdateOrderDTO updateOrderDTO) {
-        OrderEntity existingOrder = orderRepo.findById(updateOrderDTO.getId()).orElseThrow(
-                () -> new OrderNotFoundException("Order not found with ID: " + updateOrderDTO.getId())
-        );
+        try {
+            OrderEntity existingOrder = orderRepo.findById(updateOrderDTO.getId()).orElseThrow(
+                    () -> new OrderNotFoundException("Order not found with ID: " + updateOrderDTO.getId())
+            );
 
-        modelMapper.map(updateOrderDTO, existingOrder); // copy changes onto entity
-        OrderEntity savedOrder = orderRepo.save(existingOrder);
+            modelMapper.map(updateOrderDTO, existingOrder); // copy changes onto entity
+            OrderEntity savedOrder = orderRepo.save(existingOrder);
 
-        return modelMapper.map(savedOrder, RetrieveOrderDTO.class);
+            logger.info("Order {} updated successfully", savedOrder.getId());
+            return modelMapper.map(savedOrder, RetrieveOrderDTO.class);
+
+        } catch (DataAccessException e) {
+            logger.error("Database error while updating order {}", updateOrderDTO.getId(), e);
+            throw new ServiceUnavailableException("Unable to update order at this time.");
+        }
     }
 
     // --------------------- Delete ---------------------
 
-    public DeleteOrderDTO deleteOrder(int id) {
-        OrderEntity order = orderRepo.findById(id).orElseThrow(
-                () -> new OrderNotFoundException("Order not found with ID: " + id)
-        );
+    public DeleteOrderDTO deleteOrder(String id) {
+        try {
+            OrderEntity order = orderRepo.findById(id).orElseThrow(
+                    () -> new OrderNotFoundException("Order not found with ID: " + id)
+            );
 
-        orderRepo.delete(order);
+            orderRepo.delete(order);
 
-        return new DeleteOrderDTO(order.getId(), "Order deleted successfully");
+            logger.info("Order {} deleted successfully", id);
+            return new DeleteOrderDTO(order.getId(), "Order deleted successfully");
+
+        } catch (DataAccessException e) {
+            logger.error("Database error while deleting order {}", id, e);
+            throw new ServiceUnavailableException("Unable to delete order at this time.");
+        }
     }
 }
