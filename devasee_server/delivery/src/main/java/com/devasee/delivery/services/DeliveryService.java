@@ -5,6 +5,7 @@ import com.devasee.delivery.dto.DeleteDeliveryDTO;
 import com.devasee.delivery.dto.DeliveryStatsDTO;
 import com.devasee.delivery.dto.RetrieveDeliveryDTO;
 import com.devasee.delivery.entity.Delivery;
+import com.devasee.delivery.enums.DeliveryStatus;
 import com.devasee.delivery.exception.DeliveryNotFoundException;
 import com.devasee.delivery.repo.DeliveryRepository;
 import jakarta.transaction.Transactional;
@@ -26,57 +27,108 @@ public class DeliveryService {
         this.modelMapper = modelMapper;
     }
 
-    // CREATE: ensure ID is null before saving and return saved entity mapped back
+    // CREATE Delivery
     public CreateDeliveryDTO addDelivery(CreateDeliveryDTO dto) {
-        Delivery delivery = modelMapper.map(dto, Delivery.class);
-        delivery.setId(null); // important: force new insert
-        Delivery saved = deliveryRepository.save(delivery);
-        return modelMapper.map(saved, CreateDeliveryDTO.class);
+        try {
+            Delivery delivery = modelMapper.map(dto, Delivery.class);
+            delivery.setId(null); // Ensure new insert
+            Delivery saved = deliveryRepository.save(delivery);
+            return modelMapper.map(saved, CreateDeliveryDTO.class);
+        } catch (Exception e) {
+            throw new RuntimeException("Error while adding delivery: " + e.getMessage(), e);
+        }
     }
 
     // READ by ID
     public RetrieveDeliveryDTO getDeliveryById(Long id) {
-        Delivery delivery = deliveryRepository.findById(id)
-                .orElseThrow(() -> new DeliveryNotFoundException("Delivery not found with ID: " + id));
-        return modelMapper.map(delivery, RetrieveDeliveryDTO.class);
+        try {
+            Delivery delivery = deliveryRepository.findById(id)
+                    .orElseThrow(() -> new DeliveryNotFoundException("Delivery not found with ID: " + id));
+            return modelMapper.map(delivery, RetrieveDeliveryDTO.class);
+        } catch (DeliveryNotFoundException e) {
+            throw e; // rethrow custom exception
+        } catch (Exception e) {
+            throw new RuntimeException("Error while retrieving delivery: " + e.getMessage(), e);
+        }
     }
 
     // READ all
     public List<RetrieveDeliveryDTO> getAllDeliveries() {
-        List<Delivery> deliveries = deliveryRepository.findAll();
-        return modelMapper.map(deliveries, new TypeToken<List<RetrieveDeliveryDTO>>() {}.getType());
+        try {
+            List<Delivery> deliveries = deliveryRepository.findAll();
+            return modelMapper.map(deliveries, new TypeToken<List<RetrieveDeliveryDTO>>() {}.getType());
+        } catch (Exception e) {
+            throw new RuntimeException("Error while fetching all deliveries: " + e.getMessage(), e);
+        }
     }
 
-    // UPDATE: find existing, update fields, save, return updated mapped dto
+    // UPDATE Delivery
     public RetrieveDeliveryDTO updateDelivery(Long id, RetrieveDeliveryDTO dto) {
-        Delivery existing = deliveryRepository.findById(id)
-                .orElseThrow(() -> new DeliveryNotFoundException("Cannot update. Delivery not found with ID: " + id));
+        try {
+            Delivery existing = deliveryRepository.findById(id)
+                    .orElseThrow(() -> new DeliveryNotFoundException("Cannot update. Delivery not found with ID: " + id));
 
-        // Update fields explicitly to avoid accidental ID overwrite
-        existing.setOrderId(dto.getOrderId());
-        existing.setAddress(dto.getAddress());
-        existing.setStatus(dto.getStatus());
-        existing.setDeliveryDate(dto.getDeliveryDate());
+            existing.setOrderId(dto.getOrderId());
+            existing.setAddress(dto.getAddress());
+            existing.setStatus(dto.getStatus()); // enum string from DTO
+            existing.setDeliveryDate(dto.getDeliveryDate());
 
-        Delivery saved = deliveryRepository.save(existing);
-        return modelMapper.map(saved, RetrieveDeliveryDTO.class);
+            Delivery saved = deliveryRepository.save(existing);
+            return modelMapper.map(saved, RetrieveDeliveryDTO.class);
+        } catch (DeliveryNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeException("Error while updating delivery: " + e.getMessage(), e);
+        }
     }
 
-    // DELETE: find existing, delete, return deleted dto
+    // DELETE Delivery
     public DeleteDeliveryDTO deleteDelivery(Long id) {
-        Delivery existing = deliveryRepository.findById(id)
-                .orElseThrow(() -> new DeliveryNotFoundException("Cannot delete. Delivery not found with ID: " + id));
-        deliveryRepository.delete(existing);
-        return modelMapper.map(existing, DeleteDeliveryDTO.class);
+        try {
+            Delivery existing = deliveryRepository.findById(id)
+                    .orElseThrow(() -> new DeliveryNotFoundException("Cannot delete. Delivery not found with ID: " + id));
+            deliveryRepository.delete(existing);
+            return modelMapper.map(existing, DeleteDeliveryDTO.class);
+        } catch (DeliveryNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeException("Error while deleting delivery: " + e.getMessage(), e);
+        }
     }
-    // ✅ New Method: Delivery Stats
-    public DeliveryStatsDTO calculateDeliveryStats() {
-        List<RetrieveDeliveryDTO> deliveries = getAllDeliveries();
-        int totalDeliveries = deliveries.size();
-        int pendingDeliveries = (int) deliveries.stream()
-                .filter(d -> "PENDING".equalsIgnoreCase(d.getStatus()))
-                .count();
 
-        return new DeliveryStatsDTO(totalDeliveries, pendingDeliveries);
+    // DELIVERY Stats
+    public DeliveryStatsDTO calculateDeliveryStats() {
+        try {
+            List<RetrieveDeliveryDTO> deliveries = getAllDeliveries();
+            int totalDeliveries = deliveries.size();
+            int pendingDeliveries = (int) deliveries.stream()
+                    .filter(d -> DeliveryStatus.PENDING.equals(d.getStatus()))
+                    .count();
+            return new DeliveryStatsDTO(totalDeliveries, pendingDeliveries);
+        } catch (Exception e) {
+            throw new RuntimeException("Error while calculating delivery stats: " + e.getMessage(), e);
+        }
+    }
+
+    // GET all statuses
+    public List<String> getAllStatuses() {
+        try {
+            return List.of(
+                    DeliveryStatus.PENDING.name(),
+                    DeliveryStatus.IN_TRANSIT.name(),
+                    DeliveryStatus.DELIVERED.name()
+            );
+        } catch (Exception e) {
+            throw new RuntimeException("Error while fetching delivery statuses: " + e.getMessage(), e);
+        }
+    }
+
+    // GET all couriers
+    public List<String> getAllCourierServices() {
+        try {
+            return List.of("KOOBIYO", "DOMEX");
+        } catch (Exception e) {
+            throw new RuntimeException("Error while fetching courier services: " + e.getMessage(), e);
+        }
     }
 }
