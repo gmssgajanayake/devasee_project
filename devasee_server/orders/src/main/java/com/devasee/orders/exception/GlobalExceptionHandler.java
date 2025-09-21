@@ -32,6 +32,12 @@ public class GlobalExceptionHandler {
         CustomResponse<Object> response = new CustomResponse<>(false, ex.getMessage(), null);
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+    // Handle InsufficientStockException
+    @ExceptionHandler(InsufficientStockException.class)
+    public ResponseEntity<CustomResponse<Object>> handleInsufficientStock(InsufficientStockException ex) {
+        CustomResponse<Object> response = new CustomResponse<>(false, ex.getMessage(), null);
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST); // 400
+    }
 
     // Handle OrderAlreadyExistsException
     @ExceptionHandler(OrderAlreadyExistsException.class)

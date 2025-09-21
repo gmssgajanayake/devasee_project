@@ -37,7 +37,7 @@ public class OrderController {
     // GET /api/v1/orders/order/{orderId}
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/{orderId}")
-    public CustomResponse<RetrieveOrderDTO> getOrderById(@PathVariable int orderId) {
+    public CustomResponse<RetrieveOrderDTO> getOrderById(@PathVariable String orderId) {
         RetrieveOrderDTO order = orderServices.getOrderById(orderId);
         return new CustomResponse<>(true, "Order found", order);
     }
@@ -59,13 +59,14 @@ public class OrderController {
     // Save a new order
     @PreAuthorize("isAuthenticated()")
     @PostMapping
-    public CustomResponse<CreateOrderDTO> saveOrder(@RequestBody CreateOrderDTO orderDTO) {
-        CreateOrderDTO savedOrder = orderServices.saveOrder(orderDTO);
+    public CustomResponse<RetrieveOrderDTO> saveOrder(@RequestBody CreateOrderDTO orderDTO) {
+        RetrieveOrderDTO savedOrder = orderServices.saveOrder(orderDTO);
         return new CustomResponse<>(true, "Order saved successfully", savedOrder);
     }
 
+
     // Update an existing order
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("isAuthenticated()")
     @PutMapping
     public CustomResponse<RetrieveOrderDTO> updateOrder(@RequestBody UpdateOrderDTO orderDTO) {
         RetrieveOrderDTO updatedOrder = orderServices.updateOrder(orderDTO);
@@ -73,9 +74,9 @@ public class OrderController {
     }
 
     // Delete order by ID
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/{id}")
-    public CustomResponse<DeleteOrderDTO> deleteOrder(@PathVariable int id) {
+    public CustomResponse<DeleteOrderDTO> deleteOrder(@PathVariable String id) {
         DeleteOrderDTO deletedOrder = orderServices.deleteOrder(id);
         return new CustomResponse<>(true, "Order deleted successfully", deletedOrder);
     }
