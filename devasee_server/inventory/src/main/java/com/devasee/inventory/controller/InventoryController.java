@@ -37,7 +37,8 @@ public class InventoryController {
         return new CustomResponse<>(true, "Inventory found", inventoryDTO);
     }
 
-    // For Product Public Service : Get item quantity by productId
+    // For Product Public Service : Get item quantity by productId (since product public end point don't have internal
+    // tokens feign client don't forward anything to this that is why this sends point is public)
     @GetMapping("/product/{productId}/quantity")
     public Integer getInventoryQuantityById(@PathVariable String productId) {
         return inventoryServices.getInventoryQuantityById(productId);
