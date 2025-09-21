@@ -30,69 +30,88 @@ public class DeliveryService {
         this.courierRepository = courierRepository;
     }
 
-    // CREATE Delivery
+    /**
+     * CREATE a new Delivery
+     */
     public CreateDeliveryDTO addDelivery(CreateDeliveryDTO dto) {
         try {
             Delivery delivery = new Delivery();
             delivery.setOrderId(dto.getOrderId());
-            delivery.setAddress(dto.getAddress());
+            delivery.setProductId(dto.getProductId());
+            delivery.setOrderQuantity(dto.getOrderQuantity());
             delivery.setStatus(dto.getStatus());
-            delivery.setDeliveryDate(dto.getDeliveryDate());
 
-            // find courier by name
-            Courier courier = courierRepository.findByNameIgnoreCase(dto.getCourierName())
-                    .orElseThrow(() -> new DeliveryNotFoundException("Courier not found: " + dto.getCourierName()));
+            // Assign a courier (you could also add courierName in DTO if needed)
+            Courier courier = courierRepository.findAll().stream()
+                    .findFirst()
+                    .orElseThrow(() -> new DeliveryNotFoundException("No courier available"));
             delivery.setCourier(courier);
 
+            // Default: delivery date = today
+            delivery.setDeliveryDate(java.time.LocalDate.now());
+
+            // Persist
             Delivery saved = deliveryRepository.save(delivery);
 
+            // Return same DTO back
             return new CreateDeliveryDTO(
                     saved.getOrderId(),
-                    saved.getAddress(),
+                    saved.getProductId(),
                     saved.getStatus(),
-                    saved.getCourier().getName(),
-                    saved.getDeliveryDate()
+                    saved.getOrderQuantity()
             );
         } catch (Exception e) {
             throw new RuntimeException("Error while adding delivery: " + e.getMessage(), e);
         }
     }
 
-    // READ by ID
+    /**
+     * READ Delivery by ID
+     */
     public RetrieveDeliveryDTO getDeliveryById(String id) {
         Delivery delivery = deliveryRepository.findById(id)
                 .orElseThrow(() -> new DeliveryNotFoundException("Delivery not found with ID: " + id));
 
         return new RetrieveDeliveryDTO(
-                delivery.getId(),
+                delivery.getDeliveryId(),
                 delivery.getOrderId(),
+                delivery.getProductId(),
                 delivery.getAddress(),
                 delivery.getStatus(),
+                delivery.getOrderQuantity(),
                 delivery.getCourier().getName(),
                 delivery.getDeliveryDate()
         );
     }
 
-    // READ all with paging
+    /**
+     * READ all Deliveries with paging
+     */
     public Page<RetrieveDeliveryDTO> getAllDeliveries(Pageable pageable) {
         Page<Delivery> deliveries = deliveryRepository.findAll(pageable);
 
         return deliveries.map(delivery -> new RetrieveDeliveryDTO(
-                delivery.getId(),
+                delivery.getDeliveryId(),
                 delivery.getOrderId(),
+                delivery.getProductId(),
                 delivery.getAddress(),
                 delivery.getStatus(),
+                delivery.getOrderQuantity(),
                 delivery.getCourier().getName(),
                 delivery.getDeliveryDate()
         ));
     }
 
-    // UPDATE Delivery
+    /**
+     * UPDATE Delivery by ID
+     */
     public RetrieveDeliveryDTO updateDelivery(String id, RetrieveDeliveryDTO dto) {
         Delivery existing = deliveryRepository.findById(id)
                 .orElseThrow(() -> new DeliveryNotFoundException("Cannot update. Delivery not found with ID: " + id));
 
         existing.setOrderId(dto.getOrderId());
+        existing.setProductId(dto.getProductId());
+        existing.setOrderQuantity(dto.getOrderQuantity());
         existing.setAddress(dto.getAddress());
         existing.setStatus(dto.getStatus());
         existing.setDeliveryDate(dto.getDeliveryDate());
@@ -106,16 +125,20 @@ public class DeliveryService {
         Delivery saved = deliveryRepository.save(existing);
 
         return new RetrieveDeliveryDTO(
-                saved.getId(),
+                saved.getDeliveryId(),
                 saved.getOrderId(),
+                saved.getProductId(),
                 saved.getAddress(),
                 saved.getStatus(),
+                saved.getOrderQuantity(),
                 saved.getCourier().getName(),
                 saved.getDeliveryDate()
         );
     }
 
-    // DELETE Delivery
+    /**
+     * DELETE Delivery by ID
+     */
     public DeleteDeliveryDTO deleteDelivery(String id) {
         Delivery existing = deliveryRepository.findById(id)
                 .orElseThrow(() -> new DeliveryNotFoundException("Cannot delete. Delivery not found with ID: " + id));
@@ -123,14 +146,16 @@ public class DeliveryService {
         deliveryRepository.delete(existing);
 
         return new DeleteDeliveryDTO(
-                existing.getId(),
+                existing.getDeliveryId(),
                 existing.getAddress(),
                 existing.getStatus(),
                 existing.getCourier().getName()
         );
     }
 
-    // DELIVERY Stats
+    /**
+     * DELIVERY statistics (total + pending count)
+     */
     public DeliveryStatsDTO calculateDeliveryStats() {
         List<Delivery> deliveries = deliveryRepository.findAll();
         int totalDeliveries = deliveries.size();
@@ -140,7 +165,9 @@ public class DeliveryService {
         return new DeliveryStatsDTO(totalDeliveries, pendingDeliveries);
     }
 
-    // GET all statuses
+    /**
+     * Get all possible delivery statuses
+     */
     public List<String> getAllStatuses() {
         return List.of(
                 DeliveryStatus.PENDING.name(),
@@ -148,6 +175,4 @@ public class DeliveryService {
                 DeliveryStatus.DELIVERED.name()
         );
     }
-
-
 }
