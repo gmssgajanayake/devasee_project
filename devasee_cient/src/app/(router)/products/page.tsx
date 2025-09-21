@@ -41,15 +41,15 @@ export default function  Page() {
     const [isMounted, setIsMounted] = useState(false);
 
 
-
     useEffect(() => {
         async function fetchBooks() {
             setLoading(true);
             const data = await getAllBooks();
             setBooks(data);
             setLoading(false);
+            console.log(data)
         }
-        fetchBooks();
+        fetchBooks()
     }, []);
 
 
