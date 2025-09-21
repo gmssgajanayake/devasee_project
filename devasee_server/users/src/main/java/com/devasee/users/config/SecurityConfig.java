@@ -1,6 +1,5 @@
 package com.devasee.users.config;
 
-
 import com.devasee.users.filter.InternalJWTFilter;
 import com.devasee.users.service.InternalJWTService;
 import org.springframework.context.annotation.Bean;
@@ -23,14 +22,23 @@ public class SecurityConfig {
 
     // Define Security Filter Chain
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(
+            HttpSecurity http,
+            JsonAuthEntryPoint jsonAuthEntryPoint,
+            CustomAccessDeniedHandler customAccessDeniedHandler
+            ) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "api/v1/users/admin/**"
+                                "api/v1/users/admins/**",
+                                "api/v1/users/admins"
                         ).hasRole("ADMIN")
                         .anyRequest().authenticated()) // All other requests → must be authenticated (internal JWT must exist)
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(jsonAuthEntryPoint) // 401
+                        .accessDeniedHandler(customAccessDeniedHandler) // 403
+                )
                 .addFilterBefore(internalJWTFilter(), UsernamePasswordAuthenticationFilter.class);
                 // Above adding custom filter (InternalJWTFilter) before UsernamePasswordAuthenticationFilter
 

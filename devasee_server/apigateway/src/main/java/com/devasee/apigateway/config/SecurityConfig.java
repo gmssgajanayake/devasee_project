@@ -68,7 +68,8 @@ public class SecurityConfig {
                                 "/api/v1/promo"
                         ).hasRole("ADMIN")
                         .pathMatchers(
-                                "/api/v1/users/admin/**",
+                                "/api/v1/users/admins/**",
+                                "api/v1/users/admins",
                                 "/api/v1/analytics",
                                 "/api/v1/analytics/**"
                         ).hasRole("ADMIN")

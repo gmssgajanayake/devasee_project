@@ -20,4 +20,10 @@ public interface UserRepo extends JpaRepository<AppUser, String> {
 
     @Query("SELECT u FROM AppUser u JOIN u.roles r WHERE r.name = :roleName")
     Page<AppUser> findAllByRoleName(@Param("roleName") String roleName, Pageable pageable);
+
+    @Query("SELECT u FROM AppUser u JOIN u.roles r WHERE u.userId = :userId AND r.name = :roleName")
+    Optional<AppUser> findByUserIdAndRoleName(@Param("userId") String userId, @Param("roleName") String roleName);
+
+
+    Optional<Page<AppUser>> findByEmailContainingIgnoreCase(String email, Pageable pageable);
 }

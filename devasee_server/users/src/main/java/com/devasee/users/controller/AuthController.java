@@ -29,6 +29,7 @@ public class AuthController {
     }
 
     // Saving an user after registering in frontend, default role returning and assigning as CUSTOMER
+    // /api/v1/users/auth
     @PreAuthorize("isAuthenticated()")
     @PostMapping
     public CustomResponse<Object> createUser(
@@ -37,27 +38,23 @@ public class AuthController {
         // Get the Authorization header
         String authHeader = request.getHeader("Authorization");
 
-        CreateUserDTO dto = customerService.saveCustomer(authHeader);
+        CreateUserDTO dto = customerService.saveUser(authHeader);
         return new CustomResponse<>(true, "Customer created successfully", dto);
     }
 
     // TODO : No way in clerk
-    @PreAuthorize("isAuthenticated()")
-    @PutMapping
-    public String updateUser(){
-        return "updating user";
-    }
-
-    // TODO : No way in clerk
     // Delete user by user using token, this request header added by apigateway
+    // /api/v1/users/auth
     @PreAuthorize("isAuthenticated()")
     @DeleteMapping
-    public ResponseEntity<Void> deleteCustomer(@RequestHeader("X-User-Id") String customerId) {
-        customerService.deleteUser(customerId);
+    public ResponseEntity<Void> deleteUser(@RequestHeader("X-User-Id") String userId) {
+        customerService.deleteUser(userId);
         return ResponseEntity.noContent().build(); // 204 No Content
     }
 
+    // TODO : should be private
     // For api service : Return actual role or if not there return default role CUSTOMER
+    // /api/v1/users/auth/{userId}/roles
     @GetMapping("/{userId}/roles")
     public ResponseEntity<List<String>> getUserRole(@PathVariable String userId) {
         List<String> roles = adminService.getUserRole(userId);
@@ -65,7 +62,8 @@ public class AuthController {
     }
 
     // Delete user by id by user
-    // TODO :  testing
+    // /api/v1/users/auth/deleteTest/{customerId}
+    // TODO : testing
     @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/deleteTest/{customerId}")
     public ResponseEntity<Void> deleteCustomerTesting(@PathVariable String customerId) {
