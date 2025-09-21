@@ -5,10 +5,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 
-public class DeleteOrderDTO {
-    private String orderId;
-    private String message;
+public class InventoryRequestDTO {
+    private String productId;
+    private int reservedQuantity;
 }

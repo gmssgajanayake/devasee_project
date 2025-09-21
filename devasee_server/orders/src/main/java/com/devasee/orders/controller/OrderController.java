@@ -59,10 +59,11 @@ public class OrderController {
     // Save a new order
     @PreAuthorize("isAuthenticated()")
     @PostMapping
-    public CustomResponse<CreateOrderDTO> saveOrder(@RequestBody CreateOrderDTO orderDTO) {
-        CreateOrderDTO savedOrder = orderServices.saveOrder(orderDTO);
+    public CustomResponse<RetrieveOrderDTO> saveOrder(@RequestBody CreateOrderDTO orderDTO) {
+        RetrieveOrderDTO savedOrder = orderServices.saveOrder(orderDTO);
         return new CustomResponse<>(true, "Order saved successfully", savedOrder);
     }
+
 
     // Update an existing order
     @PreAuthorize("isAuthenticated()")

@@ -1,13 +1,14 @@
 package com.devasee.orders.services;
 
-import com.devasee.orders.dto.CreateOrderDTO;
-import com.devasee.orders.dto.DeleteOrderDTO;
-import com.devasee.orders.dto.RetrieveOrderDTO;
-import com.devasee.orders.dto.UpdateOrderDTO;
+import com.devasee.orders.dto.*;
 import com.devasee.orders.entity.OrderEntity;
+import com.devasee.orders.enums.DeliveryStatus;
+import com.devasee.orders.exception.InsufficientStockException;
 import com.devasee.orders.exception.OrderAlreadyExistsException;
 import com.devasee.orders.exception.OrderNotFoundException;
 import com.devasee.orders.exception.ServiceUnavailableException;
+import com.devasee.orders.interfaces.DeliveryClient;
+import com.devasee.orders.interfaces.InventoryClient;
 import com.devasee.orders.repo.OrderRepo;
 import jakarta.transaction.Transactional;
 import org.hibernate.exception.DataException;
@@ -29,10 +30,14 @@ public class OrderServices {
 
     private final OrderRepo orderRepo;
     private final ModelMapper modelMapper;
+    private final InventoryClient inventoryClient;
+    private final DeliveryClient deliveryClient;
 
-    public OrderServices(OrderRepo orderRepo, ModelMapper modelMapper) {
+    public OrderServices(OrderRepo orderRepo, ModelMapper modelMapper, InventoryClient inventoryClient,DeliveryClient deliveryClient) {
         this.orderRepo = orderRepo;
         this.modelMapper = modelMapper;
+        this.inventoryClient = inventoryClient;
+        this.deliveryClient = deliveryClient;
     }
 
     // --------------------- Retrieve ---------------------
@@ -74,6 +79,11 @@ public class OrderServices {
 
     public RetrieveOrderDTO saveOrder(CreateOrderDTO orderDTO) {
         try {
+            int availableStock = inventoryClient.getStockQuantity(orderDTO.getProductId());
+            if (availableStock < orderDTO.getOrderQuantity()) {
+                throw new InsufficientStockException("Not enough stock for product: " + orderDTO.getProductId());
+            }
+
             if (orderRepo.existsByOrderNumber(orderDTO.getOrderNumber())) {
                 throw new OrderAlreadyExistsException(
                         "Order with number: " + orderDTO.getOrderNumber() + " already exists"
@@ -82,7 +92,18 @@ public class OrderServices {
             OrderEntity orderEntity = modelMapper.map(orderDTO, OrderEntity.class);
             OrderEntity savedEntity = orderRepo.save(orderEntity);
 
-            logger.info("Order {} created successfully", savedEntity.getId());
+            logger.info("Order {} created successfully", savedEntity.getOrderId());
+            try {
+                CreateDeliveryDTO deliveryDTO = new CreateDeliveryDTO(
+                        savedEntity.getOrderId(),
+                        orderDTO.getProductId(),
+                        DeliveryStatus.PENDING,//we can put another status
+                        orderDTO.getOrderQuantity()
+                );
+                deliveryClient.createDelivery(deliveryDTO);
+            } catch (Exception ex) {
+                logger.error("Failed to create delivery for order {}", savedEntity.getOrderId(), ex);
+            }
             return modelMapper.map(savedEntity, RetrieveOrderDTO.class);
 
         } catch (DataAccessException e) {
@@ -95,18 +116,18 @@ public class OrderServices {
 
     public RetrieveOrderDTO updateOrder(UpdateOrderDTO updateOrderDTO) {
         try {
-            OrderEntity existingOrder = orderRepo.findById(updateOrderDTO.getId()).orElseThrow(
-                    () -> new OrderNotFoundException("Order not found with ID: " + updateOrderDTO.getId())
+            OrderEntity existingOrder = orderRepo.findById(updateOrderDTO.getOrderId()).orElseThrow(
+                    () -> new OrderNotFoundException("Order not found with ID: " + updateOrderDTO.getOrderId())
             );
 
             modelMapper.map(updateOrderDTO, existingOrder); // copy changes onto entity
             OrderEntity savedOrder = orderRepo.save(existingOrder);
 
-            logger.info("Order {} updated successfully", savedOrder.getId());
+            logger.info("Order {} updated successfully", savedOrder.getOrderId());
             return modelMapper.map(savedOrder, RetrieveOrderDTO.class);
 
         } catch (DataAccessException e) {
-            logger.error("Database error while updating order {}", updateOrderDTO.getId(), e);
+            logger.error("Database error while updating order {}", updateOrderDTO.getOrderId(), e);
             throw new ServiceUnavailableException("Unable to update order at this time.");
         }
     }
@@ -122,7 +143,7 @@ public class OrderServices {
             orderRepo.delete(order);
 
             logger.info("Order {} deleted successfully", id);
-            return new DeleteOrderDTO(order.getId(), "Order deleted successfully");
+            return new DeleteOrderDTO(order.getOrderId(), "Order deleted successfully");
 
         } catch (DataAccessException e) {
             logger.error("Database error while deleting order {}", id, e);

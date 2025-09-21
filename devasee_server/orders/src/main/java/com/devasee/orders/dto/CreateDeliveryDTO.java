@@ -1,20 +1,19 @@
 package com.devasee.orders.dto;
 
+
+import com.devasee.orders.enums.DeliveryStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-public class RetrieveOrderDTO {
+@NoArgsConstructor
+
+public class CreateDeliveryDTO {
     private String orderId;
     private String productId;
+    private DeliveryStatus status;
     private Integer orderQuantity;
-    private String orderNumber;
-    private String customerName;
-    private LocalDate orderDate;
-    private double totalAmount;
 }

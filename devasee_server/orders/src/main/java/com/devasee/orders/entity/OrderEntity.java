@@ -17,30 +17,44 @@ import java.time.LocalDateTime;
 public class OrderEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue()
     @UuidGenerator
-    private String id;  // Matches RetrieveOrderDTO.id
+    @Column(updatable = false, nullable = false, length = 36)
+    private String orderId;
+
+    @Column(nullable = false)
+    private String productId;
+
+    @Column(nullable = false)
+    private Integer orderQuantity;
+
+    @Column(nullable = false, length = 255)
+    private String orderAddress;
 
     @Column(nullable = false, unique = true, length = 50)
-    private String orderNumber;  // Matches CreateOrderDTO.orderNumber
+    private String orderNumber;
 
     @Column(nullable = false, length = 100)
-    private String customerName; // Matches CreateOrderDTO.customerName
+    private String customerName;
 
     @Column(nullable = false)
-    private LocalDate orderDate; // Matches CreateOrderDTO.orderDate
+    private LocalDate orderDate;
 
     @Column(nullable = false)
-    private double totalAmount;  // Matches CreateOrderDTO.totalAmount
+    private double totalAmount;
 
-    // Optional: Keep system tracking fields
+
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    @Column(nullable = false)
     private LocalDateTime updatedAt;
 
     @PrePersist
     protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now();
+        this.createdAt = now;
+        this.updatedAt = now;
     }
 
     @PreUpdate
