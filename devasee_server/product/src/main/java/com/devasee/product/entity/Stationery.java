@@ -9,7 +9,7 @@ import org.hibernate.annotations.UuidGenerator;
 import java.time.LocalDateTime;
 
 /**
- * ✅ Entity representing Stationery in DB
+ * Entity representing Stationery in DB
  */
 @Entity
 @NoArgsConstructor

@@ -1,19 +1,16 @@
 package com.devasee.delivery.entity;
 
-import com.devasee.delivery.enums.DeliveryStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.UuidGenerator;
 
-import java.time.LocalDate;
-
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class Delivery {
+public class Courier {
 
     @Id
     @GeneratedValue
@@ -21,16 +18,6 @@ public class Delivery {
     @Column(updatable = false, nullable = false, length = 36, unique = true)
     private String id;
 
-    private String orderId;
-
-    private String address;
-
-    @Enumerated(EnumType.STRING)
-    private DeliveryStatus status;
-
-    @ManyToOne
-    @JoinColumn(name = "courier_id", nullable = false)
-    private Courier courier;
-
-    private LocalDate deliveryDate;
+    @Column(unique = true, nullable = false)
+    private String name;
 }
