@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @CrossOrigin
 @RestController
 @RequestMapping(value = "api/v1/orders/order")
-public class OrderController {
+public class  OrderController {
 
     private final OrderServices orderServices;
 

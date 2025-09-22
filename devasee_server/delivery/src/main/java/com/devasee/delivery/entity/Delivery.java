@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @NoArgsConstructor
@@ -19,9 +20,13 @@ public class Delivery {
     @GeneratedValue
     @UuidGenerator
     @Column(updatable = false, nullable = false, length = 36, unique = true)
-    private String id;
+    private String deliveryId;
 
     private String orderId;
+
+    private String productId;
+
+    private Integer orderQuantity;
 
     private String address;
 
@@ -33,4 +38,19 @@ public class Delivery {
     private Courier courier;
 
     private LocalDate deliveryDate;
+
+    // Timestamps
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
 }

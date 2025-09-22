@@ -24,10 +24,13 @@ import java.util.List;
 @CrossOrigin
 @RequestMapping("api/v1/delivery")
 @RequiredArgsConstructor
-public class DeliveryController {
+public class  DeliveryController {
 
     private final DeliveryService deliveryService;
     private final CourierService courierService;
+
+    // =================== Delivery endpoints ===================
+
     /**
      * Fetch all deliveries (Accessible by ADMIN )
      */
@@ -42,8 +45,6 @@ public class DeliveryController {
         return new CustomResponse<>(true, "All deliveries fetched", deliveries);
     }
 
-    // =================== Delivery endpoints ===================
-
     /**
      * Fetch a single delivery by ID (Accessible by ADMIN)
      */
@@ -56,6 +57,7 @@ public class DeliveryController {
 
     /**
      * Create a new delivery (Admin only)
+     * Uses CreateDeliveryDTO → must include orderId, productId, status, and orderQuantity
      */
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
@@ -66,6 +68,7 @@ public class DeliveryController {
 
     /**
      * Update an existing delivery (Admin only)
+     * Uses RetrieveDeliveryDTO → must include deliveryId, orderId, productId, orderQuantity, address, status, courierName, deliveryDate
      */
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
@@ -106,7 +109,6 @@ public class DeliveryController {
         List<String> statuses = deliveryService.getAllStatuses();
         return new CustomResponse<>(true, "Delivery statuses fetched", statuses);
     }
-
 
     // =================== Courier endpoints ===================
 

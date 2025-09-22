@@ -19,11 +19,16 @@ public class SecurityConfig {
     private final InternalJWTService internalJWTService;
 
     public SecurityConfig(InternalJWTService internalJWTService) {
+
         this.internalJWTService = internalJWTService;
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(
+            HttpSecurity http,
+            JsonAuthEntryPoint jsonAuthEntryPoint,
+            CustomAccessDeniedHandler customAccessDeniedHandler
+    ) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
@@ -33,6 +38,10 @@ public class SecurityConfig {
                                 "/api/v1/analytics"
                         ).permitAll()
                         .anyRequest().hasRole("ADMIN"))
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(jsonAuthEntryPoint) // 401
+                        .accessDeniedHandler(customAccessDeniedHandler) // 403
+                )
                 .addFilterBefore(internalJWTFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
