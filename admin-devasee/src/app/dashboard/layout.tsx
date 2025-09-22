@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, Fragment } from "react";
+import { useEffect, useState } from "react";
 import { useClerk, UserButton, useUser } from "@clerk/nextjs";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
