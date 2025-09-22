@@ -11,8 +11,6 @@ import {
     Users,
     Package,
     Truck,
-    Shield,
-    TicketPercent,
     Menu,
     X,
     LogOut,
@@ -25,8 +23,6 @@ const NAV_ITEMS = [
     { href: "/dashboard/users", label: "Users", icon: Users },
     { href: "/dashboard/inventory", label: "Inventory", icon: Package },
     { href: "/dashboard/delivery", label: "Delivery", icon: Truck },
-    { href: "/dashboard/admins", label: "Admins", icon: Shield },
-    { href: "/dashboard/promotions", label: "Promotions", icon: TicketPercent },
 ];
 
 // --- Refactored NavItem with <Link> for better performance and accessibility ---
