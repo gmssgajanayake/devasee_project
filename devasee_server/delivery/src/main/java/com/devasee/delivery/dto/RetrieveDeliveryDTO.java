@@ -11,10 +11,12 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RetrieveDeliveryDTO {
-    private String id;
+    private String deliveryId;
     private String orderId;
+    private String productId;
     private String address;
     private DeliveryStatus status;
+    private Integer orderQuantity;
     private String courierName;
     private LocalDate deliveryDate;
 }
