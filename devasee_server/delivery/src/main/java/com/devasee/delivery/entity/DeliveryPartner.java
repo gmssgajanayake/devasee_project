@@ -10,7 +10,7 @@ import org.hibernate.annotations.UuidGenerator;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class Courier {
+public class DeliveryPartner {
 
     @Id
     @GeneratedValue
@@ -20,4 +20,13 @@ public class Courier {
 
     @Column(unique = true, nullable = false)
     private String name;
+
+    @Column(unique = true, nullable = false)
+    private String email;
+
+    @Column(unique = true, nullable = false, length = 10)
+    private String phone;
+
+    @Column(name = "tracking_link")
+    private String trackingLink;
 }
