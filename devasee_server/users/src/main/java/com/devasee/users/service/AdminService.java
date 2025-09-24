@@ -17,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -203,6 +204,19 @@ public class AdminService {
         } catch (Exception e){
             log.error("### Error fetching user by ID: {}", userId, e);
             throw new ServiceUnavailableException("Something went wrong on the server. Please try again later : " + e.getMessage());
+        }
+    }
+
+    // Get admin name by userid
+    public String getAdminNameById(String userId) {
+        try {
+           AppUser admin = userRepo.findByUserIdAndRoleName(userId, Roles.ADMIN.name()).orElseThrow(
+                   () -> new UserNotFoundException("Admin Not Found with id : " + userId));
+           return admin.getFirstName() + " " + admin.getLastName();
+        } catch (UserNotFoundException ex){
+            throw ex;
+        } catch (Exception e){
+            throw new ServiceUnavailableException("Something went wrong in server : " + e.getMessage());
         }
     }
 

@@ -59,6 +59,21 @@ public class AdminController {
         );
     }
 
+    // Get admin name by id
+    // /api/v1/users/admins/{userId}/name
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/{userId}/name")
+    public CustomResponse<String> getAdminNameById(
+            @PathVariable String userId
+    ) {
+        String adminName = adminService.getAdminNameById(userId);
+        return new CustomResponse<>(
+                true,
+                "Admin name returned successfully",
+                adminName
+        );
+    }
+
     // Promote/Create existing user as admin or create a new admin
     // /api/v1/users/admins
     @PreAuthorize("hasRole('ADMIN')")
@@ -85,6 +100,18 @@ public class AdminController {
                 true,
                 "Admin demoted successfully.",
                 dto
+        );
+    }
+
+    // After admin login to access admin page this end point call, get permission to access it
+    // POST /api/v1/users/admins/login
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/login")
+    public CustomResponse<Boolean> adminLogin(){
+        return new CustomResponse<>(
+                true,
+                "Admin",
+                true
         );
     }
 
