@@ -23,7 +23,11 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(
+            HttpSecurity http,
+            JsonAuthEntryPoint jsonAuthEntryPoint,
+            CustomAccessDeniedHandler customAccessDeniedHandler
+    ) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
@@ -32,6 +36,10 @@ public class SecurityConfig {
                                 "/api/v1/inventory/product/*/quantity"
                         ).permitAll()
                         .anyRequest().authenticated())
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(jsonAuthEntryPoint) // 401
+                        .accessDeniedHandler(customAccessDeniedHandler) // 403
+                )
                 .addFilterBefore(internalJWTFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
