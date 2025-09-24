@@ -14,7 +14,6 @@ public class UpdateOrderDTO {
     private String productId;
     private Integer orderQuantity;
     private String orderNumber;
-    private String customerName;
-    private LocalDate orderDate;
+    private String customerId;
     private double totalAmount;
 }

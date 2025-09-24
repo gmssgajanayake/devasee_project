@@ -35,10 +35,7 @@ public class OrderEntity {
     private String orderNumber;
 
     @Column(nullable = false, length = 100)
-    private String customerName;
-
-    @Column(nullable = false)
-    private LocalDate orderDate;
+    private String customerID;
 
     @Column(nullable = false)
     private double totalAmount;

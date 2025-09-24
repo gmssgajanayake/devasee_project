@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
+
 
 @Data
 @NoArgsConstructor
@@ -14,7 +14,6 @@ public class CreateOrderDTO {
     private Integer orderQuantity;
     private String orderAddress;
     private String orderNumber;
-    private String customerName;
-    private LocalDate orderDate;
+    private String customerId;
     private double totalAmount;
 }

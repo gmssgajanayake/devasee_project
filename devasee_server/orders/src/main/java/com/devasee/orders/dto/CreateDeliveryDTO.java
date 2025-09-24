@@ -12,8 +12,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 
 public class CreateDeliveryDTO {
-    private String orderId;
-    private String productId;
+    private String orderId;//todo
     private DeliveryStatus status;
-    private Integer orderQuantity;
 }
