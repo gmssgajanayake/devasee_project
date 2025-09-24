@@ -63,15 +63,10 @@ public class AdminController {
     // /api/v1/users/admins/{userId}/name
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{userId}/name")
-    public CustomResponse<String> getAdminNameById(
+    public String getAdminNameById(
             @PathVariable String userId
     ) {
-        String adminName = adminService.getAdminNameById(userId);
-        return new CustomResponse<>(
-                true,
-                "Admin name returned successfully",
-                adminName
-        );
+        return adminService.getAdminNameById(userId);
     }
 
     // Promote/Create existing user as admin or create a new admin
