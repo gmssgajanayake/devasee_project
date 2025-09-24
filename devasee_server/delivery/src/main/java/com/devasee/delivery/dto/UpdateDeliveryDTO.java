@@ -11,16 +11,15 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class RetrieveDeliveryDTO {
+public class UpdateDeliveryDTO {
     private String deliveryId;
     private String trackingNumber;
     private DeliveryStatus status;
     private String deliveryPartnerName;
-    private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private LocalDateTime confirmedAt;
     private LocalDateTime shippedAt;
     private LocalDateTime deliveredAt;
     private LocalDateTime cancelledAt;
-
+    //admin name
 }
