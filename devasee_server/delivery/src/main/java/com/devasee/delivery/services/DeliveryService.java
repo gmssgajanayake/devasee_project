@@ -40,7 +40,7 @@ public class DeliveryService {
             delivery.setRecipientName(dto.getRecipientName());
             delivery.setRecipientAddress(dto.getRecipientAddress());
             delivery.setTotalAmount(dto.getTotalAmount());
-            delivery.setStatus(dto.getStatus() != null ? dto.getStatus() : DeliveryStatus.Pending);
+            delivery.setStatus(dto.getStatus() != null ? dto.getStatus() : DeliveryStatus.PENDING);
             delivery.setProducts(dto.getProducts());
 
             deliveryRepository.save(delivery);
@@ -167,7 +167,7 @@ public class DeliveryService {
             List<Delivery> deliveries = deliveryRepository.findAll();
             int totalDeliveries = deliveries.size();
             int pendingDeliveries = (int) deliveries.stream()
-                    .filter(d -> DeliveryStatus.Pending.equals(d.getStatus()))
+                    .filter(d -> DeliveryStatus.PENDING.equals(d.getStatus()))
                     .count();
             return new DeliveryStatsDTO(totalDeliveries, pendingDeliveries);
         } catch (Exception e) {
@@ -180,11 +180,11 @@ public class DeliveryService {
      */
     public List<String> getAllStatuses() {
         return List.of(
-                DeliveryStatus.Pending.name(),
-                DeliveryStatus.Confirmed.name(),
-                DeliveryStatus.Shipped.name(),
-                DeliveryStatus.Delivered.name(),
-                DeliveryStatus.Cancelled.name()
+                DeliveryStatus.PENDING.name(),
+                DeliveryStatus.CONFIRMED.name(),
+                DeliveryStatus.SHIPPED.name(),
+                DeliveryStatus.DELIVERED.name(),
+                DeliveryStatus.CANCELLED.name()
         );
     }
 }
