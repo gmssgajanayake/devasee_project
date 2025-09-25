@@ -21,5 +21,8 @@ public class UpdateDeliveryDTO {
     private LocalDateTime shippedAt;
     private LocalDateTime deliveredAt;
     private LocalDateTime cancelledAt;
-    //admin name
+
+    // admin details
+    private String adminId;    // comes from request
+    private String adminName;  // fetched via Feign from User Service
 }
