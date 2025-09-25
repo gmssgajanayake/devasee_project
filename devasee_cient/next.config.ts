@@ -3,6 +3,12 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
     images: {
         domains: ["devaseebookstoreimages.blob.core.windows.net"],
+        remotePatterns: [
+            {
+                protocol: "https",
+                hostname: "images.unsplash.com",
+            },
+        ],
     },
 
     async redirects() {

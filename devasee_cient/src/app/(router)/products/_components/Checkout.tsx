@@ -102,13 +102,16 @@ export default function Checkout() {
                                             className={`text-sm justify-between flex items-center border-b border-gray-400/20 pb-6 ${index === cartItems.length - 1 ? 'last-item' : ''}`}
                                         >
                                             <div className="flex items-center gap-6">
-                                                <div className="image-container w-16 h-16 relative overflow-hidden rounded-md">
-                                                    <Image
-                                                        src={item.image}
-                                                        fill
-                                                        className="object-cover"
-                                                        alt={item.title}
-                                                    />
+                                                <div className="image-container relative overflow-hidden rounded-md">
+                                                    <div className="w-28 h-36 relative overflow-hidden rounded-md flex-shrink-0">
+                                                        <Image
+                                                            src={item.image}
+                                                            alt={item.title}
+                                                            fill
+                                                            className="object-cover w-full h-full"
+                                                            sizes="112px"
+                                                        />
+                                                    </div>
                                                 </div>
                                                 <div className="flex flex-col">
                                                     <p className="font-bold sm:text-xl text-gray-700">
@@ -121,13 +124,13 @@ export default function Checkout() {
                                                             minimumFractionDigits: 2,
                                                         }).format(item.price)}
                                                     </p>
-                                                    <div className="flex sm:hidden items-center justify-between bg-gray-100 gap-1">
+                                                    <div className="flex  sm:hidden items-center justify-between bg-gray-100 gap-1">
                                                         <button
                                                             onClick={() =>
                                                                 item.quantity > 1 &&
                                                                 updateItemQuantity(item.id, item.quantity - 1)
                                                             }
-                                                            className="px-2 sm:px-4 sm:py-6 bg-gray-300 text-white cursor-pointer hover:bg-gray-400 transition-colors duration-200"
+                                                            className="px-2 sm:px-4 sm:py-6 bg-gray-300 text-white cursor-pointer  hover:bg-gray-400 transition-colors duration-200"
                                                         >
                                                             −
                                                         </button>
@@ -145,13 +148,13 @@ export default function Checkout() {
                                                         </button>
                                                     </div>
                                                 </div>
-                                                <div className="sm:flex hidden items-center justify-between bg-gray-100 gap-1">
+                                                <div className="sm:flex  hidden items-center justify-between bg-gray-100 gap-1">
                                                     <button
                                                         onClick={() =>
                                                             item.quantity > 1 &&
                                                             updateItemQuantity(item.id, item.quantity - 1)
                                                         }
-                                                        className="px-2 py-3 sm:px-4 sm:py-6 bg-gray-300 text-white cursor-pointer hover:bg-gray-400 transition-colors duration-200"
+                                                        className="px-1 py-1 sm:px-4 sm:py-6 bg-gray-300 text-white cursor-pointer hover:bg-gray-400 transition-colors duration-200"
                                                     >
                                                         −
                                                     </button>
@@ -438,14 +441,15 @@ export default function Checkout() {
 
                                     <div>
                                         {cartItems.map(item => (
-                                            <div key={item.id} className="flex px-2 justify-between items-center border-b border-gray-400/20 py-3">
+                                            <div key={item.id} className="flex  px-2 justify-between items-center border-b border-gray-400/20 py-3">
                                                 <div className="flex items-center gap-2">
-                                                    <div className="w-10 h-10 relative rounded overflow-hidden">
+                                                    <div className="w-10 h-10 relative rounded overflow-hidden flex-shrink-0">
                                                         <Image
                                                             src={item.image}
                                                             fill
-                                                            className="object-cover"
+                                                            className="object-cover w-full h-full"
                                                             alt={item.title}
+                                                            sizes="40px"
                                                         />
                                                     </div>
                                                     <p className="text-gray-700 line-clamp-1">{item.title}</p>
@@ -543,3 +547,7 @@ export default function Checkout() {
         </div>
     );
 }
+
+
+
+

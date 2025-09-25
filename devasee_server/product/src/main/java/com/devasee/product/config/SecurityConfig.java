@@ -3,7 +3,6 @@ package com.devasee.product.config;
 import com.devasee.product.filter.InternalJWTFilter;
 import com.devasee.product.interfaces.UserClient;
 import com.devasee.product.services.InternalJWTService;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;

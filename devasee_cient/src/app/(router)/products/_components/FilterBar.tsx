@@ -160,7 +160,7 @@ export default function FilterBar({
                 isOpen={activeSection === "productType"}
                 onClick={() => toggleSection("productType")}
             >
-                {["Books", "Stationery", "Accessories"].map((type) => (
+                {["Books", "Stationery", "Accessories","Translations"].map((type) => (
                     <label key={type} className="block cursor-pointer">
                         <input
                             type="checkbox"
