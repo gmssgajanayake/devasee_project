@@ -13,8 +13,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class RetrieveStationeryDTO {
     private String id;
-    private String name;
+    private String title;
     private String description;
+    private String category;
+    private String brand;
     private double price;
     private int stockQuantity; // comes from Inventory
     private String imgUrl;     // SAS URL for image

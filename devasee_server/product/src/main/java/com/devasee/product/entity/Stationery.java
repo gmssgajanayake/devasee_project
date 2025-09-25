@@ -24,7 +24,18 @@ public class Stationery {
     private String id;
 
     @Column(nullable = false)
-    private String name;
+    private String title;
+
+    // stationery belongs to exactly one category
+    // Each category can contain many stationeries
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private StationeryCategory category;
+
+    @ManyToOne
+    @JoinColumn(name = "brand_id")
+    private StationeryBrand brand;
+
 
     @Column(length = 2000)
     private String description;
