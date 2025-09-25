@@ -3,18 +3,19 @@ package com.devasee.orders.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class UpdateOrderDTO {
     private String orderId;
-    private String productId;
-    private Integer orderQuantity;
     private String orderNumber;
-    private String customerName;
-    private LocalDate orderDate;
-    private double totalAmount;
+    private String customerId;
+    private String recipientAddress;
+    private String recipientName;
+    private String recipientPhoneNumber;
+    private String recipientEmailAddress;
+    private Double totalAmount;
+    private List<OrderItemDTO> items;
 }
