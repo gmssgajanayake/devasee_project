@@ -46,7 +46,7 @@ public class Delivery {
 
     // Total amount of the order (useful for COD or billing info)
     @Column(name = "total_amount", nullable = false)
-    private Integer totalAmount;
+    private double totalAmount;
 
     // Current delivery status (enum: CREATED, CONFIRMED, SHIPPED, DELIVERED, CANCELLED)
     @Enumerated(EnumType.STRING)
