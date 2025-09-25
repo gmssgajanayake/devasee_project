@@ -10,7 +10,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class DeleteDeliveryDTO {
     private String deliveryId;
-    private String address;
-    private DeliveryStatus status;
-    private String courierName;
+
 }

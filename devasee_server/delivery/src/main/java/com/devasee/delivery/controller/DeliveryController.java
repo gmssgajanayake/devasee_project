@@ -4,9 +4,10 @@ import com.devasee.delivery.dto.CreateDeliveryDTO;
 import com.devasee.delivery.dto.DeleteDeliveryDTO;
 import com.devasee.delivery.dto.DeliveryStatsDTO;
 import com.devasee.delivery.dto.RetrieveDeliveryDTO;
-import com.devasee.delivery.entity.Courier;
+import com.devasee.delivery.dto.UpdateDeliveryDTO;
+import com.devasee.delivery.entity.DeliveryPartner;
 import com.devasee.delivery.response.CustomResponse;
-import com.devasee.delivery.services.CourierService;
+import com.devasee.delivery.services.DeliveryPartnerService;
 import com.devasee.delivery.services.DeliveryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -24,15 +25,15 @@ import java.util.List;
 @CrossOrigin
 @RequestMapping("api/v1/delivery")
 @RequiredArgsConstructor
-public class  DeliveryController {
+public class DeliveryController {
 
     private final DeliveryService deliveryService;
-    private final CourierService courierService;
+    private final DeliveryPartnerService deliveryPartnerService;
 
     // =================== Delivery endpoints ===================
 
     /**
-     * Fetch all deliveries (Accessible by ADMIN )
+     * Fetch all deliveries (Accessible by ADMIN)
      */
     @PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping
@@ -57,7 +58,6 @@ public class  DeliveryController {
 
     /**
      * Create a new delivery (Admin only)
-     * Uses CreateDeliveryDTO → must include orderId, productId, status, and orderQuantity
      */
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
@@ -68,15 +68,14 @@ public class  DeliveryController {
 
     /**
      * Update an existing delivery (Admin only)
-     * Uses RetrieveDeliveryDTO → must include deliveryId, orderId, productId, orderQuantity, address, status, courierName, deliveryDate
      */
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
-    public CustomResponse<RetrieveDeliveryDTO> updateDelivery(
+    public CustomResponse<UpdateDeliveryDTO> updateDelivery(
             @PathVariable String id,
-            @RequestBody RetrieveDeliveryDTO dto
+            @RequestBody UpdateDeliveryDTO dto
     ) {
-        RetrieveDeliveryDTO updated = deliveryService.updateDelivery(id, dto);
+        UpdateDeliveryDTO updated = deliveryService.updateDelivery(id, dto);
         return new CustomResponse<>(true, "Delivery updated successfully", updated);
     }
 
@@ -117,9 +116,9 @@ public class  DeliveryController {
      */
     @PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping("/couriers")
-    public CustomResponse<List<Courier>> getAllCouriers() {
-        List<Courier> couriers = courierService.getAllCouriers();
-        return new CustomResponse<>(true, "All couriers fetched", couriers);
+    public CustomResponse<List<DeliveryPartner>> getAllCouriers() {
+        List<DeliveryPartner> deliveryPartners = deliveryPartnerService.getAllCouriers();
+        return new CustomResponse<>(true, "All couriers fetched", deliveryPartners);
     }
 
     /**
@@ -127,8 +126,8 @@ public class  DeliveryController {
      */
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/couriers")
-    public CustomResponse<Courier> createCourier(@RequestParam String courierName) {
-        Courier courier = courierService.createCourier(courierName);
-        return new CustomResponse<>(true, "Courier created successfully", courier);
+    public CustomResponse<DeliveryPartner> createCourier(@RequestBody DeliveryPartner courier) {
+        DeliveryPartner deliveryPartner = deliveryPartnerService.createCourier(courier);
+        return new CustomResponse<>(true, "Courier created successfully", deliveryPartner);
     }
 }
