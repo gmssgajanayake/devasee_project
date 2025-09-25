@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Map;
+
 
 @Data
 @AllArgsConstructor
@@ -13,7 +15,12 @@ import lombok.NoArgsConstructor;
 
 public class CreateDeliveryDTO {
     private String orderId;
-    private String productId;
+    private String customerId;
+    private String recipientName;
+    private String recipientAddress;
+    private double totalAmount;
     private DeliveryStatus status;
-    private Integer orderQuantity;
+
+    // Map of productId -> quantity
+    private Map<String, Integer> products;
 }

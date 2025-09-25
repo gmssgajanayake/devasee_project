@@ -2,6 +2,7 @@ package com.devasee.orders.services;
 
 import com.devasee.orders.dto.*;
 import com.devasee.orders.entity.OrderEntity;
+import com.devasee.orders.entity.OrderItem;
 import com.devasee.orders.enums.DeliveryStatus;
 import com.devasee.orders.exception.InsufficientStockException;
 import com.devasee.orders.exception.OrderAlreadyExistsException;
@@ -22,6 +23,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 @Service
 @Transactional
 public class OrderServices {
@@ -39,13 +45,13 @@ public class OrderServices {
         this.inventoryClient = inventoryClient;
         this.deliveryClient = deliveryClient;
     }
-
-    // --------------------- Retrieve ---------------------
+// --------------------- Retrieve ---------------------
 
     public Page<RetrieveOrderDTO> getAllOrders(int page, int size) {
         try {
-            Pageable pageable = PageRequest.of(page, size, Sort.by("orderDate").descending());
-            return orderRepo.findAll(pageable).map(order -> modelMapper.map(order, RetrieveOrderDTO.class));
+            Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+            return orderRepo.findAll(pageable)
+                    .map(order -> modelMapper.map(order, RetrieveOrderDTO.class));
         } catch (DataException | DataAccessException e) {
             logger.error("Database error while fetching all orders", e);
             throw new ServiceUnavailableException("Something went wrong on the server. Please try again later.");
@@ -66,7 +72,7 @@ public class OrderServices {
 
     public Page<RetrieveOrderDTO> getOrdersByCustomerName(String customerName, int page, int size) {
         try {
-            Pageable pageable = PageRequest.of(page, size, Sort.by("orderDate").descending());
+            Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
             return orderRepo.findByCustomerNameContainingIgnoreCase(customerName, pageable)
                     .map(order -> modelMapper.map(order, RetrieveOrderDTO.class));
         } catch (DataAccessException e) {
@@ -75,14 +81,18 @@ public class OrderServices {
         }
     }
 
+
     // --------------------- Create ---------------------
 
     public RetrieveOrderDTO saveOrder(CreateOrderDTO orderDTO) {
         try {
-            int availableStock = inventoryClient.getStockQuantity(orderDTO.getProductId());
-            if (availableStock < orderDTO.getOrderQuantity()) {
-                throw new InsufficientStockException("Not enough stock for product: " + orderDTO.getProductId());
+            for (OrderItemDTO item : orderDTO.getItems()) {
+                int availableStock = inventoryClient.getStockQuantity(item.getProductId());
+                if (availableStock < item.getOrderQuantity()) {
+                    throw new InsufficientStockException("Not enough stock for product: " + item.getProductId());
+                }
             }
+
 
             if (orderRepo.existsByOrderNumber(orderDTO.getOrderNumber())) {
                 throw new OrderAlreadyExistsException(
@@ -93,12 +103,19 @@ public class OrderServices {
             OrderEntity savedEntity = orderRepo.save(orderEntity);
 
             logger.info("Order {} created successfully", savedEntity.getOrderId());
+            // Build delivery DTO
+            Map<String, Integer> products = orderDTO.getItems().stream()
+                    .collect(Collectors.toMap(OrderItemDTO::getProductId, OrderItemDTO::getOrderQuantity));
+
             try {
                 CreateDeliveryDTO deliveryDTO = new CreateDeliveryDTO(
                         savedEntity.getOrderId(),
-                        orderDTO.getProductId(),
-                        DeliveryStatus.PENDING,//we can put another status
-                        orderDTO.getOrderQuantity()
+                        orderDTO.getCustomerId(),
+                        orderDTO.getTotalAmount(),
+                        orderDTO.getRecipientAddress(),
+                        orderDTO.getRecipientName(),
+                        products,
+                        DeliveryStatus.PENDING
                 );
                 deliveryClient.createDelivery(deliveryDTO);
             } catch (Exception ex) {
@@ -113,17 +130,47 @@ public class OrderServices {
     }
 
     // --------------------- Update ---------------------
-
     public RetrieveOrderDTO updateOrder(UpdateOrderDTO updateOrderDTO) {
         try {
-            OrderEntity existingOrder = orderRepo.findById(updateOrderDTO.getOrderId()).orElseThrow(
-                    () -> new OrderNotFoundException("Order not found with ID: " + updateOrderDTO.getOrderId())
-            );
+            OrderEntity existingOrder = orderRepo.findById(updateOrderDTO.getOrderId())
+                    .orElseThrow(() -> new OrderNotFoundException("Order not found with ID: " + updateOrderDTO.getOrderId()));
 
-            modelMapper.map(updateOrderDTO, existingOrder); // copy changes onto entity
+            if (updateOrderDTO.getRecipientAddress() != null)
+                existingOrder.setRecipientAddress(updateOrderDTO.getRecipientAddress());
+
+            if (updateOrderDTO.getRecipientName() != null)
+                existingOrder.setRecipientName(updateOrderDTO.getRecipientName());
+
+            if (updateOrderDTO.getRecipientPhoneNumber() != null)
+                existingOrder.setRecipientPhoneNumber(updateOrderDTO.getRecipientPhoneNumber());
+
+            if (updateOrderDTO.getRecipientEmailAddress() != null)
+                existingOrder.setRecipientEmailAddress(updateOrderDTO.getRecipientEmailAddress());
+
+            if (updateOrderDTO.getTotalAmount() != null)
+                existingOrder.setTotalAmount(updateOrderDTO.getTotalAmount());
+
+            if (updateOrderDTO.getOrderNumber() != null)
+                existingOrder.setOrderNumber(updateOrderDTO.getOrderNumber());
+
+            if (updateOrderDTO.getCustomerId() != null)
+                existingOrder.setCustomerId(updateOrderDTO.getCustomerId());
+
+            if (updateOrderDTO.getItems() != null && !updateOrderDTO.getItems().isEmpty()) {
+                List<OrderItem> items = updateOrderDTO.getItems().stream()
+                        .map(itemDTO -> {
+                            OrderItem item = modelMapper.map(itemDTO, OrderItem.class);
+                            item.setOrder(existingOrder);  // 🔑 maintain the parent reference
+                            return item;
+                        })
+                        .collect(Collectors.toList());
+
+                existingOrder.setItems(items);
+            }
+
             OrderEntity savedOrder = orderRepo.save(existingOrder);
-
             logger.info("Order {} updated successfully", savedOrder.getOrderId());
+
             return modelMapper.map(savedOrder, RetrieveOrderDTO.class);
 
         } catch (DataAccessException e) {
