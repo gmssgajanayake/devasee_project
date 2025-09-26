@@ -79,7 +79,7 @@ public class AdminController {
         AdminDTO adminDTO = adminService.promoteAsAdmin(promoteDemoteAdminDTO);
         return new CustomResponse<>(
                 true,
-                String.format("User <%s> promoted successfully", promoteDemoteAdminDTO.getEmail()),
+                String.format("User %s promoted successfully", promoteDemoteAdminDTO.getEmail()),
                 adminDTO
         );
     }
@@ -151,12 +151,21 @@ public class AdminController {
     }
 
     // Suspend a user by account status
-    // /api/v1/users/admins/suspend
+    // POST /api/v1/users/admins/suspend?userId=<userId>
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/suspend")
-    public CustomResponse<RetrieveUserDTO> suspendUserByEmail(@RequestParam String userId){
+    public CustomResponse<RetrieveUserDTO> suspendUserById(@RequestParam String userId){
         RetrieveUserDTO retrieveUserDTO = customerService.suspendUser(userId);
         return new CustomResponse<>(true, "User suspended successful", retrieveUserDTO);
+    }
+
+    // Suspend a user by account status
+    // POST /api/v1/users/admins/active?userId=<userId>
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/active")
+    public CustomResponse<RetrieveUserDTO> activeUserById(@RequestParam String userId){
+        RetrieveUserDTO retrieveUserDTO = customerService.activeUser(userId);
+        return new CustomResponse<>(true, "User Activated successful", retrieveUserDTO);
     }
 
     // TODO : should be private

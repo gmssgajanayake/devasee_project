@@ -12,6 +12,7 @@ import com.devasee.product.services.BookGenreService;
 import com.devasee.product.services.BookLanguageService;
 import com.devasee.product.services.BookServices;
 import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -148,9 +149,10 @@ public class BookController {
     @PostMapping
     public CustomResponse<CreateBookDTO> saveBook(
             @RequestParam("book") String bookJson,
-            @RequestParam("file") MultipartFile file
+            @RequestParam("file") MultipartFile file,
+            @RequestParam("otherFiles") List<MultipartFile> otherFiles
     ) {
-        CreateBookDTO dtoResponse =  bookServices.saveBook(bookJson, file);
+        CreateBookDTO dtoResponse =  bookServices.saveBook(bookJson, file, otherFiles);
         return new CustomResponse<>(true, "Book saved success", dtoResponse);
     }
 
@@ -159,9 +161,10 @@ public class BookController {
     @PutMapping
     public CustomResponse<RetrieveBookDTO> updateBook(
             @RequestParam("book") String bookJson,
-            @RequestParam("file") MultipartFile file
+            @RequestParam("file") MultipartFile file,
+            @RequestParam("otherFiles") List<MultipartFile> otherFiles
     ) {
-        RetrieveBookDTO book = bookServices.updateBook(bookJson, file);
+        RetrieveBookDTO book = bookServices.updateBook(bookJson, file, otherFiles);
         return new CustomResponse<>(true, "Book updated success", book);
     }
 
@@ -181,4 +184,13 @@ public class BookController {
 //        return new CustomResponse<>(true, "Category created", category);
 //    }
 
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/az")
+    public CustomResponse<RetrieveBookDTO> deleteOtherImgFile (
+            @RequestParam("fileName") String fileName,
+            @RequestParam("productId") String productId
+    ){
+        RetrieveBookDTO updatedBook = bookServices.deleteImgFromAzureBlobByFileName(fileName, productId);
+        return new CustomResponse<>(true, "Image deleted successfully", updatedBook);
+    }
 }

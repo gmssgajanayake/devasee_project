@@ -1,6 +1,7 @@
 package com.devasee.users.controller;
 
 import com.devasee.users.dto.CreateUserDTO;
+import com.devasee.users.dto.UserDataDTO;
 import com.devasee.users.response.CustomResponse;
 import com.devasee.users.service.AdminService;
 import com.devasee.users.service.CustomerService;
@@ -52,13 +53,12 @@ public class AuthController {
         return ResponseEntity.noContent().build(); // 204 No Content
     }
 
-    // TODO : should be private
     // For api service : Return actual role or if not there return default role CUSTOMER
-    // /api/v1/users/auth/{userId}/roles
-    @GetMapping("/{userId}/roles")
-    public ResponseEntity<List<String>> getUserRole(@PathVariable String userId) {
-        List<String> roles = adminService.getUserRole(userId);
-        return ResponseEntity.ok(new ArrayList<>(roles)); // Ensure mutable list
+    // /api/v1/users/auth/{userId}/info
+    @GetMapping("/{userId}/info")
+    public ResponseEntity<UserDataDTO> getUserRole(@PathVariable String userId) {
+        UserDataDTO userDataDTO = adminService.getUserInfo(userId);
+        return ResponseEntity.ok(userDataDTO);
     }
 
     // Delete user by id by user

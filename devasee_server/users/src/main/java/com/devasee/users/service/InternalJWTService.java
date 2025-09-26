@@ -6,6 +6,8 @@ import com.devasee.users.exceptions.UserNotFoundException;
 import com.devasee.users.repository.UserRepo;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +22,8 @@ public class InternalJWTService {
     private String secretString;
 
     private SecretKey secretKey;
+
+    private static final Logger log = LoggerFactory.getLogger(InternalJWTService.class);
 
     public InternalJWTService(UserRepo userRepo) {
         this.userRepo = userRepo;
@@ -38,10 +42,12 @@ public class InternalJWTService {
 
     public AppUser getUserById(String userId) {
         try{
+            log.info("Getting user by id (user service) : {}", userId);
            return userRepo.findById(userId).orElseThrow(()-> new UserNotFoundException("User Not Found"));
         }catch (UserNotFoundException e) {
             throw e; // propagate so we can handle it separately in the filter
         } catch (Exception e){
+            log.info("Error getting user by id (user service) : {}", e.getMessage());
             throw new ServiceUnavailableException("Something went wrong in user service");
         }
     }
