@@ -22,8 +22,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -132,12 +130,6 @@ public class CustomerService {
             appUser.getRoles().add(adminRole);  // Assign only USER role
         }
 
-
-//        if ( // TODO : move to login
-//            customer.getAccountStatus().equals(AccountStatus.SUSPENDED)||
-//            customer.getAccountStatus().equals(AccountStatus.BANNED)
-//        ) throw new RuntimeException("Account is banned");
-
         safeSaveUser(appUser);
         return modelMapper.map(appUser, CreateUserDTO.class);
     }
@@ -191,12 +183,34 @@ public class CustomerService {
 
     // Suspend the user
     public RetrieveUserDTO suspendUser(String userId){
-        AppUser existingUser = userRepo.findById(userId).orElseThrow(
-                ()-> new UserNotFoundException("Customer not found"));
+        try {
+            AppUser existingUser = userRepo.findById(userId).orElseThrow(
+                    () -> new UserNotFoundException("Customer not found"));
 
-        existingUser.setAccountStatus(AccountStatus.SUSPENDED);
-        log.info("### Suspended customer with ID: {}", userId);
-        return modelMapper.map(safeSaveUser(existingUser), RetrieveUserDTO.class);
+            existingUser.setAccountStatus(AccountStatus.SUSPENDED);
+            log.info("### Suspended customer with ID: {}", userId);
+            return modelMapper.map(safeSaveUser(existingUser), RetrieveUserDTO.class);
+        } catch (UserNotFoundException e){
+            throw e;
+        } catch (Exception ex){
+            throw new ServiceUnavailableException("Service unavailable right now");
+        }
+    }
+
+    // Active again the suspended user
+    public RetrieveUserDTO activeUser(String userId){
+        try {
+            AppUser existingUser = userRepo.findById(userId).orElseThrow(
+                    () -> new UserNotFoundException("Customer not found"));
+
+            existingUser.setAccountStatus(AccountStatus.ACTIVE);
+            log.info("### Activated customer with ID: {}", userId);
+            return modelMapper.map(safeSaveUser(existingUser), RetrieveUserDTO.class);
+        } catch (UserNotFoundException e){
+            throw e;
+        } catch (Exception ex){
+            throw new ServiceUnavailableException("Service unavailable right now");
+        }
     }
 
     public AppUser safeSaveUser(AppUser appUser){

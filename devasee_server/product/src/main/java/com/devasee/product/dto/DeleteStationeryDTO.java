@@ -12,5 +12,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class DeleteStationeryDTO {
     private String id;
-    private String name;
+    private String title;
 }

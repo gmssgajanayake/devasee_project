@@ -1,9 +1,9 @@
 package com.devasee.apigateway.service;
 
+import com.devasee.apigateway.UserDataDTO;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
 
 public interface ReactiveUserService {
-      Mono<List<String>> findRolesByUserId(String userId);
+      Mono<UserDataDTO> findRoleAccountStatusByUserId(String userId);
 }

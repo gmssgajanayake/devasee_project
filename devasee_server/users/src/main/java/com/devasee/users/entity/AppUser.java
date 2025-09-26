@@ -31,7 +31,7 @@ public class AppUser {
 //    @Column(length = 72)
 //    private String password;
     @Enumerated(EnumType.STRING)
-    private AccountStatus accountStatus = AccountStatus.INACTIVE;
+    private AccountStatus accountStatus = AccountStatus.ACTIVE;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(

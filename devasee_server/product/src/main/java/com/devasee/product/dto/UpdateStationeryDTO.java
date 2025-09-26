@@ -13,7 +13,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class UpdateStationeryDTO {
     private String id;
-    private String name;
+    private String title;
     private String description;
+    private String category;
+    private String brand;
     private double price;
 }
