@@ -12,8 +12,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CreateStationeryDTO {
-    private String name;
+    private String title;
     private String description;
+    private String category;
+    private String brand;
     private double price;
     private int initialQuantity; // used for inventory creation
 }

@@ -111,8 +111,8 @@ public class StationeryServices {
         }
 
         // Check if stationery with same name already exists
-        if (stationeryRepo.existsByName(dto.getName())){
-            throw new ProductAlreadyExistsException("Stationery with name '" + dto.getName() + "' already exists");
+        if (stationeryRepo.existsByName(dto.getTitle())){
+            throw new ProductAlreadyExistsException("Stationery with name '" + dto.getTitle() + "' already exists");
         }
 
         try {
