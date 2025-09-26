@@ -2,6 +2,7 @@ package com.devasee.users.service;
 
 import com.devasee.users.dto.AdminDTO;
 import com.devasee.users.dto.PromoteDemoteAsAdminDTO;
+import com.devasee.users.dto.UserDataDTO;
 import com.devasee.users.entity.AppUser;
 import com.devasee.users.entity.Role;
 import com.devasee.users.enums.AccountStatus;
@@ -17,12 +18,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -67,6 +66,7 @@ public class AdminService {
         }
     }
 
+    @Transactional
     public AdminDTO promoteAsAdmin(PromoteDemoteAsAdminDTO promoteDemoteAsAdminDTO) {
         try {
             log.info("### Promoting user as admin: {}", promoteDemoteAsAdminDTO.getEmail());
@@ -152,7 +152,7 @@ public class AdminService {
 
     public void safeSaveUser(AppUser appUser){
         try {
-            userRepo.save(appUser);
+            userRepo.saveAndFlush(appUser);
             log.info("### User saved: {} | Roles: {}", appUser.getEmail(),
                     appUser.getRoles().stream().map(Role::getName).toList());
         }catch (Exception e){
@@ -161,26 +161,38 @@ public class AdminService {
         }
     }
 
-    public List<String> getUserRole(String userId) {
+    public UserDataDTO getUserInfo(String userId) {
         try {
             Optional<AppUser> existingUser = userRepo.findById(userId);
+            UserDataDTO userDataDTO = new UserDataDTO(new ArrayList<>(), false);
 
+            // If user not found let return customer role, account status active (this sis for user crating end point)
             if (existingUser.isEmpty()) {
-                log.warn("### User not found in database, returning default CUSTOMER role");
-                return new ArrayList<>(Collections.singletonList(Roles.CUSTOMER.name())); // Mutable list
+                log.warn("### User not found in database, returning default CUSTOMER role with active status");
+                userDataDTO.setRoles(new ArrayList<>());
+                userDataDTO.setUserActive(false);
+                return userDataDTO;
+//                return new ArrayList<>(Collections.singletonList(Roles.CUSTOMER.name())); // Mutable list
             }
 
             List<String> roles = existingUser.get().getRoles().stream()
                     .map(Role::getName)
                     .collect(Collectors.toList()); // This returns a mutable list
 
+            userDataDTO.setRoles(roles);
             log.info("### Roles for user {}: {}", userId, roles);
-            return roles.isEmpty()
-                    ? new ArrayList<>(Collections.singletonList(Roles.CUSTOMER.name()))
-                    : roles;
+
+
+            // --- Fetch user from DB to check AccountStatus ---
+            String accountStatus = existingUser.get().getAccountStatus().name();
+            log.info("### accountStatus : {}", accountStatus);
+
+            userDataDTO.setUserActive(accountStatus.equals(AccountStatus.ACTIVE.name()));
+
+            return userDataDTO;
         } catch (Exception e) {
             log.error("### Failed to get roles for userId {}: {}", userId, e.getMessage(), e);
-            return new ArrayList<>(Collections.singletonList(Roles.CUSTOMER.name())); // Mutable list
+            return new UserDataDTO(new ArrayList<>(), false);
         }
     }
 

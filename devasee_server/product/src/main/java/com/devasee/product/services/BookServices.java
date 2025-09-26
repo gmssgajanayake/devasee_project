@@ -72,18 +72,34 @@ public class BookServices {
     // Same time add available quantity to response from Inventory
     private RetrieveBookDTO sasUrlAdderAndQuantitySetter(Book book){
 
-            RetrieveBookDTO dto = modelMapper.map(book, RetrieveBookDTO.class);
+        RetrieveBookDTO dto = modelMapper.map(book, RetrieveBookDTO.class);
 
-            String blobName = dto.getImgUrl(); // stored as filename
-            if (blobName != null && !blobName.isEmpty()) {
-                String sasUrl = azureBlobService.generateSasUrl(blobName, ContainerType.BOOK);
-                dto.setImgUrl(sasUrl);
+        // for cover image
+        String blobName = book.getImgFileName(); // stored as filename
+        if (blobName != null && !blobName.isEmpty()) {
+            log.info("### main file name : {}", blobName);
+            String sasUrl = azureBlobService.generateSasUrl(blobName, ContainerType.BOOK);
+            dto.setImgUrl(sasUrl);
+        }
+
+        // for other images
+        List<String> otherImgUrls = new ArrayList<>();
+        List<String> storedFileNames = book.getOtherImgFileNames();
+        if (storedFileNames != null && !storedFileNames.isEmpty()) {
+            for (String fileName : storedFileNames) {
+                if (fileName != null && !fileName.isEmpty()) {
+                    log.info("### other file names : {}", fileName);
+                    String otherSasUrl = azureBlobService.generateSasUrl(fileName, ContainerType.BOOK);
+                    otherImgUrls.add(otherSasUrl);
+                }
             }
+        }
+        dto.setOtherImgUrls(otherImgUrls);
 
-            dto.setStockQuantity(stockQuantityGetter(dto.getId()));
-            dto.setCategory(book.getCategory() != null ? book.getCategory().getName() : null);
-            dto.setGenre(book.getGenre() != null ? book.getGenre().getName() : null);
-            dto.setLanguage(book.getLanguage() != null ? book.getLanguage().getName() : null);
+        dto.setStockQuantity(stockQuantityGetter(dto.getId()));
+        dto.setCategory(book.getCategory() != null ? book.getCategory().getName() : null);
+        dto.setGenre(book.getGenre() != null ? book.getGenre().getName() : null);
+        dto.setLanguage(book.getLanguage() != null ? book.getLanguage().getName() : null);
 
         return dto;
     }
@@ -261,7 +277,11 @@ public class BookServices {
     }
 
     // Save New Book In Database
-    public CreateBookDTO saveBook(String bookJson, MultipartFile file) {
+    public CreateBookDTO saveBook(
+            String bookJson,
+            MultipartFile file,
+            List<MultipartFile> otherFiles
+    ) {
 
         CreateBookDTO bookDTO;
 
@@ -278,11 +298,26 @@ public class BookServices {
         }
 
         try {
-            // Upload the image to Azure Blob Storage
-            String fileName = (file!=null)? azureBlobService.uploadFile(file, ContainerType.BOOK) : null;
+            // Upload the cover image to Azure Blob Storage
+            String fileName = (file != null) ? azureBlobService.uploadFile(file, ContainerType.BOOK) : null;
+            log.info("### main file name : {}", file);
+
+            // Upload the other image to Azure Blob Storage
+            List<String> otherFilesNames = new ArrayList<>();
+
+            if (otherFiles != null && !otherFiles.isEmpty()) {
+                for (MultipartFile f : otherFiles) {
+                    if(f != null && !f.isEmpty()){
+                        log.info("### other file names : {}", f);
+                        String uploadedFileName = azureBlobService.uploadFile(f, ContainerType.BOOK);
+                        otherFilesNames.add(uploadedFileName);
+                    }
+                }
+            }
 
             Book newBook = modelMapper.map(bookDTO, Book.class);
-            newBook.setImgUrl(fileName); // Set uploaded saved file's name as url
+            newBook.setImgFileName(fileName); // Set uploaded saved file's name as url
+            newBook.setOtherImgFileNames(otherFilesNames);
 
             Book updatedNewBook = categoryGenreLanguageAdder(
                     newBook,
@@ -309,7 +344,11 @@ public class BookServices {
     }
 
     // Update Book Details, Cover Image Not Required
-    public RetrieveBookDTO updateBook(String bookJson, MultipartFile file) {
+    public RetrieveBookDTO updateBook(
+            String bookJson,
+            MultipartFile file,
+            List<MultipartFile> otherFiles
+    ) {
 
         UpdateBookDTO bookDTO;
 
@@ -321,29 +360,46 @@ public class BookServices {
             Book existingBook = bookRepo.findById(bookDTO.getId()).orElseThrow(
                     ()-> new ProductNotFoundException("Book not found"));
 
-            String existingImgUrl = existingBook.getImgUrl();
+            String existingFileName = existingBook.getImgFileName();
 
             // map only non-null fields from DTO into existing entity
             modelMapper.map(bookDTO, existingBook);
 
-            log.info("########## file : {}",file);
+            // Cover image file updating handling
+            log.info("### cover img file : {}",file);
             if(file != null && !file.isEmpty()){
-                log.info("############### file not null : {}",existingBook.getImgUrl());
+                log.info("### image file is not null : {}", file.getOriginalFilename());
                 try {
                     // Delete existing file from Azure
-                    if (existingImgUrl != null && !existingImgUrl.isEmpty()) {
-                        azureBlobService.deleteFile(existingImgUrl, ContainerType.BOOK);
+                    if (existingFileName != null && !existingFileName.isEmpty()) {
+                        azureBlobService.deleteFile(existingFileName, ContainerType.BOOK);
                     }
 
                     // Upload the new image to Azure Blob Storage
                     String fileName = azureBlobService.uploadFile(file, ContainerType.BOOK);
-                    existingBook.setImgUrl(fileName); // Set uploaded image file name in DTO
+                    existingBook.setImgFileName(fileName); // Set uploaded image file name in DTO
                 } catch (Exception exception){
                     throw new InternalServerErrorException("Something went wrong when uploading images");
                 }
-            } else {
-                log.info("############### current url : {} ",existingBook.getImgUrl());
-                existingBook.setImgUrl(existingImgUrl);
+            }
+
+            // Other img files updating handling
+            List<String> ExistingOtherFilesNames = existingBook.getOtherImgFileNames();
+            if(otherFiles != null && !otherFiles.isEmpty()){
+                log.info("### Other image files are not null : {}", otherFiles);
+                log.warn("### Existing other file names : {}", existingBook.getOtherImgFileNames());
+                try{
+                    for (MultipartFile f : otherFiles){
+                        if (f != null && !f.isEmpty()){
+                            // Upload the image to Azure Blob Storage
+                            String fileName = azureBlobService.uploadFile(f, ContainerType.BOOK);
+                            ExistingOtherFilesNames.add(fileName);
+                        }
+                    }
+                    existingBook.setOtherImgFileNames(ExistingOtherFilesNames);
+                } catch (Exception ex) {
+                    throw new InternalServerErrorException("Something went wrong when uploading images");
+                }
             }
 
             Book updatedExistenceBook = categoryGenreLanguageAdder(
@@ -358,7 +414,7 @@ public class BookServices {
 
             return sasUrlAdderAndQuantitySetter(savedBook);
 
-        }catch (JsonProcessingException e) {
+        } catch (JsonProcessingException e) {
             log.error("### Invalid JSON : {}", e.getMessage());
             throw new BadRequestException("Invalid JSON: " + e.getMessage());
         } catch (DataAccessException  e){
@@ -378,8 +434,8 @@ public class BookServices {
             inventoryClient.deleteInventory(bookId);
 
             // Delete file from Azure
-            if (book.getImgUrl() != null && !book.getImgUrl().isEmpty()) {
-                azureBlobService.deleteFile(book.getImgUrl(), ContainerType.BOOK);
+            if (book.getImgFileName() != null && !book.getImgFileName().isEmpty()) {
+                azureBlobService.deleteFile(book.getImgFileName(), ContainerType.BOOK);
             }
 
             // Delete book from database
@@ -393,14 +449,28 @@ public class BookServices {
 
         return modelMapper.map(book, DeleteBookDTO.class);
     }
+
+    public RetrieveBookDTO deleteImgFromAzureBlobByFileName(String fileName, String productId) {
+        try {
+            if(fileName != null && !fileName.isEmpty()){
+                azureBlobService.deleteFile(fileName, ContainerType.BOOK);
+            }
+
+            // Delete book from database
+            Book book = bookRepo.findById(productId).orElseThrow(
+                    ()-> new ProductNotFoundException("Book not found with id : "+ productId));
+
+            List<String> existingFiles = book.getOtherImgFileNames();
+            existingFiles.removeIf(f-> f.equals(fileName));
+
+            book.setOtherImgFileNames(existingFiles);
+            Book updatedBook = bookRepo.save(book);
+
+            // return updated DTO with fresh SAS URLs
+            return sasUrlAdderAndQuantitySetter(updatedBook);
+
+        } catch (Exception e){
+            throw new ServiceUnavailableException("Something went wrong in server");
+        }
+    }
 }
-
-
-
-//            Page<Book> bookPage = switch (field) {
-//                case PUBLISHER -> bookRepo.findByPublisherContainingIgnoreCase(value, pageable);
-//                case CATEGORY -> bookRepo.findByCategoryContainingIgnoreCase(value, pageable);
-//                case GENRE -> bookRepo.findByCategoryContainingIgnoreCase(value, pageable);
-//                case PRICE -> bookRepo.findByCategoryContainingIgnoreCase(value, pageable);
-//                // default -> throw new IllegalArgumentException("Invalid filter field: " + value);
-//            };
