@@ -70,17 +70,43 @@ public class OrderServices {
         }
     }
 
-    public Page<RetrieveOrderDTO> getOrdersByCustomerName(String customerName, int page, int size) {
+    public Page<RetrieveOrderDTO> getOrdersByRecipientName(String recipientName, int page, int size) {
         try {
             Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-            return orderRepo.findByCustomerNameContainingIgnoreCase(customerName, pageable)
+            return orderRepo.findByRecipientNameContainingIgnoreCase(recipientName, pageable)
                     .map(order -> modelMapper.map(order, RetrieveOrderDTO.class));
         } catch (DataAccessException e) {
-            logger.error("Database error while fetching orders for customer {}", customerName, e);
-            throw new ServiceUnavailableException("Unable to retrieve customer orders at this time.");
+            logger.error("Database error while fetching orders for recipient {}", recipientName, e);
+            throw new ServiceUnavailableException("Unable to retrieve recipient orders at this time.");
         }
     }
 
+
+    public Page<RetrieveOrderDTO> getOrdersByCustomerId(String customerId, int page, int size) {
+        try {
+            Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+            return orderRepo.findByCustomerId(customerId, pageable)
+                    .map(order -> modelMapper.map(order, RetrieveOrderDTO.class));
+        } catch (DataAccessException e) {
+            logger.error("Database error while fetching orders for customerId {}", customerId, e);
+            throw new ServiceUnavailableException("Unable to retrieve orders for customer at this time.");
+        }
+    }
+
+    public List<OrderItemDTO> getOrderItems(String orderId) {
+        try {
+            OrderEntity order = orderRepo.findById(orderId)
+                    .orElseThrow(() -> new OrderNotFoundException("Order not found with ID: " + orderId));
+
+            return order.getItems().stream()
+                    .map(item -> modelMapper.map(item, OrderItemDTO.class))
+                    .collect(Collectors.toList());
+
+        } catch (DataAccessException e) {
+            logger.error("Database error while fetching items for order {}", orderId, e);
+            throw new ServiceUnavailableException("Unable to retrieve order items at this time.");
+        }
+    }
 
     // --------------------- Create ---------------------
 
@@ -178,6 +204,26 @@ public class OrderServices {
             throw new ServiceUnavailableException("Unable to update order at this time.");
         }
     }
+
+    public RetrieveOrderDTO updateAddress(String orderId, String newAddress) {
+        try {
+            OrderEntity order = orderRepo.findById(orderId)
+                    .orElseThrow(() -> new OrderNotFoundException("Order not found with ID: " + orderId));
+
+            order.setRecipientAddress(newAddress);
+            OrderEntity updatedOrder = orderRepo.save(order);
+
+            return modelMapper.map(updatedOrder, RetrieveOrderDTO.class);
+
+        } catch (DataAccessException e) {
+            logger.error("Database error while updating address for order {}", orderId, e);
+            throw new ServiceUnavailableException("Unable to update order address at this time.");
+        }
+    }
+
+
+
+
 
     // --------------------- Delete ---------------------
 

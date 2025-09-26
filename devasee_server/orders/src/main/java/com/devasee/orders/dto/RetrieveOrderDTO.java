@@ -3,8 +3,10 @@ package com.devasee.orders.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+
 import java.util.List;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -19,6 +21,6 @@ public class RetrieveOrderDTO {
     private String recipientEmailAddress;
     private double totalAmount;
     private List<OrderItemDTO> items;
-    private LocalDate createdAt;
-    private LocalDate updatedAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

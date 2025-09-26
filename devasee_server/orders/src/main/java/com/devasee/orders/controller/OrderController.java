@@ -1,14 +1,13 @@
 package com.devasee.orders.controller;
 
-import com.devasee.orders.dto.CreateOrderDTO;
-import com.devasee.orders.dto.DeleteOrderDTO;
-import com.devasee.orders.dto.RetrieveOrderDTO;
-import com.devasee.orders.dto.UpdateOrderDTO;
+import com.devasee.orders.dto.*;
 import com.devasee.orders.response.CustomResponse;
 import com.devasee.orders.services.OrderServices;
 import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @CrossOrigin
 @RestController
@@ -44,15 +43,36 @@ public class  OrderController {
 
     // GET /api/v1/orders/order/customer/{customerName}?page=0&size=10
     @PreAuthorize("isAuthenticated()")
-    @GetMapping("/customer/{customerName}")
-    public CustomResponse<Page<RetrieveOrderDTO>> getOrdersByCustomer(
-            @PathVariable String customerName,
+    @GetMapping("/customer/id/{customerId}")
+    public CustomResponse<Page<RetrieveOrderDTO>> getOrdersByCustomerId(
+            @PathVariable String customerId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        Page<RetrieveOrderDTO> orders = orderServices.getOrdersByCustomerName(customerName, page, size);
-        return new CustomResponse<>(true, "Orders for " + customerName, orders);
+        Page<RetrieveOrderDTO> orders = orderServices.getOrdersByCustomerId(customerId, page, size);
+        return new CustomResponse<>(true, "Orders for customer " + customerId, orders);
     }
+    // GET /api/v1/orders/order/recipient/{recipientName}?page=0&size=10
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/recipient/{recipientName}")
+    public CustomResponse<Page<RetrieveOrderDTO>> getOrdersByRecipientName(
+            @PathVariable String recipientName,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Page<RetrieveOrderDTO> orders = orderServices.getOrdersByRecipientName(recipientName, page, size);
+        return new CustomResponse<>(true, "Orders for recipient " + recipientName, orders);
+    }
+
+
+    //get order items in order
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/{orderId}/items")
+    public CustomResponse<List<OrderItemDTO>> getOrderItems(@PathVariable String orderId) {
+        List<OrderItemDTO> items = orderServices.getOrderItems(orderId);
+        return new CustomResponse<>(true, "Items for order " + orderId, items);
+    }
+
 
     // --------------------- Admin ---------------------
 
@@ -72,6 +92,18 @@ public class  OrderController {
         RetrieveOrderDTO updatedOrder = orderServices.updateOrder(orderDTO);
         return new CustomResponse<>(true, "Order updated successfully", updatedOrder);
     }
+
+    //get update order address
+    @PreAuthorize("isAuthenticated()")
+    @PatchMapping("/{orderId}/address")
+    public CustomResponse<RetrieveOrderDTO> updateOrderAddress(
+            @PathVariable String orderId,
+            @RequestBody String newAddress
+    ) {
+        RetrieveOrderDTO updatedOrder = orderServices.updateAddress(orderId, newAddress);
+        return new CustomResponse<>(true, "Address updated successfully", updatedOrder);
+    }
+
 
     // Delete order by ID
     @PreAuthorize("isAuthenticated()")

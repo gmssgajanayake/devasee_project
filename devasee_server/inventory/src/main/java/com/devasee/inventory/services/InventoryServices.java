@@ -35,16 +35,35 @@ public class InventoryServices {
     }
 
     public RetrieveInventoryDTO getInventoryById(String inventoryId) {
-        Inventory inventory = inventoryRepo.findById(inventoryId)
-                .orElseThrow(() -> new RuntimeException("Inventory not found with ID: " + inventoryId));
-        return modelMapper.map(inventory, RetrieveInventoryDTO.class);
+        try {
+            Inventory inventory = inventoryRepo.findById(inventoryId)
+                    .orElseThrow(() -> new RuntimeException("Inventory not found with ID: " + inventoryId));
+
+            return modelMapper.map(inventory, RetrieveInventoryDTO.class);
+
+        } catch (RuntimeException ex) {
+            // Log the error (recommended in real apps)
+            System.err.println("Error retrieving inventory: " + ex.getMessage());
+
+            throw ex;
+            // Or return null / custom DTO with error status if that suits your design
+            // return null;
+        }
+    }
+    // For Product Service : Get quantity from database, if error return 0
+    public int getInventoryQuantityById(String productId) {
+        try {
+            return inventoryRepo.findByProductId(productId)
+                    .map(Inventory::getAvailableQuantity)
+                    .orElse(0);
+        } catch (Exception ex) {
+            // Log the error for debugging
+            System.err.println("Error retrieving inventory quantity for productId: "
+                    + productId + " - " + ex.getMessage());
+            return 0; // fallback value
+        }
     }
 
-    // For Product Service : Get quantity form database if error return 0
-    public int getInventoryQuantityById(String productId) {
-        return inventoryRepo.findByProductId(productId).map(Inventory::getAvailableQuantity)
-                .orElse(0);
-    }
 
     // For Product Service
     public CreateUpdateInventoryDTO saveInventory(CreateUpdateInventoryDTO createUpdateInventoryDTO) {
@@ -60,27 +79,57 @@ public class InventoryServices {
 
     // For Product Service
     public RetrieveInventoryDTO updateInventory(CreateUpdateInventoryDTO inventoryDTO) {
-        Inventory existingInventory = inventoryRepo.findByProductIdForUpdate(inventoryDTO.getProductId())
-                .orElseThrow(() -> new InventoryNotFoundException("Inventory not found with ID: " + inventoryDTO.getProductId()));
+        try {
+            Inventory existingInventory = inventoryRepo.findByProductIdForUpdate(inventoryDTO.getProductId())
+                    .orElseThrow(() -> new InventoryNotFoundException(
+                            "Inventory not found with ID: " + inventoryDTO.getProductId()));
 
-        int updatedQuantity = existingInventory.getAvailableQuantity() + inventoryDTO.getReservedQuantity();
+            int updatedQuantity = existingInventory.getAvailableQuantity() + inventoryDTO.getReservedQuantity();
 
-        if (updatedQuantity < 0) {
-            throw new IllegalArgumentException("Available quantity cannot go below zero");
+            if (updatedQuantity < 0) {
+                throw new IllegalArgumentException("Available quantity cannot go below zero");
+            }
+
+            existingInventory.setAvailableQuantity(updatedQuantity);
+
+            Inventory savedInventory = inventoryRepo.save(existingInventory);
+            return modelMapper.map(savedInventory, RetrieveInventoryDTO.class);
+
+        } catch (InventoryNotFoundException | IllegalArgumentException ex) {
+            // Business-related errors → rethrow so controller/global handler can respond properly
+            System.err.println("Update failed: " + ex.getMessage());
+            throw ex;
+
+        } catch (Exception ex) {
+            // Unexpected errors (DB crash, mapping failure, etc.)
+            System.err.println("Unexpected error while updating inventory: " + ex.getMessage());
+            throw new RuntimeException("Unable to update inventory at this time", ex);
         }
-
-        existingInventory.setAvailableQuantity(updatedQuantity);
-
-        Inventory savedInventory = inventoryRepo.save(existingInventory);
-        return modelMapper.map(savedInventory, RetrieveInventoryDTO.class);
     }
+
 
     public DeleteInventoryDTO deleteInventory(String inventoryId) {
-        Inventory inventory = inventoryRepo.findById(inventoryId)
-                .orElseThrow(() -> new InventoryNotFoundException("Inventory not found with ID: " + inventoryId));
-        inventoryRepo.delete(inventory);
-        return modelMapper.map(inventory, DeleteInventoryDTO.class);
+        try {
+            Inventory inventory = inventoryRepo.findById(inventoryId)
+                    .orElseThrow(() -> new InventoryNotFoundException(
+                            "Inventory not found with ID: " + inventoryId));
+
+            inventoryRepo.delete(inventory);
+
+            return modelMapper.map(inventory, DeleteInventoryDTO.class);
+
+        } catch (InventoryNotFoundException ex) {
+            // Known error → rethrow so upper layer (controller/global handler) can handle
+            System.err.println("Delete failed: " + ex.getMessage());
+            throw ex;
+
+        } catch (Exception ex) {
+            // Unexpected issues (DB error, mapping error, etc.)
+            System.err.println("Unexpected error while deleting inventory: " + ex.getMessage());
+            throw new RuntimeException("Unable to delete inventory at this time", ex);
+        }
     }
+
 
     // For Product Service
     public DeleteInventoryDTO deleteInventoryByProductId(String productId) {

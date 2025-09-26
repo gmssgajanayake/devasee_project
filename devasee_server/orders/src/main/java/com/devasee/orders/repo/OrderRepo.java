@@ -10,7 +10,10 @@ import org.springframework.stereotype.Repository;
 public interface OrderRepo extends JpaRepository<OrderEntity, String> {
 
     // Paginated search by customer name (case-insensitive, partial match)
-    Page<OrderEntity> findByCustomerNameContainingIgnoreCase(String customerName, Pageable pageable);
+    Page<OrderEntity> findByRecipientNameContainingIgnoreCase(String recipientName, Pageable pageable);
+
+    Page<OrderEntity> findByCustomerId(String customerId, Pageable pageable);
+
 
     // Check if an order with this number already exists
     boolean existsByOrderNumber(String orderNumber);
