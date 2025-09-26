@@ -9,6 +9,7 @@ import com.devasee.delivery.entity.Delivery;
 import com.devasee.delivery.enums.DeliveryStatus;
 import com.devasee.delivery.exception.DeliveryNotFoundException;
 import com.devasee.delivery.repo.DeliveryRepository;
+import com.devasee.delivery.Interfaces.UsersClient;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -26,6 +27,7 @@ import java.util.List;
 public class DeliveryService {
 
     private final DeliveryRepository deliveryRepository;
+    private final UsersClient usersClient; // Feign client to fetch admin name
 
     /**
      * CREATE a new Delivery
@@ -38,7 +40,7 @@ public class DeliveryService {
             delivery.setRecipientName(dto.getRecipientName());
             delivery.setRecipientAddress(dto.getRecipientAddress());
             delivery.setTotalAmount(dto.getTotalAmount());
-            delivery.setStatus(dto.getStatus() != null ? dto.getStatus() : DeliveryStatus.Pending);
+            delivery.setStatus(dto.getStatus() != null ? dto.getStatus() : DeliveryStatus.PENDING);
             delivery.setProducts(dto.getProducts());
 
             deliveryRepository.save(delivery);
@@ -100,6 +102,7 @@ public class DeliveryService {
 
     /**
      * UPDATE Delivery by ID
+     * Adds adminName from Feign client into DTO (not stored in entity)
      */
     public UpdateDeliveryDTO updateDelivery(String id, UpdateDeliveryDTO dto) {
         try {
@@ -116,6 +119,12 @@ public class DeliveryService {
 
             Delivery saved = deliveryRepository.save(existing);
 
+            // Fetch admin name only for DTO (not entity)
+            String adminName = null;
+            if (dto.getAdminId() != null) {
+                adminName = usersClient.getAdminNameById(dto.getAdminId());
+            }
+
             return new UpdateDeliveryDTO(
                     saved.getDeliveryId(),
                     saved.getTrackingNumber(),
@@ -125,7 +134,9 @@ public class DeliveryService {
                     saved.getConfirmedAt(),
                     saved.getShippedAt(),
                     saved.getDeliveredAt(),
-                    saved.getCancelledAt()
+                    saved.getCancelledAt(),
+                    dto.getAdminId(),
+                    adminName
             );
         } catch (Exception e) {
             throw new RuntimeException("Error while updating delivery: " + e.getMessage(), e);
@@ -156,7 +167,7 @@ public class DeliveryService {
             List<Delivery> deliveries = deliveryRepository.findAll();
             int totalDeliveries = deliveries.size();
             int pendingDeliveries = (int) deliveries.stream()
-                    .filter(d -> DeliveryStatus.Pending.equals(d.getStatus()))
+                    .filter(d -> DeliveryStatus.PENDING.equals(d.getStatus()))
                     .count();
             return new DeliveryStatsDTO(totalDeliveries, pendingDeliveries);
         } catch (Exception e) {
@@ -169,11 +180,11 @@ public class DeliveryService {
      */
     public List<String> getAllStatuses() {
         return List.of(
-                DeliveryStatus.Pending.name(),
-                DeliveryStatus.Confirmed.name(),
-                DeliveryStatus.Shipped.name(),
-                DeliveryStatus.Delivered.name(),
-                DeliveryStatus.Cancelled.name()
+                DeliveryStatus.PENDING.name(),
+                DeliveryStatus.CONFIRMED.name(),
+                DeliveryStatus.SHIPPED.name(),
+                DeliveryStatus.DELIVERED.name(),
+                DeliveryStatus.CANCELLED.name()
         );
     }
 }

@@ -18,7 +18,7 @@ public class CreateDeliveryDTO {
     private String customerId;
     private String recipientName;
     private String recipientAddress;
-    private Integer totalAmount;
+    private double totalAmount;
     private DeliveryStatus status;
 
     // Map of productId -> quantity
