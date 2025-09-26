@@ -11,19 +11,19 @@ import java.util.List;
 @AllArgsConstructor
 public class CreatePrintDTO {
     private String title;
-    private String type;
+    private String types;
     private String material;
     private String size;
-    private String color;
+    private String weight;
+    private String printArtWorkSize;
+    private String packaging;
+    private boolean giftWrapAvailable;
+    private double giftWrapPrice;
+    private List<String> colors;
     private double price;
-    private int stockQuantity;
     private String imgUrl;
-
-
-    // Categorization
+    private List<String> otherImages;
+    private int initialQuantity;
     private String category;
-    private List<String> tags;
-
-    // Long description
     private String description;
 }

@@ -18,26 +18,58 @@ public class Printing {
     @Id
     @GeneratedValue
     @UuidGenerator
-    @Column(updatable = false, nullable = false, length = 36)
+    @Column(updatable = false, nullable = false, length = 36, unique = true)
     private String id;
 
     // Basic product info
+    @Column(nullable = false)
     private String title;
-    private String type; // Mug, T-shirt, Banner etc.
-    private String material;
+
+    @ManyToOne
+    @JoinColumn(name = "type_id", nullable = false)
+    private PrintProductType types;
+
+    @ManyToOne
+    @JoinColumn(name = "material_id", nullable = false)
+    private PrintingMaterial material;
+
+    @Column(nullable = false)
     private String size;
-    private String color;
+
+    @Column(nullable = false)
+    private String weight;
+
+    @Column(nullable = false)
+    private String printArtWorkSize; // 80cm*50cm
+
+    private String packaging;        // white box
+
+    @Column(nullable = false)
+    private boolean giftWrapAvailable;
+
+    private double giftWrapPrice;
+
+    @ElementCollection
+    @CollectionTable(name = "printing_colors", joinColumns = @JoinColumn(name = "printing_id"))
+    @Column(name = "color")
+    private List<String> colors;
+
+    @Column(nullable = false)
     private double price;
-    private int stockQuantity;
+
     private String imgUrl;
 
-
-    // Categorization
-    private String category;
     @ElementCollection
-    private List<String> tags;
+    @CollectionTable(name = "printing_images", joinColumns = @JoinColumn(name = "printing_id"))
+    @Column(name = "image_url")
+    private List<String> otherImages;
+
+    @ManyToOne
+    @JoinColumn(name = "category_id", nullable = false)
+    private PrintingCategory category;
 
     @Lob
+    @Column(nullable = false)
     private String description;
 
     // Timestamps

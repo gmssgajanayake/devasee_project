@@ -61,28 +61,27 @@ public class PrintController {
 
     // --------------------- Admin ---------------------
 
-    // Save new print type
+    // Save new print
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public CustomResponse<CreatePrintDTO> savePrint(
             @RequestParam("print") String printJson,
-            @RequestParam("file") MultipartFile file
+            @RequestParam(value = "file", required = false) MultipartFile file
     ) {
         CreatePrintDTO dtoResponse = printServices.savePrint(printJson, file);
         return new CustomResponse<>(true, "Print saved successfully", dtoResponse);
     }
 
     // Update existing print type
-    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public CustomResponse<RetrievePrintDTO> updatePrint(
             @RequestParam("print") String printJson,
-            @RequestParam("file") MultipartFile file
+            @RequestParam(value = "file", required = false) MultipartFile file
     ) {
         RetrievePrintDTO dtoResponse = printServices.updatePrint(printJson, file);
         return new CustomResponse<>(true, "Print updated successfully", dtoResponse);
     }
-
     // Delete print type by ID
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{printId}")
