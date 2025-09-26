@@ -4,29 +4,26 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class UpdatePrintDTO {
-    private String id;   // Needed for identifying which print to update
-
+    private String id;
     private String title;
-    private String type;
+    private String types;
     private String material;
     private String size;
-    private String color;
-    private double price;
-    private int stockQuantity;
+    private String weight;
+    private String printArtWorkSize;
+    private String packaging;
+    private Boolean giftWrapAvailable;
+    private Double giftWrapPrice;
+    private List<String> colors;
+    private Double price;
     private String imgUrl;
-
-    // Categorization
+    private List<String> otherImages;
     private String category;
-    private List<String> tags;
-
-    // Long description
     private String description;
-
 }
