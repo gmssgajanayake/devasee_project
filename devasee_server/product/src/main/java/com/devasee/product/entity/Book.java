@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @NoArgsConstructor
@@ -51,7 +53,10 @@ public class Book {
     @Column(nullable = false, unique = true)
     private long isbn;
 
-    private String imgUrl;
+    private String imgFileName;
+
+    @ElementCollection
+    private List<String> otherImgFileNames = new ArrayList<>();
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

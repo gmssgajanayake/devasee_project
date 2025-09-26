@@ -62,19 +62,19 @@ public class InternalJWTFilter extends OncePerRequestFilter {
                 if (rolesObj instanceof List<?>) {
                     for (Object role : (List<?>) rolesObj) {
                         if (role instanceof String) {
-                            log.info("### role in inv : {}", role);
+                            log.info("### role in product : {}", role);
                             roles.add((String) role);
                         }
                     }
                 }
 
-                // --- Fetch user from DB to check AccountStatus ---
-                String accountStatus = userClient.getUseAccountStatus(userId);
-                log.info("### accountStatus : {}", accountStatus);
-                if (!accountStatus.equals(AccountStatus.ACTIVE.name())) {
-                    response.sendError(HttpServletResponse.SC_FORBIDDEN, "Your account is not active");
-                    return;
-                }
+//                // --- Fetch user from DB to check AccountStatus ---
+//                String accountStatus = userClient.getUseAccountStatus(userId);
+//                log.info("### accountStatus : {}", accountStatus);
+//                if (!accountStatus.equals(AccountStatus.ACTIVE.name())) {
+//                    response.sendError(HttpServletResponse.SC_FORBIDDEN, "Your account is not active");
+//                    return;
+//                }
 
                 var authorities = roles.stream()
                         .map(r -> new SimpleGrantedAuthority("ROLE_" + r))

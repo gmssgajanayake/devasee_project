@@ -38,7 +38,7 @@ public class JsonAuthEntryPoint implements AuthenticationEntryPoint {
                     "message": "%s",
                     "data": "INTERNAL_AUTH_ERROR"
                 }
-                """.formatted(authException.getMessage());;
+                """.formatted(authException.getMessage());
 
         // Write JSON to response body
         response.getWriter().write(json);

@@ -1,12 +1,12 @@
 package com.devasee.apigateway.config;
 
+import com.devasee.apigateway.UserDataDTO;
 import com.devasee.apigateway.service.ReactiveUserService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
 
 @Service
 public class ReactiveUserServiceImpl implements ReactiveUserService {
@@ -21,13 +21,13 @@ public class ReactiveUserServiceImpl implements ReactiveUserService {
     }
 
     @Override
-    public Mono<List<String>> findRolesByUserId(String userId) {
+    public Mono<UserDataDTO> findRoleAccountStatusByUserId(String userId) {
         return webClient.get()
-                .uri(userServiceBaseUrl + "/{userId}/roles", userId)
+                .uri(userServiceBaseUrl + "/{userId}/info", userId)
                 .retrieve()
                 .bodyToMono(
                         new org.springframework.core.ParameterizedTypeReference
-                                <List<String>>(){}
+                                <>(){}
                 );
     }
 }

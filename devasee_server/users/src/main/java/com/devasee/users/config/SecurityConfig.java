@@ -4,6 +4,7 @@ import com.devasee.users.filter.InternalJWTFilter;
 import com.devasee.users.service.InternalJWTService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -34,6 +35,10 @@ public class SecurityConfig {
                                 "api/v1/users/admins/**",
                                 "api/v1/users/admins"
                         ).hasRole("ADMIN")
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "api/v1/users/auth/*/info"
+                        ).permitAll()
                         .anyRequest().authenticated()) // All other requests → must be authenticated (internal JWT must exist)
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint(jsonAuthEntryPoint) // 401
