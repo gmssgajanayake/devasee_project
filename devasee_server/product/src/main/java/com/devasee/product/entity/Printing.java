@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -59,10 +60,11 @@ public class Printing {
 
     private String imgUrl;
 
+    private String imgFileName;
+
     @ElementCollection
-    @CollectionTable(name = "printing_images", joinColumns = @JoinColumn(name = "printing_id"))
-    @Column(name = "image_url")
-    private List<String> otherImages;
+    private List<String> otherImgFileNames = new ArrayList<>();
+
 
     @ManyToOne
     @JoinColumn(name = "category_id", nullable = false)
@@ -72,7 +74,6 @@ public class Printing {
     @Column(nullable = false)
     private String description;
 
-    // Timestamps
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
