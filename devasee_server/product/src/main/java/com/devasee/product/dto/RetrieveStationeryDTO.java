@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 /**
  * DTO for retrieving Stationery details
  * Includes stock from Inventory + image SAS URL
@@ -20,4 +22,5 @@ public class RetrieveStationeryDTO {
     private double price;
     private int stockQuantity; // comes from Inventory
     private String imgUrl;     // SAS URL for image
+    private List<String> otherImgUrls;
 }
