@@ -12,9 +12,6 @@ public interface PrintRepo extends JpaRepository<Printing, String> {
 
     boolean existsByTitleAndTypes(String title, PrintProductType types);
 
-
-    Page<Printing> findByMaterialContainingIgnoreCase(String material, Pageable pageable);
-
     Page<Printing> findBySizeContainingIgnoreCase(String size, Pageable pageable);
 
     Page<Printing> findByColorsContainingIgnoreCase(String color, Pageable pageable);
@@ -22,7 +19,10 @@ public interface PrintRepo extends JpaRepository<Printing, String> {
 
     Page<Printing> findByTitleContainingIgnoreCase(String title, Pageable pageable);
 
-    Page<Printing> findByTypesContainingIgnoreCase(String types, Pageable pageable);
+    Page<Printing> findByTypes_NameContainingIgnoreCase(String name, Pageable pageable);
+
+    Page<Printing> findByMaterial_NameContainingIgnoreCase(String name, Pageable pageable);
+
 
 }
 
