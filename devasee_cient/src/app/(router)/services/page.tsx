@@ -26,12 +26,6 @@ export default function PrintingServicesPage() {
 
   return (
     <div className={"pt-24 lg:pt-30"}>
-      {/* Hero / Banner Section */}
-      <section className="relative bg-[#0000ff] text-white py-16 text-center">
-        <h1 className="text-4xl font-bold">Printing Services</h1>
-        <p className="mt-2 text-lg">High-quality printing for banners, mugs, papers, and more</p>
-      </section>
-
       {/* Filter Buttons */}
       <section className="py-8">
         <div className="flex justify-center gap-2 flex-wrap">
@@ -53,19 +47,23 @@ export default function PrintingServicesPage() {
 
       {/* Product Grid */}
       <section className="px-4 pb-12">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {/* More columns => narrower cards */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
           {filteredProducts.map((product) => (
             <div
               key={product.id}
               className="bg-white rounded-md shadow hover:shadow-lg transition overflow-hidden text-sm"
             >
-              <Image
-                src={product.image}
-                alt={product.name}
-                width={400}
-                height={300}
-                className="w-full h-40 object-cover"
-              />
+              {/* Tall aspect ratio image */}
+              <div className="relative w-full aspect-[2/3]">
+                <Image
+                  src={product.image}
+                  alt={product.name}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, (max-width: 1280px) 25vw, 16vw"
+                />
+              </div>
               <div className="p-3">
                 <h3 className="text-base font-semibold">{product.name}</h3>
                 <p className="text-xs text-gray-500">{product.category}</p>
