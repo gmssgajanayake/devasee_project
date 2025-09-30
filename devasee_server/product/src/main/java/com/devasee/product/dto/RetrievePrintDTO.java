@@ -10,6 +10,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+
 public class RetrievePrintDTO {
     private String id;
     private String title;
@@ -24,10 +25,11 @@ public class RetrievePrintDTO {
     private List<String> colors;
     private double price;
     private String imgUrl;
-    private List<String> otherImages;
+    private List<String> otherImgUrls;   // ✅ renamed
     private String category;
     private int stockQuantity;
     private String description;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }
+

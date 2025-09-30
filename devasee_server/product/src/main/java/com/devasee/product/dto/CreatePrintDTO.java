@@ -22,7 +22,7 @@ public class CreatePrintDTO {
     private List<String> colors;
     private double price;
     private String imgUrl;
-    private List<String> otherImages;
+    private List<String> otherImgUrls;
     private int initialQuantity;
     private String category;
     private String description;
