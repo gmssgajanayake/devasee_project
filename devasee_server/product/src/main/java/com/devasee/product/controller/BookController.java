@@ -1,8 +1,9 @@
 package com.devasee.product.controller;
 
-import com.devasee.product.dto.CreateBookDTO;
-import com.devasee.product.dto.DeleteBookDTO;
-import com.devasee.product.dto.RetrieveBookDTO;
+import com.devasee.product.dto.book.BookContentBasedFilteringDTO;
+import com.devasee.product.dto.book.CreateBookDTO;
+import com.devasee.product.dto.book.DeleteBookDTO;
+import com.devasee.product.dto.book.RetrieveBookDTO;
 import com.devasee.product.entity.BookCategory;
 import com.devasee.product.entity.BookGenre;
 import com.devasee.product.entity.BookLanguage;
@@ -12,7 +13,6 @@ import com.devasee.product.services.BookGenreService;
 import com.devasee.product.services.BookLanguageService;
 import com.devasee.product.services.BookServices;
 import org.springframework.data.domain.Page;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -52,6 +52,14 @@ public class BookController {
     ) {
         Page<RetrieveBookDTO> bookPage  = bookServices.getAllBooks(page, size);
         return new CustomResponse<>(true, "Books found", bookPage);
+    }
+
+    // Get all books for content-based filtering
+    @GetMapping("/all")
+    public CustomResponse<List<BookContentBasedFilteringDTO>> getAllBooksForContentBasedFilter(
+    ) {
+        List<BookContentBasedFilteringDTO> books  = bookServices.getAllBooksForContentBasedFilter();
+        return new CustomResponse<>(true, "All Books found", books);
     }
 
     // Get book by bookId
@@ -128,14 +136,14 @@ public class BookController {
     @GetMapping("/genres")
     public CustomResponse<List<BookGenre>> getAllGenres() {
         List<BookGenre> genres = bookGenreService.getAllGenres();
-        return new CustomResponse<>(true, "All categories fetched", genres);
+        return new CustomResponse<>(true, "All genres fetched", genres);
     }
 
     // GET all categories for dropdown
     @GetMapping("/languages")
     public CustomResponse<List<BookLanguage>> getAllLanguages() {
         List<BookLanguage> languages = bookLanguageService.getAllLanguages();
-        return new CustomResponse<>(true, "All categories fetched", languages);
+        return new CustomResponse<>(true, "All languages fetched", languages);
     }
 
 
