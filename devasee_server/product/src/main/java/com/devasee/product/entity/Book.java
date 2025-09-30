@@ -32,18 +32,22 @@ public class Book {
 
     // book belongs to exactly one category
     // Each category can contain many books
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "category_id")
     private BookCategory category;
 
-    @ManyToOne
-    @JoinColumn(name = "genre_id")
-    private BookGenre genre;
+    @ManyToMany(cascade = CascadeType.MERGE)
+    @JoinTable(
+            name = "book_genre_mapping",
+            joinColumns = @JoinColumn(name = "book_id"),
+            inverseJoinColumns = @JoinColumn(name = "genre_id")
+    )
+    private List<BookGenre> genres = new ArrayList<>();
 
     @Column(nullable = false)
     private String description;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "language_id")
     private BookLanguage language;
 
