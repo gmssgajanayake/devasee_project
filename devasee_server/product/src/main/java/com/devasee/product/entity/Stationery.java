@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Entity representing Stationery in DB
@@ -43,7 +45,10 @@ public class Stationery {
     @Column(nullable = false)
     private double price;
 
-    private String imgUrl;
+    private String imgFileName;
+
+    @ElementCollection
+    private List<String> otherImgFileNames = new ArrayList<>();
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
