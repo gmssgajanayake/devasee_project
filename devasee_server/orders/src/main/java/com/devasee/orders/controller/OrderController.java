@@ -11,7 +11,7 @@ import java.util.List;
 
 @CrossOrigin
 @RestController
-@RequestMapping(value = "api/v1/orders/order")
+@RequestMapping(value = "api/v1/orders")
 public class  OrderController {
 
     private final OrderServices orderServices;
@@ -22,7 +22,7 @@ public class  OrderController {
 
     // --------------------- Public ---------------------
 
-    // GET /api/v1/orders/order?page=0&size=20
+    // GET /api/v1/orders?page=0&size=20
     @GetMapping
     @PreAuthorize("isAuthenticated()")
     public CustomResponse<Page<RetrieveOrderDTO>> getAllOrders(
@@ -33,7 +33,7 @@ public class  OrderController {
         return new CustomResponse<>(true, "Orders retrieved successfully", orders);
     }
 
-    // GET /api/v1/orders/order/{orderId}
+    // GET /api/v1/orders/{orderId}
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/{orderId}")
     public CustomResponse<RetrieveOrderDTO> getOrderById(@PathVariable String orderId) {
@@ -41,7 +41,7 @@ public class  OrderController {
         return new CustomResponse<>(true, "Order found", order);
     }
 
-    // GET /api/v1/orders/order/customer/{customerName}?page=0&size=10
+    // GET /api/v1/orders/customer/{customerName}?page=0&size=10
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/customer/id/{customerId}")
     public CustomResponse<Page<RetrieveOrderDTO>> getOrdersByCustomerId(
@@ -52,7 +52,7 @@ public class  OrderController {
         Page<RetrieveOrderDTO> orders = orderServices.getOrdersByCustomerId(customerId, page, size);
         return new CustomResponse<>(true, "Orders for customer " + customerId, orders);
     }
-    // GET /api/v1/orders/order/recipient/{recipientName}?page=0&size=10
+    // GET /api/v1/orders/recipient/{recipientName}?page=0&size=10
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/recipient/{recipientName}")
     public CustomResponse<Page<RetrieveOrderDTO>> getOrdersByRecipientName(
