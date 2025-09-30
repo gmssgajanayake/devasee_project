@@ -56,7 +56,6 @@ services:
     depends_on:
       - eureka
       - db
-      - inventory
 
   # Inventory
   inventory:

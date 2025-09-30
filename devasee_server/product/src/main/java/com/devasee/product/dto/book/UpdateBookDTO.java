@@ -1,8 +1,10 @@
-package com.devasee.product.dto;
+package com.devasee.product.dto.book;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -13,7 +15,7 @@ public class UpdateBookDTO {
     private String author;
     private String publisher;
     private String category;
-    private String genre;
+    private List<String> genres;
     private String description;
     private String language;
     private double price;
