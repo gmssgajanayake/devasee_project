@@ -2,7 +2,6 @@
 "use server";
 
 export async function addBook(formData: FormData, JWTtoken: string | null) {
-    console.log()
 
     try {
         const token = JWTtoken;
@@ -63,5 +62,27 @@ export async function addBook(formData: FormData, JWTtoken: string | null) {
     } catch (error) {
         console.error("Error adding book:", error);
         throw error;
+    }
+}
+
+// app/actions/auth.ts
+export async function authenticateWithAPI(token: string) {
+    try {
+        const response = await fetch('http://api.devasee.lk/api/v1/users/auth', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error('API authentication failed');
+        }
+
+        return { success: true };
+    } catch (error) {
+        console.error('API authentication error:', error);
+        return { success: false, error: 'Failed to authenticate with API' };
     }
 }

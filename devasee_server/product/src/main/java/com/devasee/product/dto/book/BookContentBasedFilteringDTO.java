@@ -1,21 +1,23 @@
-package com.devasee.product.dto;
+package com.devasee.product.dto.book;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+import java.util.Map;
+
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-public class CreateBookDTO {
+@NoArgsConstructor
+public class BookContentBasedFilteringDTO {
+    private String id;
     private String title;
     private String author;
     private String publisher;
     private String category;
-    private String genre;
+    private List<Map<String, Object>> genres;
     private String description;
     private String language;
-    private double price;
-    private int initialQuantity;
     private long isbn;
 }

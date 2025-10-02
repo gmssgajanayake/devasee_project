@@ -3,6 +3,8 @@ package com.devasee.product.services;
 import com.devasee.product.dto.*;
 import com.devasee.product.entity.PrintProductType;
 import com.devasee.product.entity.Printing;
+import com.devasee.product.entity.PrintingCategory;
+import com.devasee.product.entity.PrintingMaterial;
 import com.devasee.product.enums.ContainerType;
 import com.devasee.product.interfaces.InventoryClient;
 import com.devasee.product.repo.PrintRepo;
@@ -10,6 +12,8 @@ import com.devasee.product.repo.PrintProductTypeRepo;
 import com.devasee.product.exception.ProductAlreadyExistsException;
 import com.devasee.product.exception.ProductNotFoundException;
 import com.devasee.product.exception.ServiceUnavailableException;
+import com.devasee.product.repo.PrintingCategoryRepo;
+import com.devasee.product.repo.PrintingMaterialRepo;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
@@ -27,6 +31,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 @Service
 @Transactional
 public class PrintServices {
@@ -39,46 +47,85 @@ public class PrintServices {
     private final InventoryClient inventoryClient;
     private final ObjectMapper objectMapper;
     private final PrintProductTypeRepo printProductTypeRepo;
+    private final PrintingCategoryRepo printingCategoryRepo;
+    private final PrintingMaterialRepo printingMaterialRepo;
 
-    public PrintServices(PrintRepo printRepo, ModelMapper modelMapper,
-                         AzureBlobService azureBlobService, InventoryClient inventoryClient,
+
+
+
+    public PrintServices(PrintRepo printRepo,
+                         ModelMapper modelMapper,
+                         AzureBlobService azureBlobService,
+                         InventoryClient inventoryClient,
                          ObjectMapper objectMapper,
-                         PrintProductTypeRepo printProductTypeRepo) {
+                         PrintProductTypeRepo printProductTypeRepo,
+                         PrintingCategoryRepo printingCategoryRepo,
+                         PrintingMaterialRepo printingMaterialRepo) {
         this.printRepo = printRepo;
         this.modelMapper = modelMapper;
         this.azureBlobService = azureBlobService;
         this.inventoryClient = inventoryClient;
         this.objectMapper = objectMapper;
         this.printProductTypeRepo = printProductTypeRepo;
+        this.printingCategoryRepo = printingCategoryRepo;
+        this.printingMaterialRepo = printingMaterialRepo;
     }
+
 
     private RetrievePrintDTO sasUrlAndQuantitySetter(Printing printing) {
         RetrievePrintDTO dto = modelMapper.map(printing, RetrievePrintDTO.class);
 
+        // --- Cover image ---
         try {
-            // Generate SAS URL for image
-            String blobName = dto.getImgUrl();
+            String blobName = printing.getImgFileName(); // stored as filename
             if (blobName != null && !blobName.isEmpty()) {
+                log.info("### main file name : {}", blobName);
                 String sasUrl = azureBlobService.generateSasUrl(blobName, ContainerType.PRINTING);
                 dto.setImgUrl(sasUrl);
             }
         } catch (Exception e) {
-            // Log the error but continue
-            log.error("### Error generating SAS URL for print ID {}: {}", dto.getId(), e.getMessage());
-            dto.setImgUrl(null); // fallback to null if URL fails
+            log.error("### Error generating SAS URL for print cover ID {}: {}", dto.getId(), e.getMessage());
+            dto.setImgUrl(null);
         }
 
+        // --- Other images ---
         try {
-            // Set stock quantity
+            List<String> otherImgUrls = new ArrayList<>();
+            List<String> storedFileNames = printing.getOtherImgFileNames();
+            if (storedFileNames != null && !storedFileNames.isEmpty()) {
+                for (String fileName : storedFileNames) {
+                    if (fileName != null && !fileName.isEmpty()) {
+                        log.info("### other file names : {}", fileName);
+                        try {
+                            String otherSasUrl = azureBlobService.generateSasUrl(fileName, ContainerType.PRINTING);
+                            otherImgUrls.add(otherSasUrl);
+                        } catch (Exception innerEx) {
+                            log.error("### Error generating SAS URL for other image {} in print ID {}: {}", fileName, dto.getId(), innerEx.getMessage());
+                        }
+                    }
+                }
+            }
+            dto.setOtherImgUrls(otherImgUrls);
+        } catch (Exception e) {
+            log.error("### Error processing other images for print ID {}: {}", dto.getId(), e.getMessage());
+            dto.setOtherImgUrls(Collections.emptyList());
+        }
+
+        // --- Stock quantity ---
+        try {
             dto.setStockQuantity(getStockQuantity(dto.getId()));
         } catch (Exception e) {
-            // Log the error but continue
             log.error("### Error fetching stock quantity for print ID {}: {}", dto.getId(), e.getMessage());
-            dto.setStockQuantity(0); // fallback to 0 if inventory fails
+            dto.setStockQuantity(0);
         }
+
+        // --- Metadata ---
+        dto.setCategory(printing.getCategory() != null ? printing.getCategory().getName() : null);
+        dto.setTypes(printing.getTypes() != null ? printing.getTypes().getName() : null);
 
         return dto;
     }
+
 
 
     private int getStockQuantity(String productId) {
@@ -127,14 +174,27 @@ public class PrintServices {
         try {
             createDTO = objectMapper.readValue(printJson, CreatePrintDTO.class);
 
-            // Find the PrintProductType entity
+            // Validate PrintProductType
             PrintProductType typeEntity = printProductTypeRepo.findByName(createDTO.getTypes())
                     .orElseThrow(() -> new IllegalArgumentException("Invalid print type: " + createDTO.getTypes()));
 
-            // Check for duplicate
+            // Validate PrintingCategory
+            PrintingCategory categoryEntity = printingCategoryRepo.findByName(createDTO.getCategory())
+                    .orElseThrow(() -> new IllegalArgumentException("Invalid print category: " + createDTO.getCategory()));
+
+            // Validate PrintingMaterial
+            PrintingMaterial materialEntity = printingMaterialRepo.findByName(createDTO.getMaterial())
+                    .orElseThrow(() -> new IllegalArgumentException("Invalid print material: " + createDTO.getMaterial()));
+
+            // Check for duplicate (title + type)
             if (printRepo.existsByTitleAndTypes(createDTO.getTitle(), typeEntity)) {
                 throw new ProductAlreadyExistsException("Print with same title and type already exists.");
             }
+
+            // ✅ Attach resolved names into DTO for consistency
+            createDTO.setTypes(typeEntity.getName());
+            createDTO.setCategory(categoryEntity.getName());
+            createDTO.setMaterial(materialEntity.getName());
 
         } catch (JsonProcessingException e) {
             log.error("### Invalid JSON for print: {}", e.getMessage());
@@ -150,9 +210,24 @@ public class PrintServices {
                     ? azureBlobService.uploadFile(file, ContainerType.PRINTING)
                     : null;
 
-            // Map DTO to entity
+            // Map DTO → Entity
             Printing newPrint = modelMapper.map(createDTO, Printing.class);
-            newPrint.setImgUrl(fileName);
+
+            // Store only the filename, not SAS URL
+            newPrint.setImgFileName(fileName);
+
+            // Resolve and attach associations again to entity
+            PrintProductType typeEntity = printProductTypeRepo.findByName(createDTO.getTypes())
+                    .orElseThrow(() -> new IllegalArgumentException("Invalid print type: " + createDTO.getTypes()));
+            newPrint.setTypes(typeEntity);
+
+            PrintingCategory categoryEntity = printingCategoryRepo.findByName(createDTO.getCategory())
+                    .orElseThrow(() -> new IllegalArgumentException("Invalid print category: " + createDTO.getCategory()));
+            newPrint.setCategory(categoryEntity);
+
+            PrintingMaterial materialEntity = printingMaterialRepo.findByName(createDTO.getMaterial())
+                    .orElseThrow(() -> new IllegalArgumentException("Invalid print material: " + createDTO.getMaterial()));
+            newPrint.setMaterial(materialEntity);
 
             // Save entity
             Printing savedPrint = printRepo.save(newPrint);
@@ -175,56 +250,65 @@ public class PrintServices {
         return createDTO;
     }
 
+
     // Update Print Details, Cover Image Not Required
     public RetrievePrintDTO updatePrint(String printJson, MultipartFile file) {
         UpdatePrintDTO printDTO;
 
         try {
             // Convert JSON string to DTO
-            ObjectMapper mapper = new ObjectMapper();
-            printDTO = mapper.readValue(printJson, UpdatePrintDTO.class);
+            printDTO = objectMapper.readValue(printJson, UpdatePrintDTO.class);
 
             // Find existing print or throw custom exception
             Printing existingPrint = printRepo.findById(printDTO.getId())
                     .orElseThrow(() -> new ProductNotFoundException("Print not found"));
 
-            String existingImgUrl = existingPrint.getImgUrl();
+            String existingFileName = existingPrint.getImgFileName();
 
-            // Map only non-null fields from DTO into existing entity
+            // Map simple fields (ignore associations)
             modelMapper.map(printDTO, existingPrint);
 
-            log.info("########## file : {}", file);
-            if (file != null && !file.isEmpty()) {
-                log.info("############### file not null : {}", existingPrint.getImgUrl());
-                try {
-                    // Delete existing image from Azure
-                    if (existingImgUrl != null && !existingImgUrl.isEmpty()) {
-                        azureBlobService.deleteFile(existingImgUrl, ContainerType.PRINTING);
-                    }
-
-                    // Upload new image to Azure Blob Storage
-                    String fileName = azureBlobService.uploadFile(file, ContainerType.PRINTING);
-                    existingPrint.setImgUrl(fileName); // Set uploaded image file name
-                } catch (Exception exception) {
-                    throw new InternalServerErrorException("Something went wrong when uploading images");
-                }
-            } else {
-                log.info("############### current url : {} ", existingPrint.getImgUrl());
-                existingPrint.setImgUrl(existingImgUrl);
+            // Handle associations: type
+            if (printDTO.getTypes() != null) {
+                PrintProductType typeEntity = printProductTypeRepo.findByName(printDTO.getTypes())
+                        .orElseThrow(() -> new IllegalArgumentException("Invalid print type: " + printDTO.getTypes()));
+                existingPrint.setTypes(typeEntity);
             }
 
-            // Save updated print
+            // Handle associations: category
+            if (printDTO.getCategory() != null) {
+                PrintingCategory categoryEntity = printingCategoryRepo.findByName(printDTO.getCategory())
+                        .orElseThrow(() -> new IllegalArgumentException("Invalid print category: " + printDTO.getCategory()));
+                existingPrint.setCategory(categoryEntity);
+            }
+
+            // Handle image
+            if (file != null && !file.isEmpty()) {
+                try {
+                    if (existingFileName != null && !existingFileName.isEmpty()) {
+                        azureBlobService.deleteFile(existingFileName, ContainerType.PRINTING);
+                    }
+                    String fileName = azureBlobService.uploadFile(file, ContainerType.PRINTING);
+                    existingPrint.setImgFileName(fileName); // ✅ store filename only
+                } catch (Exception ex) {
+                    throw new InternalServerErrorException("Error when uploading new image");
+                }
+            } else {
+                existingPrint.setImgFileName(existingFileName); // keep old filename
+            }
+
+            // Save updated entity
             Printing savedPrint = printRepo.save(existingPrint);
             log.info("### Print updated successfully with ID: {}", savedPrint.getId());
 
-            // Add SAS URL and update quantity if needed
+            // Return enriched DTO
             return sasUrlAndQuantitySetter(savedPrint);
 
         } catch (JsonProcessingException e) {
             log.error("### Invalid JSON : {}", e.getMessage());
             throw new BadRequestException("Invalid JSON: " + e.getMessage());
         } catch (DataAccessException e) {
-            log.error("### Error updating print with ID: {}", e.getMessage());
+            log.error("### Error updating print: {}", e.getMessage());
             throw new ServiceUnavailableException("Something went wrong on the server. Please try again later.");
         }
     }
@@ -235,8 +319,8 @@ public class PrintServices {
             Pageable pageable = PageRequest.of(page, size);
             Page<Printing> printPage = switch (field.toLowerCase()) {
                 case "title" -> printRepo.findByTitleContainingIgnoreCase(value, pageable);
-                case "type" -> printRepo.findByTypesContainingIgnoreCase(value, pageable);
-                case "material" -> printRepo.findByMaterialContainingIgnoreCase(value, pageable);
+                case "type" -> printRepo.findByTypes_NameContainingIgnoreCase(value, pageable);
+                case "material" -> printRepo.findByMaterial_NameContainingIgnoreCase(value, pageable);
                 case "size" -> printRepo.findBySizeContainingIgnoreCase(value, pageable);
                 case "color" -> printRepo.findByColorsContainingIgnoreCase(value, pageable);
                 default -> throw new IllegalArgumentException("Unsupported search field: " + field +
@@ -247,22 +331,17 @@ public class PrintServices {
                 throw new ProductNotFoundException("No prints found for " + field + " : " + value);
             }
 
-            // Map to DTO with SAS URL and stock quantity
             return printPage.map(this::sasUrlAndQuantitySetter);
 
-        } catch (IllegalArgumentException e) {
-            log.error("### Invalid search field: {}", e.getMessage());
+        } catch (IllegalArgumentException | ProductNotFoundException e) {
+            log.warn("### Search issue: {}", e.getMessage());
             throw e;
-
-        } catch (ProductNotFoundException e) {
-            log.warn("### No prints found: {}", e.getMessage());
-            throw e;
-
         } catch (Exception e) {
             log.error("### Error searching prints: {}", e.getMessage(), e);
             throw new ServiceUnavailableException("Something went wrong while searching prints. Please try again later.");
         }
     }
+
 
     // Delete Print Details
     public DeletePrintDTO deletePrint(String printId) {

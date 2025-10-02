@@ -3,12 +3,20 @@ package com.devasee.product.controller;
 import com.devasee.product.dto.CreatePrintDTO;
 import com.devasee.product.dto.DeletePrintDTO;
 import com.devasee.product.dto.RetrievePrintDTO;
+import com.devasee.product.entity.PrintProductType;
+import com.devasee.product.entity.PrintingCategory;
+import com.devasee.product.entity.PrintingMaterial;
 import com.devasee.product.response.CustomResponse;
+import com.devasee.product.services.PrintProductTypeService;
 import com.devasee.product.services.PrintServices;
+import com.devasee.product.services.PrintingCategoryService;
+import com.devasee.product.services.PrintingMaterialService;
 import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @CrossOrigin
 @RestController
@@ -16,9 +24,19 @@ import org.springframework.web.multipart.MultipartFile;
 public class PrintController {
 
     private final PrintServices printServices;
+    private final PrintingCategoryService categoryService;
+    private final PrintingMaterialService materialService;
+    private final PrintProductTypeService productTypeService;
 
-    public PrintController(PrintServices printServices) {
+    public PrintController(PrintServices printServices,
+                           PrintingCategoryService categoryService,
+                           PrintingMaterialService materialService,
+                           PrintProductTypeService productTypeService)
+    {
         this.printServices = printServices;
+        this.categoryService = categoryService;
+        this.materialService = materialService;
+        this.productTypeService = productTypeService;
     }
 
     // --------------------- Public ---------------------
@@ -58,6 +76,39 @@ public class PrintController {
                 printPage
         );
     }
+    // Categories
+    @GetMapping("/categories")
+    @PreAuthorize("isAuthenticated()")
+    public CustomResponse<List<String>> getAllCategories() {
+        List<String> categories = categoryService.getAllCategories()
+                .stream()
+                .map(PrintingCategory::getName)   // ✅ method reference
+                .toList();
+        return new CustomResponse<>(true, "Categories fetched", categories);
+    }
+
+    // Materials
+    @GetMapping("/materials")
+    @PreAuthorize("isAuthenticated()")
+    public CustomResponse<List<String>> getAllMaterials() {
+        List<String> materials = materialService.getAllMaterials()
+                .stream()
+                .map(PrintingMaterial::getName)   // ✅ method reference
+                .toList();
+        return new CustomResponse<>(true, "Materials fetched", materials);
+    }
+
+    // Types
+    @GetMapping("/types")
+    @PreAuthorize("isAuthenticated()")
+    public CustomResponse<List<String>> getAllProductTypes() {
+        List<String> types = productTypeService.getAllTypes()
+                .stream()
+                .map(PrintProductType::getName)   // ✅ method reference
+                .toList();
+        return new CustomResponse<>(true, "Types fetched", types);
+    }
+
 
     // --------------------- Admin ---------------------
 
