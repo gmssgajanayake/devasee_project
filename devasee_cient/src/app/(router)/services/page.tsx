@@ -6,7 +6,7 @@ import SubNavBar from "@/app/(router)/_components/SubNavBar";
 import FilterBar from "@/app/(router)/products/_components/FilterBar";
 import { StaticImageData } from "next/image";
 
-import printingService1 from "@/assets/items image/img.png";
+import printingService1 from "@/assets/items image/mug 2.png";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -434,6 +434,7 @@ function PrintingSortOptions({ sortBy, setSortBy }: PrintingSortOptionsProps) {
 }
 
 // Custom Item Card component for printing services
+// Custom Item Card component for printing services
 interface PrintingItemCardProps {
     image: string | StaticImageData;
     itemName: string;
@@ -444,39 +445,57 @@ interface PrintingItemCardProps {
 }
 
 function PrintingItemCard({
-    image,
-    itemName,
-    price,
-    onAddToCart,
-    onRemoveFromCart,
-    isInCart,
-}: PrintingItemCardProps) {
+                              image,
+                              itemName,
+                              price,
+                              onAddToCart,
+                              onRemoveFromCart,
+                              isInCart,
+                          }: PrintingItemCardProps) {
     return (
-        <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 overflow-hidden">
-            <div className="relative w-full aspect-[3/4]">
+        // group enables hover/focus styling for children
+        <div className="group bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 overflow-hidden">
+            {/* IMAGE - scaled on hover, overflow-hidden prevents bleeding */}
+            <div className="w-full aspect-[3/4] relative overflow-hidden">
                 <img
-                    src={typeof image === 'string' ? image : image.src}
+                    src={typeof image === "string" ? image : image.src}
                     alt={itemName}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover block transform transition-transform duration-300 ease-out group-hover:scale-105 group-focus-within:scale-105"
                 />
             </div>
-            <div className="p-3">
-                <h3 className="text-sm font-semibold text-gray-800 mb-1 line-clamp-2">
+
+            {/* CONTENT: reduced top padding and slight negative margin to reduce gap */}
+            <div className="px-3 pb-3 pt-2 -mt-1 bg-white relative z-10">
+                <h3 className="text-sm font-semibold text-gray-800 mb-0 line-clamp-2">
                     {itemName}
                 </h3>
-                <p className="text-lg font-bold text-[#2b216d] mb-2">
-                    Rs. {price}
-                </p>
-                <button
-                    onClick={isInCart ? onRemoveFromCart : onAddToCart}
-                    className={`w-full py-2 px-3 rounded text-sm font-medium transition-colors ${
-                        isInCart
-                            ? "bg-red-500 text-white hover:bg-red-600"
-                            : "bg-[#2b216d] text-white hover:bg-[#1a1242]"
-                    }`}
-                >
-                    {isInCart ? "Remove from Cart" : "Add to Cart"}
-                </button>
+
+                <p className="text-lg font-bold text-[#2b216d] mb-2">Rs. {price}</p>
+
+                {/* If already in cart -> show Remove button always */}
+                {isInCart ? (
+                    <button
+                        onClick={onRemoveFromCart}
+                        className="w-full py-2 rounded-md text-sm font-medium transition-colors bg-red-500 text-white hover:bg-red-600"
+                    >
+                        Remove from Cart
+                    </button>
+                ) : (
+                    /* Place Order: hidden by default, visible on group hover/focus-within */
+                    <button
+                        onClick={onAddToCart}
+                        className={
+                            "w-full py-2 rounded-md text-sm font-medium transition-all duration-200 " +
+                            "opacity-0 translate-y-1 pointer-events-none " +
+                            "group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto " +
+                            "group-focus-within:opacity-100 group-focus-within:translate-y-0 group-focus-within:pointer-events-auto " +
+                            "bg-blue-600 text-white hover:bg-blue-700"
+                        }
+                        aria-hidden={false}
+                    >
+                        Place Order
+                    </button>
+                )}
             </div>
         </div>
     );
