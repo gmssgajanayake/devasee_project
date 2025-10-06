@@ -23,7 +23,7 @@ public class UpdatePrintDTO {
     private List<String> colors;
     private Double price;
     private String imgUrl;
-    private List<String> otherImages;
+    private List<String> otherImgUrls;
     private String category;
     private String description;
 }
