@@ -1,6 +1,7 @@
 package com.devasee.product.services;
 
 import com.devasee.product.dto.*;
+import com.devasee.product.dto.book.*;
 import com.devasee.product.entity.Book;
 import com.devasee.product.entity.BookCategory;
 import com.devasee.product.entity.BookGenre;
@@ -22,6 +23,7 @@ import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.InternalServerErrorException;
 import org.hibernate.exception.DataException;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.PropertyMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
@@ -34,7 +36,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Transactional
@@ -71,9 +75,14 @@ public class BookServices {
     // Due to image original url is private generate new SAS url
     // Same time add available quantity to response from Inventory
     private RetrieveBookDTO sasUrlAdderAndQuantitySetter(Book book){
-
+        // Skip problematic fields during initial mapping to avoid ModelMapper issues
+        modelMapper.typeMap(Book.class, RetrieveBookDTO.class)
+                .addMappings(mapper -> {
+                    mapper.skip(RetrieveBookDTO::setGenres);
+                });
         RetrieveBookDTO dto = modelMapper.map(book, RetrieveBookDTO.class);
 
+        log.info("### Adding cover img url");
         // for cover image
         String blobName = book.getImgFileName(); // stored as filename
         if (blobName != null && !blobName.isEmpty()) {
@@ -82,6 +91,7 @@ public class BookServices {
             dto.setImgUrl(sasUrl);
         }
 
+        log.info("### Adding other images urls");
         // for other images
         List<String> otherImgUrls = new ArrayList<>();
         List<String> storedFileNames = book.getOtherImgFileNames();
@@ -96,53 +106,82 @@ public class BookServices {
         }
         dto.setOtherImgUrls(otherImgUrls);
 
+        log.info("### Adding quantity to dto");
         dto.setStockQuantity(stockQuantityGetter(dto.getId()));
+
+        log.info("### Adding categories to dto");
         dto.setCategory(book.getCategory() != null ? book.getCategory().getName() : null);
-        dto.setGenre(book.getGenre() != null ? book.getGenre().getName() : null);
+
+        log.info("### Adding genres to dto");
+        // Genres as List<Map<String,Object>>
+        List<Map<String, Object>> genreList = book.getGenres().stream()
+                .map(g -> {
+                    Map<String, Object> genreMap = new HashMap<>();
+                    genreMap.put("id", g.getId());
+                    genreMap.put("name", g.getName());
+                    return genreMap;
+                })
+                .toList();
+        dto.setGenres(genreList.isEmpty() ? null : genreList);
+
+        log.info("### Adding languages to dto");
         dto.setLanguage(book.getLanguage() != null ? book.getLanguage().getName() : null);
 
         return dto;
     }
 
     // Convert String attributes pass in request to relevant entity
-    private Book categoryGenreLanguageAdder(Book book, String category, String genre, String language){
+    private Book categoryGenreLanguageAdder(Book book, String category, List<String> genres, String language){
 
-        // Handle Category
-        if (category != null && !category.isBlank()) {
-            BookCategory categoryEntity = bookCategoryRepo.findByNameIgnoreCase(category)
-                    .orElseGet(() -> {
-                        // Create new category if not exists
-                        BookCategory newCategory = new BookCategory();
-                        newCategory.setName(category);
-                        return bookCategoryRepo.save(newCategory);
-                    });
-            book.setCategory(categoryEntity);
-        }
+       try {
+           log.info("### handling categories");
+           // Handle Category
+            if (category != null && !category.isBlank()) {
+                BookCategory categoryEntity = bookCategoryRepo.findByNameIgnoreCase(category)
+                        .orElseGet(() -> {
+                            // Create new category if not exists
+                            BookCategory newCategory = new BookCategory();
+                            newCategory.setName(category);
+                            return bookCategoryRepo.save(newCategory);
+                        });
+                book.setCategory(categoryEntity);
+            }
 
-        // Handle Genre
-        if (genre != null && !genre.isBlank()) {
-            BookGenre genreEntity = bookGenreRepo.findByNameIgnoreCase(genre)
-                    .orElseGet(() -> {
-                        // Create new category if not exists
-                        BookGenre newGenre = new BookGenre();
-                        newGenre.setName(genre);
-                        return bookGenreRepo.save(newGenre);
-                    });
-            book.setGenre(genreEntity);
-        }
+           log.info("### handling generes");
+            // Handle Multiple Genre
+            if (genres != null && !genres.isEmpty()) {
+                List<BookGenre> genreEntityList = genres.stream()
+                        .map(genreName -> bookGenreRepo.findByNameIgnoreCase(genreName)
+                                .orElseGet(() -> {
+                                    // Create new genre if it does not exist
+                                    BookGenre newGenre = new BookGenre();
+                                    newGenre.setName(genreName);
+                                    return bookGenreRepo.save(newGenre);
+                                })
+                        ).toList();
+                // Clear existing genres first
+                book.getGenres().clear();
+                book.getGenres().addAll(genreEntityList);
+            }
 
-        // Handle Language
-        if (language != null && !language.isBlank()) {
-            BookLanguage languageEntity = bookLanguageRepo.findByNameIgnoreCase(language)
-                    .orElseGet(() -> {
-                        // Create new category if not exists
-                        BookLanguage newLanguage = new BookLanguage();
-                        newLanguage.setName(language);
-                        return bookLanguageRepo.save(newLanguage);
-                    });
-            book.setLanguage(languageEntity);
+           log.info("### handling languages");
+            // Handle Language
+            if (language != null && !language.isBlank()) {
+                BookLanguage languageEntity = bookLanguageRepo.findByNameIgnoreCase(language)
+                        .orElseGet(() -> {
+                            // Create new category if not exists
+                            BookLanguage newLanguage = new BookLanguage();
+                            newLanguage.setName(language);
+                            return bookLanguageRepo.save(newLanguage);
+                        });
+                book.setLanguage(languageEntity);
+            }
+            return book;
+
+        } catch (Exception e){
+            log.error("### categoryGenreLanguageAdder failed", e);
+            throw new ServiceUnavailableException("Something went wrong : " + e.getMessage());
         }
-        return book;
     }
 
     // Get available product item quantity from Inventory
@@ -150,6 +189,7 @@ public class BookServices {
         try {
             return inventoryClient.getStockQuantity(productId);
         } catch (Exception e){
+            log.error("### 1 Exception details: ", e);
             throw new InternalServerErrorException("Error fetching quantity from inventory");
         }
     }
@@ -161,13 +201,57 @@ public class BookServices {
             Page<Book> bookPage = bookRepo.findAll(pageable);
 
             // Convert Book → DTO and replace blob names with SAS URLs
-            // Convert Book → DTO and replace blob names with SAS URLs
             Page<RetrieveBookDTO> dtoPage = bookPage.map(this::sasUrlAdderAndQuantitySetter);
             if (dtoPage.isEmpty()) {
+                log.error("### 2 Exception details: {}", dtoPage.isEmpty());
                 throw new ProductNotFoundException("No books found");
             }
 
             return dtoPage;
+
+        } catch (DataException exception){
+            log.error("### Error fetching all books", exception);
+            throw new ServiceUnavailableException("Something went wrong on the server. Please try again later.");
+        }
+    }
+
+    // Get all books for content-based filtering
+    public List<BookContentBasedFilteringDTO> getAllBooksForContentBasedFilter() {
+        try {
+            List<Book> books = bookRepo.findAll();
+            List<BookContentBasedFilteringDTO> bookData = new ArrayList<>();
+
+            for (Book book : books){
+                BookContentBasedFilteringDTO dto = new BookContentBasedFilteringDTO();
+                dto.setId(book.getId());
+                dto.setTitle(book.getTitle());
+                dto.setAuthor(book.getAuthor());
+                dto.setPublisher(book.getPublisher());
+                dto.setDescription(book.getDescription());
+                dto.setIsbn(book.getIsbn());
+                dto.setCategory(book.getCategory().getName());
+                dto.setLanguage(book.getLanguage().getName());
+
+                // FIX: Use HashMap instead of Map.of()
+                List<Map<String, Object>> genreList = book.getGenres().stream()
+                        .map(g -> {
+                            Map<String, Object> genreMap = new HashMap<>();
+                            genreMap.put("id", g.getId());
+                            genreMap.put("name", g.getName());
+                            return genreMap;
+                        })
+                        .toList();
+                dto.setGenres(genreList);
+
+                bookData.add(dto);
+            }
+
+            if(bookData.isEmpty()) {
+                log.warn("### Book list is empty {}", bookData);
+                throw new ProductNotFoundException("No books found");
+            }
+
+            return bookData;
 
         } catch (DataException exception){
             log.error("### Error fetching all books", exception);
@@ -207,12 +291,14 @@ public class BookServices {
            };
 
            if (bookPage.isEmpty()) {
+               log.error("### Error fetching books by {}", bookPage.isEmpty());
                throw new ProductNotFoundException("No books found for " + field.toLowerCase() + " : " + value);
            }
 
            return bookPage.map(this::sasUrlAdderAndQuantitySetter);
 
        } catch (ProductNotFoundException exception){
+           log.error("### 4 ",exception);
            throw exception;
        } catch (Exception e){
             log.error("### Error fetching books by {} : {}", field, value, e);
@@ -263,12 +349,14 @@ public class BookServices {
             Page<Book> bookPage = bookRepo.findAll(specification, pageable);
 
             if (bookPage.isEmpty()) {
+                log.error("### 5 {}",bookPage.isEmpty());
                 throw new ProductNotFoundException("No books found for given filter criteria");
             }
 
             return bookPage.map(this::sasUrlAdderAndQuantitySetter);
 
         } catch (ProductNotFoundException exception){
+            log.error("### 6 ", exception);
             throw exception;
         } catch (Exception e){
             log.error("### Error fetching books by filter {}", e.getMessage());
@@ -294,6 +382,7 @@ public class BookServices {
                 throw new ProductAlreadyExistsException("Book with ISBN : " + bookDTO.getIsbn() + " already exists");
             }
         } catch (Exception e){
+            log.error("### 8 ", e);
             throw new ServiceUnavailableException("Error mapping JSON to DTO : "+ e);
         }
 
@@ -316,15 +405,18 @@ public class BookServices {
             }
 
             Book newBook = modelMapper.map(bookDTO, Book.class);
+            log.info("### save newbook : "+ newBook);
+
             newBook.setImgFileName(fileName); // Set uploaded saved file's name as url
             newBook.setOtherImgFileNames(otherFilesNames);
 
             Book updatedNewBook = categoryGenreLanguageAdder(
                     newBook,
                     bookDTO.getCategory(),
-                    bookDTO.getGenre(),
+                    bookDTO.getGenres(),
                     bookDTO.getLanguage()
             );
+            log.info("### save updatedNewBook : "+ updatedNewBook);
 
             Book savedBook = bookRepo.save(updatedNewBook);
 
@@ -352,6 +444,7 @@ public class BookServices {
 
         UpdateBookDTO bookDTO;
 
+        log.info("### Updating book...");
         try {
             // Convert JSON string to DTO
             ObjectMapper mapper = new ObjectMapper();
@@ -359,16 +452,45 @@ public class BookServices {
 
             Book existingBook = bookRepo.findById(bookDTO.getId()).orElseThrow(
                     ()-> new ProductNotFoundException("Book not found"));
+            log.info("### Book exists");
 
-            String existingFileName = existingBook.getImgFileName();
+
+            log.info("### 1111 : {}", bookDTO);
+
+//            if (bookDTO.getTitle() != null){
+//                existingBook.setTitle(bookDTO.getTitle());
+//            }
 
             // map only non-null fields from DTO into existing entity
-            modelMapper.map(bookDTO, existingBook);
+            // modelMapper.map(bookDTO, existingBook);
+
+            // Configure ModelMapper to skip relational fields
+            if (modelMapper.getTypeMap(UpdateBookDTO.class, Book.class) == null) {
+                modelMapper.typeMap(UpdateBookDTO.class, Book.class).addMappings(new PropertyMap<>() {
+                    @Override
+                    protected void configure() {
+                        skip(destination.getCategory());
+                        skip(destination.getGenres());
+                        skip(destination.getLanguage());
+                    }
+                });
+            }
+
+            log.info("### 222 dto : {}", bookDTO);
+            log.info("### 222 ent : {}", existingBook);
+
+            // Map only simple fields (title, author, publisher, description, price, isbn)
+            // category, genres, language has skipped
+            modelMapper.map(bookDTO, existingBook); // copies matching properties from the DTO to the existing entity
+
+            log.info("### 333 : {}", existingBook);
 
             // Cover image file updating handling
-            log.info("### cover img file : {}",file);
+            String existingFileName = existingBook.getImgFileName();
+
+            log.info("### cover img file : {}", file);
             if(file != null && !file.isEmpty()){
-                log.info("### image file is not null : {}", file.getOriginalFilename());
+                log.info("### cover image file is not null : {}", file.getOriginalFilename());
                 try {
                     // Delete existing file from Azure
                     if (existingFileName != null && !existingFileName.isEmpty()) {
@@ -379,25 +501,51 @@ public class BookServices {
                     String fileName = azureBlobService.uploadFile(file, ContainerType.BOOK);
                     existingBook.setImgFileName(fileName); // Set uploaded image file name in DTO
                 } catch (Exception exception){
-                    throw new InternalServerErrorException("Something went wrong when uploading images");
+                    log.error("### Error  uploading cover image {}", exception.getMessage());
+                    throw new ServiceUnavailableException("Something went wrong when uploading cover image");
                 }
             }
 
             // Other img files updating handling
-            List<String> ExistingOtherFilesNames = existingBook.getOtherImgFileNames();
+            List<String> existingOtherFilesNames = existingBook.getOtherImgFileNames();
+            List<String> updatedFileNames = new ArrayList<>();
+
+            log.info("### existingOtherFilesNames : {}", existingOtherFilesNames);
+            log.info("### otherFiles : {}", otherFiles);
+
             if(otherFiles != null && !otherFiles.isEmpty()){
                 log.info("### Other image files are not null : {}", otherFiles);
                 log.warn("### Existing other file names : {}", existingBook.getOtherImgFileNames());
                 try{
-                    for (MultipartFile f : otherFiles){
-                        if (f != null && !f.isEmpty()){
-                            // Upload the image to Azure Blob Storage
-                            String fileName = azureBlobService.uploadFile(f, ContainerType.BOOK);
-                            ExistingOtherFilesNames.add(fileName);
+                    for (MultipartFile newFile  : otherFiles){
+                        if (newFile  != null && !newFile .isEmpty()){
+                            String newFileName = newFile.getOriginalFilename();
+                            log.info("### Processing file: {}", newFileName);
+
+                            // Already exists? Keep it
+                            if(existingOtherFilesNames.contains(newFileName)){
+                                log.info("###  Already exists keeping it : {}", newFileName);
+                                updatedFileNames.add(newFileName);
+                            } else {
+                                // Upload new file
+                                log.info("###  New file updating : {}", newFileName);
+                                String uploadedFileName = azureBlobService.uploadFile(newFile, ContainerType.BOOK);
+                                updatedFileNames.add(uploadedFileName);
+                            }
                         }
                     }
-                    existingBook.setOtherImgFileNames(ExistingOtherFilesNames);
+
+                    // Delete files that are no longer present
+                    for (String existingFile  : existingOtherFilesNames){
+                        if(!updatedFileNames.contains(existingFile)){
+                            log.info("### this file not longer present in updating : {}", existingFile);
+                            azureBlobService.deleteFile(existingFile, ContainerType.BOOK);
+                        }
+                    }
+                    existingBook.setOtherImgFileNames(updatedFileNames);
+
                 } catch (Exception ex) {
+                    log.error("### Error uploading other images");
                     throw new InternalServerErrorException("Something went wrong when uploading images");
                 }
             }
@@ -405,21 +553,27 @@ public class BookServices {
             Book updatedExistenceBook = categoryGenreLanguageAdder(
                     existingBook,
                     bookDTO.getCategory(),
-                    bookDTO.getGenre(),
+                    bookDTO.getGenres(),
                     bookDTO.getLanguage()
             );
 
-            Book savedBook = bookRepo.save(updatedExistenceBook);
-            log.info("### Book updated successfully with ID: {}", savedBook.getId());
+            log.info("### 444 : {}", updatedExistenceBook);
 
-            return sasUrlAdderAndQuantitySetter(savedBook);
+            try {
+                Book savedBook = bookRepo.save(updatedExistenceBook);
+                log.info("### Book updated successfully with ID: {}", savedBook.getId());
+                return sasUrlAdderAndQuantitySetter(savedBook);
+            } catch (Exception e){
+                log.error("### book saving error : ", e);
+                throw new ServiceUnavailableException("Error saving book : " + e.getMessage());
+            }
 
         } catch (JsonProcessingException e) {
             log.error("### Invalid JSON : {}", e.getMessage());
             throw new BadRequestException("Invalid JSON: " + e.getMessage());
         } catch (DataAccessException  e){
             log.error("### Error updating book with ID: {}", e.getMessage());
-            throw new ServiceUnavailableException("Something went wrong on the server. Please try again later.");
+            throw new ServiceUnavailableException("Something went wrong on the server. Please try again later : " + e.getMessage());
         }
     }
 
@@ -470,7 +624,9 @@ public class BookServices {
             return sasUrlAdderAndQuantitySetter(updatedBook);
 
         } catch (Exception e){
+            log.error("### 10 ", e);
             throw new ServiceUnavailableException("Something went wrong in server");
         }
     }
+
 }

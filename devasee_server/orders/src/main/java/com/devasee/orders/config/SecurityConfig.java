@@ -31,9 +31,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 HttpMethod.GET,
-                                "/api/v1/orders/order/**",
-                                "/api/v1/orders/order"
-                        ).permitAll()
+                                "/api/v1/orders/**",
+                                "/api/v1/orders/"
+                        ).authenticated()
                         .anyRequest().authenticated())
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint(jsonAuthEntryPoint) // 401
