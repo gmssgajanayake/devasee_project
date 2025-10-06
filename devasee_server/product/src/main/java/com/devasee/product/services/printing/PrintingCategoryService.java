@@ -1,8 +1,8 @@
-package com.devasee.product.services;
+package com.devasee.product.services.printing;
 
-import com.devasee.product.entity.PrintingCategory;
+import com.devasee.product.entity.printing.PrintingCategory;
 import com.devasee.product.exception.ProductNotFoundException;
-import com.devasee.product.repo.PrintingCategoryRepo;
+import com.devasee.product.repo.printing.PrintingCategoryRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

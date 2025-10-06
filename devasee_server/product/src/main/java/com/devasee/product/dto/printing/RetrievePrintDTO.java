@@ -1,15 +1,17 @@
-package com.devasee.product.dto;
+package com.devasee.product.dto.printing;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UpdatePrintDTO {
+
+public class RetrievePrintDTO {
     private String id;
     private String title;
     private String types;
@@ -18,12 +20,16 @@ public class UpdatePrintDTO {
     private String weight;
     private String printArtWorkSize;
     private String packaging;
-    private Boolean giftWrapAvailable;
-    private Double giftWrapPrice;
+    private boolean giftWrapAvailable;
+    private double giftWrapPrice;
     private List<String> colors;
-    private Double price;
+    private double price;
     private String imgUrl;
-    private List<String> otherImgUrls;
+    private List<String> otherImgUrls;   // ✅ renamed
     private String category;
+    private int stockQuantity;
     private String description;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }
+

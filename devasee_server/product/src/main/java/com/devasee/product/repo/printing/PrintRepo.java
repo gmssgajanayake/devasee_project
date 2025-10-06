@@ -1,7 +1,7 @@
-package com.devasee.product.repo;
+package com.devasee.product.repo.printing;
 
-import com.devasee.product.entity.PrintProductType;
-import com.devasee.product.entity.Printing;
+import com.devasee.product.entity.printing.PrintProductType;
+import com.devasee.product.entity.printing.Printing;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
