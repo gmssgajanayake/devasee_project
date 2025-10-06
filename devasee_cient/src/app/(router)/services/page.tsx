@@ -346,7 +346,7 @@ function PrintingContainer({
         <div className="w-full py-10 px-6 sm:px-12">
             <PrintingSortOptions sortBy={sortBy} setSortBy={setSortBy} />
 
-            <div className="grid gap-2 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7">
+            <div className="grid gap-6 [grid-template-columns:repeat(auto-fit,minmax(220px,1fr))]">
                 {currentServices.map((service) => (
                     <div key={service.id} className="w-full">
                         <PrintingItemCard
@@ -360,6 +360,7 @@ function PrintingContainer({
                     </div>
                 ))}
             </div>
+
 
             <div className="flex justify-center items-center gap-3 flex-wrap mt-10">
                 <button
@@ -465,12 +466,17 @@ function PrintingItemCard({
             </div>
 
             {/* CONTENT: reduced top padding and slight negative margin to reduce gap */}
-            <div className="px-3 pb-3 pt-2 -mt-1 bg-white relative z-10">
-                <h3 className="text-sm font-semibold text-gray-800 mb-0 line-clamp-2">
+            <div className="p-3 flex flex-col items-center text-center">
+                <h3
+                    className="text-xl font-semibold text-gray-800 mb-1 transition-colors duration-200 line-clamp-2
+             hover:underline hover:text-[#0000ff] hover:decoration-[#0000ff]
+             focus:underline focus:text-[#0000ff] focus:decoration-[#0000ff]"
+                >
                     {itemName}
                 </h3>
 
-                <p className="text-lg font-bold text-[#2b216d] mb-2">Rs. {price}</p>
+
+                <p className="text-base font-bold text-[#0000ff] mt-1">Rs. {price}</p>
 
                 {/* If already in cart -> show Remove button always */}
                 {isInCart ? (
@@ -485,7 +491,7 @@ function PrintingItemCard({
                     <button
                         onClick={onAddToCart}
                         className={
-                            "w-full py-2 rounded-md text-sm font-medium transition-all duration-200 " +
+                            "w-full py-2 rounded-md text-sm font-medium mt-3 transition-all duration-200 " +
                             "opacity-0 translate-y-1 pointer-events-none " +
                             "group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto " +
                             "group-focus-within:opacity-100 group-focus-within:translate-y-0 group-focus-within:pointer-events-auto " +
@@ -495,6 +501,7 @@ function PrintingItemCard({
                     >
                         Place Order
                     </button>
+
                 )}
             </div>
         </div>
