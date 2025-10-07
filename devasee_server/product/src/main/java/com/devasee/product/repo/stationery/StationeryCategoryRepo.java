@@ -1,6 +1,6 @@
-package com.devasee.product.repo;
+package com.devasee.product.repo.stationery;
 
-import com.devasee.product.entity.StationeryCategory;
+import com.devasee.product.entity.stationery.StationeryCategory;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

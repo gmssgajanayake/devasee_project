@@ -1,4 +1,4 @@
-package com.devasee.product.entity;
+package com.devasee.product.entity.stationery;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
