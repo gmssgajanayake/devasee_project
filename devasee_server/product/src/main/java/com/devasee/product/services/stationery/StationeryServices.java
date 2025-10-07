@@ -1,17 +1,18 @@
-package com.devasee.product.services;
+package com.devasee.product.services.stationery;
 
-import com.devasee.product.dto.*;
-import com.devasee.product.entity.Stationery;
-import com.devasee.product.entity.StationeryBrand;
-import com.devasee.product.entity.StationeryCategory;
+import com.devasee.product.dto.stationery.*;
+import com.devasee.product.entity.stationery.Stationery;
+import com.devasee.product.entity.stationery.StationeryBrand;
+import com.devasee.product.entity.stationery.StationeryCategory;
 import com.devasee.product.enums.ContainerType;
 import com.devasee.product.exception.ProductAlreadyExistsException;
 import com.devasee.product.exception.ProductNotFoundException;
 import com.devasee.product.exception.ServiceUnavailableException;
 import com.devasee.product.interfaces.InventoryClient;
-import com.devasee.product.repo.StationeryRepo;
-import com.devasee.product.repo.StationeryBrandRepo;
-import com.devasee.product.repo.StationeryCategoryRepo;
+import com.devasee.product.repo.stationery.StationeryRepo;
+import com.devasee.product.repo.stationery.StationeryBrandRepo;
+import com.devasee.product.repo.stationery.StationeryCategoryRepo;
+import com.devasee.product.services.AzureBlobService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;

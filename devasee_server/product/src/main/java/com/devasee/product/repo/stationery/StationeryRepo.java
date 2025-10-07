@@ -1,6 +1,6 @@
-package com.devasee.product.repo;
+package com.devasee.product.repo.stationery;
 
-import com.devasee.product.entity.Stationery;
+import com.devasee.product.entity.stationery.Stationery;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;

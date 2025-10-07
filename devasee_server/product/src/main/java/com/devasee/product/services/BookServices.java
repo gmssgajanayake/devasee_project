@@ -1,7 +1,7 @@
 package com.devasee.product.services;
 
-import com.devasee.product.dto.*;
 import com.devasee.product.dto.book.*;
+import com.devasee.product.dto.stationery.InventoryRequestDTO;
 import com.devasee.product.entity.Book;
 import com.devasee.product.entity.BookCategory;
 import com.devasee.product.entity.BookGenre;
