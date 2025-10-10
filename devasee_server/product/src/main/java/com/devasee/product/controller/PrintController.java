@@ -1,16 +1,16 @@
 package com.devasee.product.controller;
 
-import com.devasee.product.dto.CreatePrintDTO;
-import com.devasee.product.dto.DeletePrintDTO;
-import com.devasee.product.dto.RetrievePrintDTO;
-import com.devasee.product.entity.PrintProductType;
-import com.devasee.product.entity.PrintingCategory;
-import com.devasee.product.entity.PrintingMaterial;
+import com.devasee.product.dto.printing.CreatePrintDTO;
+import com.devasee.product.dto.printing.DeletePrintDTO;
+import com.devasee.product.dto.printing.RetrievePrintDTO;
+import com.devasee.product.entity.printing.PrintProductType;
+import com.devasee.product.entity.printing.PrintingCategory;
+import com.devasee.product.entity.printing.PrintingMaterial;
 import com.devasee.product.response.CustomResponse;
-import com.devasee.product.services.PrintProductTypeService;
-import com.devasee.product.services.PrintServices;
-import com.devasee.product.services.PrintingCategoryService;
-import com.devasee.product.services.PrintingMaterialService;
+import com.devasee.product.services.printing.PrintProductTypeService;
+import com.devasee.product.services.printing.PrintServices;
+import com.devasee.product.services.printing.PrintingCategoryService;
+import com.devasee.product.services.printing.PrintingMaterialService;
 import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;

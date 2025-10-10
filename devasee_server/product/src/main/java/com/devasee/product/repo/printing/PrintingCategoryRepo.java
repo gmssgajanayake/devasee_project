@@ -1,6 +1,6 @@
-package com.devasee.product.repo;
+package com.devasee.product.repo.printing;
 
-import com.devasee.product.entity.PrintingCategory;
+import com.devasee.product.entity.printing.PrintingCategory;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

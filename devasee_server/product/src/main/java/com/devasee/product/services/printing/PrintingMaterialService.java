@@ -1,8 +1,8 @@
-package com.devasee.product.services;
+package com.devasee.product.services.printing;
 
-import com.devasee.product.entity.PrintingMaterial;
+import com.devasee.product.entity.printing.PrintingMaterial;
 import com.devasee.product.exception.ProductNotFoundException;
-import com.devasee.product.repo.PrintingMaterialRepo;
+import com.devasee.product.repo.printing.PrintingMaterialRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
