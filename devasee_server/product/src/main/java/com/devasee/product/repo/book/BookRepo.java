@@ -1,6 +1,6 @@
-package com.devasee.product.repo;
+package com.devasee.product.repo.book;
 
-import com.devasee.product.entity.Book;
+import com.devasee.product.entity.book.Book;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;

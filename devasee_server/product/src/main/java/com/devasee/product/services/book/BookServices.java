@@ -1,20 +1,21 @@
-package com.devasee.product.services;
+package com.devasee.product.services.book;
 
 import com.devasee.product.dto.*;
 import com.devasee.product.dto.book.*;
-import com.devasee.product.entity.Book;
-import com.devasee.product.entity.BookCategory;
-import com.devasee.product.entity.BookGenre;
-import com.devasee.product.entity.BookLanguage;
+import com.devasee.product.entity.book.Book;
+import com.devasee.product.entity.book.BookCategory;
+import com.devasee.product.entity.book.BookGenre;
+import com.devasee.product.entity.book.BookLanguage;
 import com.devasee.product.enums.ContainerType;
 import com.devasee.product.interfaces.InventoryClient;
-import com.devasee.product.repo.BookCategoryRepo;
-import com.devasee.product.repo.BookGenreRepo;
-import com.devasee.product.repo.BookLanguageRepo;
-import com.devasee.product.repo.BookRepo;
+import com.devasee.product.repo.book.BookCategoryRepo;
+import com.devasee.product.repo.book.BookGenreRepo;
+import com.devasee.product.repo.book.BookLanguageRepo;
+import com.devasee.product.repo.book.BookRepo;
 import com.devasee.product.exception.ProductAlreadyExistsException;
 import com.devasee.product.exception.ProductNotFoundException;
 import com.devasee.product.exception.ServiceUnavailableException;
+import com.devasee.product.services.AzureBlobService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.criteria.Predicate;
@@ -84,10 +85,10 @@ public class BookServices {
 
         log.info("### Adding cover img url");
         // for cover image
-        String blobName = book.getImgFileName(); // stored as filename
-        if (blobName != null && !blobName.isEmpty()) {
-            log.info("### main file name : {}", blobName);
-            String sasUrl = azureBlobService.generateSasUrl(blobName, ContainerType.BOOK);
+        String coverImgFileName = book.getImgFileName(); // stored as filename
+        if (coverImgFileName != null && !coverImgFileName.isEmpty()) {
+            log.info("### cover image name : {}", coverImgFileName);
+            String sasUrl = azureBlobService.generateSasUrl(coverImgFileName, ContainerType.BOOK);
             dto.setImgUrl(sasUrl);
         }
 
@@ -98,7 +99,7 @@ public class BookServices {
         if (storedFileNames != null && !storedFileNames.isEmpty()) {
             for (String fileName : storedFileNames) {
                 if (fileName != null && !fileName.isEmpty()) {
-                    log.info("### other file names : {}", fileName);
+                    log.info("### other image names : {}", fileName);
                     String otherSasUrl = azureBlobService.generateSasUrl(fileName, ContainerType.BOOK);
                     otherImgUrls.add(otherSasUrl);
                 }
@@ -147,7 +148,7 @@ public class BookServices {
                 book.setCategory(categoryEntity);
             }
 
-           log.info("### handling generes");
+           log.info("### handling genres");
             // Handle Multiple Genre
             if (genres != null && !genres.isEmpty()) {
                 List<BookGenre> genreEntityList = genres.stream()
@@ -179,7 +180,7 @@ public class BookServices {
             return book;
 
         } catch (Exception e){
-            log.error("### categoryGenreLanguageAdder failed", e);
+            log.error("### categoryGenreLanguageAdder failed : ", e);
             throw new ServiceUnavailableException("Something went wrong : " + e.getMessage());
         }
     }
@@ -189,7 +190,7 @@ public class BookServices {
         try {
             return inventoryClient.getStockQuantity(productId);
         } catch (Exception e){
-            log.error("### 1 Exception details: ", e);
+            log.error("### stockQuantityGetter Exception in product : ", e);
             throw new InternalServerErrorException("Error fetching quantity from inventory");
         }
     }
@@ -203,7 +204,7 @@ public class BookServices {
             // Convert Book → DTO and replace blob names with SAS URLs
             Page<RetrieveBookDTO> dtoPage = bookPage.map(this::sasUrlAdderAndQuantitySetter);
             if (dtoPage.isEmpty()) {
-                log.error("### 2 Exception details: {}", dtoPage.isEmpty());
+                log.error("### No books found is empty : {}", dtoPage.isEmpty());
                 throw new ProductNotFoundException("No books found");
             }
 
@@ -228,6 +229,7 @@ public class BookServices {
                 dto.setAuthor(book.getAuthor());
                 dto.setPublisher(book.getPublisher());
                 dto.setDescription(book.getDescription());
+                dto.setKeywords(book.getKeywords());
                 dto.setIsbn(book.getIsbn());
                 dto.setCategory(book.getCategory().getName());
                 dto.setLanguage(book.getLanguage().getName());
@@ -291,14 +293,14 @@ public class BookServices {
            };
 
            if (bookPage.isEmpty()) {
-               log.error("### Error fetching books by {}", bookPage.isEmpty());
+               log.error("### Error fetching books by field : {}, : {}",  field.toLowerCase(),value);
                throw new ProductNotFoundException("No books found for " + field.toLowerCase() + " : " + value);
            }
 
            return bookPage.map(this::sasUrlAdderAndQuantitySetter);
 
        } catch (ProductNotFoundException exception){
-           log.error("### 4 ",exception);
+           log.error("### Product not found ", exception);
            throw exception;
        } catch (Exception e){
             log.error("### Error fetching books by {} : {}", field, value, e);
@@ -349,17 +351,17 @@ public class BookServices {
             Page<Book> bookPage = bookRepo.findAll(specification, pageable);
 
             if (bookPage.isEmpty()) {
-                log.error("### 5 {}",bookPage.isEmpty());
+                log.error("### No books found for given filter criteria");
                 throw new ProductNotFoundException("No books found for given filter criteria");
             }
 
             return bookPage.map(this::sasUrlAdderAndQuantitySetter);
 
         } catch (ProductNotFoundException exception){
-            log.error("### 6 ", exception);
+            log.error("### Product Not FoundException ", exception);
             throw exception;
         } catch (Exception e){
-            log.error("### Error fetching books by filter {}", e.getMessage());
+            log.error("### Error fetching books by filter : ", e);
             throw new ServiceUnavailableException("Something went wrong in server");
         }
     }
@@ -373,31 +375,37 @@ public class BookServices {
 
         CreateBookDTO bookDTO;
 
+        // Convert JSON string to DTO, already existence checking
         try {
-            // Convert JSON string to DTO
             ObjectMapper mapper = new ObjectMapper();
             bookDTO = mapper.readValue(bookJson, CreateBookDTO.class);
 
             if (bookRepo.existsByIsbn(bookDTO.getIsbn())) {
                 throw new ProductAlreadyExistsException("Book with ISBN : " + bookDTO.getIsbn() + " already exists");
             }
+        }catch(ProductAlreadyExistsException exception){
+            throw exception;
         } catch (Exception e){
-            log.error("### 8 ", e);
+            log.error("### Convert JSON string to DTO Error : ", e);
             throw new ServiceUnavailableException("Error mapping JSON to DTO : "+ e);
         }
 
+        String fileName = null;
         try {
             // Upload the cover image to Azure Blob Storage
-            String fileName = (file != null) ? azureBlobService.uploadFile(file, ContainerType.BOOK) : null;
-            log.info("### main file name : {}", file);
+            if(file!= null && !file.isEmpty()){
+                fileName =  azureBlobService.uploadFile(file, ContainerType.BOOK);
+                log.info("### cover image file not null, fie name is : {}", fileName);
+            } else {
+                log.info("### Cover image is null");
+            }
 
             // Upload the other image to Azure Blob Storage
             List<String> otherFilesNames = new ArrayList<>();
-
             if (otherFiles != null && !otherFiles.isEmpty()) {
                 for (MultipartFile f : otherFiles) {
                     if(f != null && !f.isEmpty()){
-                        log.info("### other file names : {}", f);
+                        log.info("### other file names : {}", f.getName());
                         String uploadedFileName = azureBlobService.uploadFile(f, ContainerType.BOOK);
                         otherFilesNames.add(uploadedFileName);
                     }
@@ -405,7 +413,7 @@ public class BookServices {
             }
 
             Book newBook = modelMapper.map(bookDTO, Book.class);
-            log.info("### save newbook : "+ newBook);
+            log.info("### save new book : "+ newBook);
 
             newBook.setImgFileName(fileName); // Set uploaded saved file's name as url
             newBook.setOtherImgFileNames(otherFilesNames);
@@ -416,7 +424,7 @@ public class BookServices {
                     bookDTO.getGenres(),
                     bookDTO.getLanguage()
             );
-            log.info("### save updatedNewBook : "+ updatedNewBook);
+            log.info("### save updatedNewBook : {}", updatedNewBook);
 
             Book savedBook = bookRepo.save(updatedNewBook);
 
@@ -501,7 +509,7 @@ public class BookServices {
                     String fileName = azureBlobService.uploadFile(file, ContainerType.BOOK);
                     existingBook.setImgFileName(fileName); // Set uploaded image file name in DTO
                 } catch (Exception exception){
-                    log.error("### Error  uploading cover image {}", exception.getMessage());
+                    log.error("### Error  uploading cover image : ", exception);
                     throw new ServiceUnavailableException("Something went wrong when uploading cover image");
                 }
             }
@@ -572,7 +580,7 @@ public class BookServices {
             log.error("### Invalid JSON : {}", e.getMessage());
             throw new BadRequestException("Invalid JSON: " + e.getMessage());
         } catch (DataAccessException  e){
-            log.error("### Error updating book with ID: {}", e.getMessage());
+            log.error("### Error updating book with ID: }", e);
             throw new ServiceUnavailableException("Something went wrong on the server. Please try again later : " + e.getMessage());
         }
     }
@@ -624,7 +632,7 @@ public class BookServices {
             return sasUrlAdderAndQuantitySetter(updatedBook);
 
         } catch (Exception e){
-            log.error("### 10 ", e);
+            log.error("### Delete Img From AzureBlob By FileName Error ", e);
             throw new ServiceUnavailableException("Something went wrong in server");
         }
     }

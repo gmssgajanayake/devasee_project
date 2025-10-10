@@ -18,6 +18,7 @@ public class BookContentBasedFilteringDTO {
     private String category;
     private List<Map<String, Object>> genres;
     private String description;
+    private List<String> keywords;
     private String language;
     private long isbn;
 }
