@@ -1,0 +1,61 @@
+recsys_api/
+│
+├── app/
+│   ├── __init__.py
+│   ├── main.py
+│   │
+│   ├── api/
+│   │   ├── __init__.py
+│   │   ├── v1/
+│   │   │   ├── __init__.py
+│   │   │   ├── recommender.py   # /recommend endpoint
+│   │   │   ├── health.py
+│   │
+│   ├── core/
+│   │   ├── __init__.py
+│   │   ├── config.py
+│   │   ├── logging.py
+│   │
+│   ├── schemas/
+│   │   ├── __init__.py
+│   │   ├── recommender.py
+│   │
+│   ├── services/
+│   │   ├── __init__.py
+│   │   ├── recommender_service.py   # orchestrates algo selection
+│   │   ├── user_service.py
+│   │
+│   ├── recommender/
+│   │   ├── __init__.py
+│   │   ├── model_loader.py
+│   │   ├── trainer.py
+│   │   │
+│   │   ├── algorithms/          # <-- new subfolder
+│   │   │   ├── __init__.py
+│   │   │   ├── content_based.py
+│   │   │   ├── collaborative.py
+│   │   │   ├── hybrid.py
+│   │   │
+│   │   ├── inference.py         # entrypoint: picks algorithm & runs
+│   │
+│   └── utils/
+│       ├── __init__.py
+│       ├── http_client.py
+│       ├── preprocessing.py
+│       ├── common.py
+│
+├── artifacts/
+│   ├── book_df.pkl
+│   ├── similarity_matrix.pkl
+│   ├── collaborative_model.pkl   # e.g. ALS/NN model later
+│
+├── tests/
+│   ├── __init__.py
+│   ├── test_recommender.py
+│   ├── test_health.py
+│
+├── requirements.txt
+├── Dockerfile
+├── docker-compose.yml
+├── .env
+└── README.md

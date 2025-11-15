@@ -1,8 +1,8 @@
-package com.devasee.product.services;
+package com.devasee.product.services.book;
 
-import com.devasee.product.entity.BookLanguage;
+import com.devasee.product.entity.book.BookLanguage;
 import com.devasee.product.exception.ProductNotFoundException;
-import com.devasee.product.repo.BookLanguageRepo;
+import com.devasee.product.repo.book.BookLanguageRepo;
 import jakarta.ws.rs.InternalServerErrorException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

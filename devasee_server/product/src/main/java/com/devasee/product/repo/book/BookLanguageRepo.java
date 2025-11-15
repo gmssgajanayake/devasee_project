@@ -1,6 +1,6 @@
-package com.devasee.product.repo;
+package com.devasee.product.repo.book;
 
-import com.devasee.product.entity.BookLanguage;
+import com.devasee.product.entity.book.BookLanguage;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

@@ -1,4 +1,4 @@
-package com.devasee.product.entity;
+package com.devasee.product.entity.book;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -58,6 +58,8 @@ public class Book {
     private long isbn;
 
     private String imgFileName;
+
+    private List<String> keywords;
 
     @ElementCollection
     private List<String> otherImgFileNames = new ArrayList<>();
