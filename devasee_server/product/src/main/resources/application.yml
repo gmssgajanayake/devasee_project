@@ -35,4 +35,4 @@ azure:
     # account-name: devaseebookstoreimages
     # account-key: YOUR_ACCOUNT_KEY
     # use the same connection string for all your containers in the same storage account.
-    connect-str: DefaultEndpointsProtocol=https;AccountName=devasee;AccountKey=7f30G4zqLIu2yQZxqQYnjtDnOKmh84YNUUDJbAUW4bitEnvekn1nUqrd7itxpVGROqxsO0MNoea3+ASt/bjvAw==;EndpointSuffix=core.windows.net
+    connect-str: DefaultEndpointsProtocol=https;EndpointSuffix=core.windows.net;AccountName=devaseebookstoreimages;AccountKey=pAjow61U0YsxPRwz+mZ+ihb3k4+KMrLHverA9Z4TY4nIwBS/MRjUDKUqD4EHQVGLhHmW2+/r/qGG+AStCiH9Kg==;BlobEndpoint=https://devaseebookstoreimages.blob.core.windows.net/;FileEndpoint=https://devaseebookstoreimages.file.core.windows.net/;QueueEndpoint=https://devaseebookstoreimages.queue.core.windows.net/;TableEndpoint=https://devaseebookstoreimages.table.core.windows.net/
