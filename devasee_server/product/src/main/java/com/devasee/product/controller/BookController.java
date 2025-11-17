@@ -147,9 +147,6 @@ public class BookController {
     }
 
 
-
-
-
     // --------------------------------- Admin ---------------------------------
 
     // Save the book in database
