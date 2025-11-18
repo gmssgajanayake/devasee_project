@@ -1,4 +1,4 @@
-package com.devasee.product.dto;
+package com.devasee.product.dto.stationery;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

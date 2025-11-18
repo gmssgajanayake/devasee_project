@@ -1,7 +1,7 @@
 package com.devasee.product.services.book;
 
-import com.devasee.product.dto.*;
 import com.devasee.product.dto.book.*;
+import com.devasee.product.dto.stationery.InventoryRequestDTO;
 import com.devasee.product.entity.book.Book;
 import com.devasee.product.entity.book.BookCategory;
 import com.devasee.product.entity.book.BookGenre;
@@ -18,6 +18,8 @@ import com.devasee.product.exception.ServiceUnavailableException;
 import com.devasee.product.services.AzureBlobService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.BadRequestException;
@@ -332,7 +334,8 @@ public class BookServices {
                     predicates.add(cb.like(cb.lower(root.get("publisher")), "%" + publisher.toLowerCase() + "%"));
                 }
                 if (genre != null) {
-                    predicates.add(cb.like(cb.lower(root.get("genre").get("name")), "%" + genre.toLowerCase() + "%"));
+                    Join<Book, BookGenre> genreJoin = root.join("genres", JoinType.LEFT);
+                    predicates.add(cb.like(cb.lower(genreJoin.get("name")), "%" + genre.toLowerCase() + "%"));
                 }
                 if (language != null) {
                     predicates.add(cb.like(cb.lower(root.get("language").get("name")), "%" + language.toLowerCase() + "%"));

@@ -1,8 +1,8 @@
-package com.devasee.product.services;
+package com.devasee.product.services.stationery;
 
-import com.devasee.product.entity.StationeryCategory;
+import com.devasee.product.entity.stationery.StationeryCategory;
 import com.devasee.product.exception.ProductNotFoundException;
-import com.devasee.product.repo.StationeryCategoryRepo;
+import com.devasee.product.repo.stationery.StationeryCategoryRepo;
 import jakarta.ws.rs.InternalServerErrorException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

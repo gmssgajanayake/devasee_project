@@ -1,10 +1,10 @@
 package com.devasee.product.services.printing;
 
-import com.devasee.product.dto.*;
 import com.devasee.product.dto.printing.CreatePrintDTO;
 import com.devasee.product.dto.printing.DeletePrintDTO;
 import com.devasee.product.dto.printing.RetrievePrintDTO;
 import com.devasee.product.dto.printing.UpdatePrintDTO;
+import com.devasee.product.dto.stationery.InventoryRequestDTO;
 import com.devasee.product.entity.printing.PrintProductType;
 import com.devasee.product.entity.printing.Printing;
 import com.devasee.product.entity.printing.PrintingCategory;
