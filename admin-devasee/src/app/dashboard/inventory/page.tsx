@@ -15,7 +15,7 @@ export default function InventoryPage() {
                     View All Books
                 </button>
             </div>
-
+            
             {/* Content Section */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Left: Add Book Form */}

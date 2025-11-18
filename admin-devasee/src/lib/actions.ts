@@ -69,12 +69,16 @@ export async function addBook(formData: FormData, JWTtoken: string | null) {
 export async function authenticateWithAPI(token: string) {
     try {
         const response = await fetch('http://api.devasee.lk/api/v1/users/auth', {
+
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json',
             },
         });
+
+
+        console.log(response.body);
 
         if (!response.ok) {
             throw new Error('API authentication failed');

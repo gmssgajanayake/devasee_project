@@ -17,6 +17,7 @@ public class CreateBookDTO {
     private List<String> genres;
     private String description;
     private String language;
+    private List<String> keywords;
     private double price;
     private int initialQuantity;
     private long isbn;
