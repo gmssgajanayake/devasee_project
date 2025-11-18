@@ -26,13 +26,17 @@ public class SecurityConfig {
                         .pathMatchers(
                                 HttpMethod.GET,
                                 "/api/v1/product/books",  // Spring Security treats /books and /books/ differently
+                                "/api/v1/product/books/",  // Spring Security treats /books and /books/ differently
                                 "/api/v1/product/books/**",
                                 "/api/v1/product/stationery",
+                                "/api/v1/product/stationery/",
                                 "/api/v1/product/stationery/**",
                                 "/api/v1/promo",
+                                "/api/v1/promo/",
                                 "/api/v1/promo/**",
                                 "/api/v1/inventory/product/*/quantity",
                                 "/api/v1/product/printing",
+                                "/api/v1/product/printing/",
                                 "/api/v1/product/printing/**"
                         ).permitAll() // no token required
                         .pathMatchers(

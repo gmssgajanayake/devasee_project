@@ -181,14 +181,6 @@ public class BookController {
         return new CustomResponse<>(true, "Book deleted success", bookDTO);
     }
 
-//    // POST to create new book category
-//    @PreAuthorize("hasRole('ADMIN')")
-//    @PostMapping("/categories")
-//    public CustomResponse<BookCategory> createCategory(@RequestParam String name) {
-//        BookCategory category = bookCategoryService.createCategory(name);
-//        return new CustomResponse<>(true, "Category created", category);
-//    }
-
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/az")
     public CustomResponse<RetrieveBookDTO> deleteOtherImgFile (
