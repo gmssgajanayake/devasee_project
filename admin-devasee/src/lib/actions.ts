@@ -2,52 +2,49 @@
 "use server";
 
 export async function addBook(formData: FormData, JWTtoken: string | null) {
-
     try {
-        const token = JWTtoken;
-
-        //testing token
-        //const token = "eyJhbGciOiJSUzI1NiIsImNhdCI6ImNsX0I3ZDRQRDIyMkFBQSIsImtpZCI6Imluc18yemt5Q3ZzcllvdFV2RWRmTTdFTURKZm4zZjUiLCJ0eXAiOiJKV1QifQ.eyJhenAiOiJodHRwczovL3d3dy5kZXZhc2VlLmxrIiwiZW1haWwiOiIyMDIxc3AwMjZAdW5pdi5qZm4uYWMubGsiLCJlbWFpbFZlcmlmaWVkIjp0cnVlLCJleHAiOjE3NTg1ODc5MjMsImZpcnN0TmFtZSI6IjIwMjFzcDAyNiIsImlhdCI6MTc1ODU1MTkyMywiaW1hZ2VVcmwiOiJodHRwczovL2ltZy5jbGVyay5jb20vZXlKMGVYQmxJam9pWkdWbVlYVnNkQ0lzSW1scFpDSTZJbWx1YzE4eWVtdDVRM1p6Y2xsdmRGVjJSV1JtVFRkRlRVUktabTR6WmpVaUxDSnlhV1FpT2lKMWMyVnlYek15U0dsdFpUSm1VakpqU0V4M1JtNVRWbXBFYkVkSFdHdGtheUlzSW1sdWFYUnBZV3h6SWpvaU1sTWlmUSIsImlzcyI6Imh0dHBzOi8vY2xlcmsuZGV2YXNlZS5sayIsImp0aSI6IjgyNWUzNWNmYWZmYjVmZGQyNmYxIiwibGFzdE5hbWUiOiJTYWt1amEgU2hhbWFsIEdhamFuYXlha2UiLCJuYmYiOjE3NTg1NTE5MTgsIm9yZ0lkIjpudWxsLCJvcmdOYW1lIjpudWxsLCJvcmdSb2xlIjpudWxsLCJwaG9uZU51bWJlclZlcmlmaWVkIjpmYWxzZSwicHJpbWFyeUVtYWlsQWRkcmVzcyI6IjIwMjFzcDAyNkB1bml2Lmpmbi5hYy5sayIsInByaW1hcnlQaG9uZU51bWJlciI6bnVsbCwicHJpbWFyeVdlYjNXYWxsZXQiOm51bGwsInN1YiI6InVzZXJfMzJIaW1lMmZSMmNITHdGblNWakRsR0dYa2RrIiwidXNlcklkIjoidXNlcl8zMkhpbWUyZlIyY0hMd0ZuU1ZqRGxHR1hrZGsiLCJ1c2VybmFtZSI6InNoYW1hbCJ9.DLI9_UIxv_YpbS4_wOpdVlwbyMg4C5WrHpefpjjvwZrVF8lu6_bHCYIW7r2hKFcW_N6i3GURQyhjSSRU_7pKMAGJyfxD6r6NK3uyZ70nq0fVV_XFJAcddvWkgH9zwCMr04O_hM8zkZwBT6xtmkmyqYvWAMc77tBbiXJfwp7H9XIJogvKA2dIb0vD1cdDpdtCa_4vqTG6O_RXO3oQ7SNEh5ESmqwTToio2FIj1uVLBbOSGbqIqW1JTPHmxahpcpEv_3UTpDt6c-wcBDVEQ-77PR1ZQFAA0lk4arXxkuITeXSg65-phgtdCZZdS5fmxcwP0hrunyaOmy1edoVGoEtqFw"
-
-        if (!token) {
+        if (!JWTtoken) {
             throw new Error("Missing authentication token");
         }
 
-        // Build FormData properly
+        // 1. Construct the book object from the incoming form data
+        // Ensure we map the frontend field names (like 'stockQuantity') to the backend expected names (like 'initialQuantity')
+        const bookData = {
+            title: formData.get("title"),
+            author: formData.get("author"),
+            publisher: formData.get("publisher"),
+            category: formData.get("category"),
+            genres: [], // Logic to parse genres if sent from frontend, e.g., formData.getAll("genres")
+            description: formData.get("description"),
+            language: formData.get("language"),
+            price: Number(formData.get("price")),
+            initialQuantity: Number(formData.get("stockQuantity")),
+            isbn: formData.get("isbn"),
+            keywords: []
+        };
+
+        // 2. Create the FormData payload expected by the backend
+        // The backend expects a multipart/form-data request with:
+        // - 'book': A stringified JSON object
+        // - 'file': The actual image file
         const body = new FormData();
 
-        console.log(formData)
-
-        body.append(
-            "book",
-            JSON.stringify({
-                title: formData.get("title"),
-                author: formData.get("author"),
-                publisher: formData.get("publisher"),
-                category: formData.get("category"),
-                genres: [],   // Add array if needed
-                description: formData.get("description"),
-                language: formData.get("language"),
-                price: Number(formData.get("price")), // optional: convert to number
-                initialQuantity: Number(formData.get("stockQuantity")),
-                isbn: formData.get("isbn"),
-                keywords: []  // Add array if needed
-            })
-        );
-
+        body.append("book", JSON.stringify(bookData));
 
         const file = formData.get("file") as File | null;
         if (file) {
             body.append("file", file);
         }
 
+        // 3. Send the request
         const response = await fetch(
-            "http://localhost:8080/api/v1/product/books",
+            "http://api.devasee.lk/api/v1/product/books",
             {
                 method: "POST",
                 headers: {
-                    Authorization: `Bearer ${token}`,
-                    // ⚠️ Don't set Content-Type manually; fetch will set correct boundary
+                    Authorization: `Bearer ${JWTtoken}`,
+                    // NOTE: Do NOT set 'Content-Type' manually when using FormData.
+                    // The browser/fetch will automatically set it with the correct boundary.
                 },
                 body,
             }
@@ -72,16 +69,12 @@ export async function addBook(formData: FormData, JWTtoken: string | null) {
 export async function authenticateWithAPI(token: string) {
     try {
         const response = await fetch('http://api.devasee.lk/api/v1/users/auth', {
-
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json',
             },
         });
-
-
-        console.log(response.body);
 
         if (!response.ok) {
             throw new Error('API authentication failed');
