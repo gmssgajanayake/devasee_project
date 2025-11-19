@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import gsap from "gsap";
 import SubNavBar from "@/app/(router)/_components/SubNavBar";
 import FilterBar from "@/app/(router)/products/_components/FilterBar";
@@ -305,13 +306,14 @@ interface PrintingContainerProps {
 const ITEMS_PER_PAGE = 24;
 
 function PrintingContainer({
-    printingServices,
-    sortBy,
-    setSortBy,
-    addToCart,
-    removeFromCart,
-    cartItems,
-}: PrintingContainerProps) {
+                               printingServices,
+                               sortBy,
+                               setSortBy,
+                              // addToCart,
+                               removeFromCart,
+                               cartItems,
+                           }: PrintingContainerProps) {
+    const router = useRouter(); // <--- THIS IS THE NEW LINE
     const [currentPage, setCurrentPage] = useState(1);
     const [sortedServices, setSortedServices] = useState<PrintingService[]>([]);
 
@@ -353,7 +355,7 @@ function PrintingContainer({
                             image={service.image}
                             itemName={service.itemName}
                             price={service.price}
-                            onAddToCart={() => addToCart(service)}
+                            onAddToCart={() => router.push(`/services/product/${service.id}`)}
                             onRemoveFromCart={() => removeFromCart(service.id)}
                             isInCart={cartItems.some((item) => item.id === service.id)}
                         />
