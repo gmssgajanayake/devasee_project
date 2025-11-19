@@ -21,17 +21,20 @@ export async function addBook(formData: FormData, JWTtoken: string | null) {
         body.append(
             "book",
             JSON.stringify({
-                title: formData.get('title'),
-                author:formData.get('author'),
-                publisher: formData.get('publisher'),
-                category: formData.get('category'),
-                description:formData.get('description'),
-                language: formData.get('language'),
-                price: formData.get('price'),
-                initialQuantity: formData.get('stockQuantity'),
-                isbn: formData.get('isbn')
+                title: formData.get("title"),
+                author: formData.get("author"),
+                publisher: formData.get("publisher"),
+                category: formData.get("category"),
+                genres: [],   // Add array if needed
+                description: formData.get("description"),
+                language: formData.get("language"),
+                price: Number(formData.get("price")), // optional: convert to number
+                initialQuantity: Number(formData.get("stockQuantity")),
+                isbn: formData.get("isbn"),
+                keywords: []  // Add array if needed
             })
         );
+
 
         const file = formData.get("file") as File | null;
         if (file) {
@@ -39,7 +42,7 @@ export async function addBook(formData: FormData, JWTtoken: string | null) {
         }
 
         const response = await fetch(
-            "http://api.devasee.lk/api/v1/product/books",
+            "http://localhost:8080/api/v1/product/books",
             {
                 method: "POST",
                 headers: {
