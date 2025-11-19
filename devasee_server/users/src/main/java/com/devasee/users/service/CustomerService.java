@@ -95,9 +95,11 @@ public class CustomerService {
         log.info("### Creating new customer: {} ({})", email, customerId);
 
         if(userRepo.existsByEmail(email)) {
+            AppUser existing = userRepo.findByEmail(email).orElseThrow(()-> new UserNotFoundException("User Not Found"));
             log.warn("### Customer already exists: {}", email);
-            throw new UserAlreadyExistsException("Customer with email '" + email + "' already exists");
+            throw new UserAlreadyExistsException("already exists:"+existing.getUsername());
         }
+        // if (("exists:{clerkObj.userName}" == "already exists:userName" AND statusCode==409) OR statusCode 200) allowed user
 
         AppUser appUser = new AppUser();
         appUser.setUserId(customerId);
