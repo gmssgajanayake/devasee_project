@@ -11,16 +11,17 @@ def root():
     return {"message" : "Welcome To Devasee Book Recommendation System"}
 
 
-
+# API for get reccomendation for a particuler book
 @app.post("/recommend/", response_model=list[BookResponse])
 def recommend_books(request: RecommendationRequest):
-    print("comming rec req")
+    print("### comming rec req")
     recommendations  = get_recommendation(request.title, request.top_n)
 
     if not recommendations:
         raise HTTPException(status_code=404, detail=f"No books found for title {request.title}")
     return recommendations
 
+# API for retrain the model
 @app.post("/retrain/")
 def manual_retrain():
     try:
@@ -35,3 +36,7 @@ def manual_retrain():
 
 
 # pip install -U sentence-transformers
+
+# .\recsys_env\Scripts\activate
+# python -m uvicorn app.main:app --reload
+# python -m uvicorn app.main:app
