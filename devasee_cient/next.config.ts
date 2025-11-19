@@ -2,11 +2,18 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
     images: {
+        // You can keep this for backward compatibility if needed, but it's less preferred than remotePatterns
         domains: ["devaseebookstoreimages.blob.core.windows.net"],
         remotePatterns: [
             {
                 protocol: "https",
                 hostname: "images.unsplash.com",
+            },
+            // ✨ ADD THIS ENTRY TO FIX THE ERROR!
+            {
+                protocol: "https",
+                // This is the hostname from your error message:
+                hostname: "devasee.blob.core.windows.net",
             },
         ],
     },
