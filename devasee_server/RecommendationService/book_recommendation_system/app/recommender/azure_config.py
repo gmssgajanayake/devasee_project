@@ -1,0 +1,2 @@
+AZURE_CONNECTION_STRING  = "DefaultEndpointsProtocol=https;AccountName=devasee;AccountKey=7f30G4zqLIu2yQZxqQYnjtDnOKmh84YNUUDJbAUW4bitEnvekn1nUqrd7itxpVGROqxsO0MNoea3+ASt/bjvAw==;EndpointSuffix=core.windows.net"
+AZURE_CONTAINER_NAME  = "rec-sys-pkls"

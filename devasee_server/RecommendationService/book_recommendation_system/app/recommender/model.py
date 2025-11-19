@@ -1,12 +1,18 @@
+# recommendation Engine Core Logic is herte like
+#   - fwetching books data from spring-boot backend 
+#   - retraining recommendation model
+#   - at app start load pkls into memory
+
 import joblib
 import pandas as pd
 import numpy as np
 from difflib import get_close_matches
 from app.models import BookResponse
-from threading import Lock
 import requests
 from tqdm import tqdm
 from sklearn.metrics.pairwise import cosine_similarity
+import random
+import os
 
 from app.recommender.data_cleaning_functions import (
     genres_string_to_list_convertor, 
@@ -17,16 +23,21 @@ from app.recommender.data_cleaning_functions import (
 )
 
 from app.recommender.embedding_model import get_weighted_embedding
-# from app.recommender.loader import upload_to_blob # todo
+from app.recommender.loader import save_and_upload, load_data_from_blob
 
-lock = Lock()
 
 book_df = None
 similarity_matrix = None
 
-#Get all books
+book_blob_name = "book_df.pkl"
+sim_blob_name = "similarity_matrix.pkl"
+
+local_book_path = 'app/artifacts_v1/book_df.pkl'
+local_sim_path = 'app/artifacts_v1/similarity_matrix.pkl'
+
+# Get all books
+SPRING_BOOKS_URL = "http://api.devasee.lk/api/v1/product/books/all"
 # SPRING_BOOKS_URL = "http://localhost:8080/api/v1/product/books/all"
-SPRING_BOOKS_URL = "http://localhost:8080/api/v1/product/books/all"
 
 
 # ---------------------- Retrainning --------------------------
@@ -34,19 +45,24 @@ SPRING_BOOKS_URL = "http://localhost:8080/api/v1/product/books/all"
 
 # Fetching book data from springboot, create data frame
 def fetch_books_from_spring():
-    response = requests.get(SPRING_BOOKS_URL)
-    response.raise_for_status()
-    books_json = response.json()
-    books_data = books_json['data'] 
-    df = pd.json_normalize(books_data, sep='_') 
-    return df
+    print(f"### Fetching books data from {SPRING_BOOKS_URL}")
+
+    try:
+        response = requests.get(SPRING_BOOKS_URL, timeout=10)
+        response.raise_for_status()
+        books_json = response.json()
+        books_data = books_json['data'] 
+        return pd.json_normalize(books_data, sep='_')
+    except requests.RequestException as e:
+        print(f"### Error fetching books: {e}")
+        return pd.DataFrame()  # return empty df instead of crashing
 
 
 
 # Retrain similarity matrix from Spring Boot data"
 def retrain_model():
     global book_df, similarity_matrix
-    print("Retraining model from Spring Boot backend...")
+    print("### Retraining model from Spring Boot backend...")
 
     book_df = fetch_books_from_spring()
 
@@ -59,7 +75,6 @@ def retrain_model():
     if book_df.duplicated(subset='title', keep=False).sum() > 0:
         book_df = book_df.drop_duplicates(subset='title', keep='first')
         print("Duplicates found!, cleaned success")
-    
 
     # remove null values
     if book_df.isnull().values.any() > 0:
@@ -76,6 +91,8 @@ def retrain_model():
 
     # empty list to hold embeddings
     embedding_list = []
+    
+    # Generate embeddings
 
     # Iterate over rows with a progress bar
     for _, row  in tqdm(book_df.iterrows(), total=len(book_df), desc="Embedding books"):
@@ -89,70 +106,87 @@ def retrain_model():
     # Cosine similarity
     similarity_matrix = cosine_similarity(embeddings)
 
-    # Save pickles locally (or upload to Azure Blob)
-    with lock:
-        # TODO : For testing local
-        joblib.dump(book_df, 'artifacts_v1/book_df_new.pkl')
-        joblib.dump(similarity_matrix, 'artifacts_v1/similarity_matrix_new.pkl')
-
-        # TODO : azure
-        #upload_to_blob('artifacts_v1/book_df.pkl', 'book_df.pkl')
-        #upload_to_blob('artifacts_v1/similarity_matrix.pkl', 'similarity_matrix.pkl')
-
+    save_and_upload(book_df, similarity_matrix, book_blob_name, sim_blob_name)
     print("### Retraining completed & pkl uploaded to Azure/local !")
-
+    return book_df, similarity_matrix
 
 
 
 # ---------------------- Recommendation --------------------------
 
-# todo if pkl not there retrain model
+
+
+# Initial loading of data
 def initial_pkl_loader():
     global book_df, similarity_matrix
+
+    print("### initial_pkl_loader")
     try:
-        # TODO : testing
-        book_df = joblib.load("app/artifacts_v1/book_df.pkl")
-        similarity_matrix = joblib.load("app/artifacts_v1/similarity_matrix.pkl")
+        # if local data exists load data from local else load from azure
+        if os.path.exists(local_book_path) and os.path.exists(local_sim_path):
+            book_df = joblib.load(local_book_path)
+            similarity_matrix = joblib.load(local_sim_path)
+        else:
+            book_df, similarity_matrix = load_data_from_blob(book_blob_name, sim_blob_name)
+            if book_df is None or similarity_matrix is None:
+                print("### Pickles missing in both local, azure, retraining model...")
+                book_df, similarity_matrix = retrain_model()
 
-        # azure
-        # TODO :  get from azure
-
-        print("### Pkls loaded into memory")
+        print(f"### Pkls loaded into memory , books: {book_df.shape[0]}")
         print(book_df.head())
+        print(book_df.columns.tolist())
     except Exception as e:
         print(f"### Pkls laoding error into memory{e}")
 
 
 
+# title into lower then find, then retun original
+def get_best_match(book_title, titles):
+    titles_lower = [t.lower() for t in titles]
+    matches = get_close_matches(book_title.lower(), titles_lower, n=1, cutoff=0.6)
+    if matches:
+        # Return the original title with correct case
+        return [titles[titles_lower.index(m)] for m in matches]
+    return []  # empty list if no match
+
 # loading saved pkls into memory at startup
 initial_pkl_loader()
 
+
+def ensure_data_loaded():
+    global book_df, similarity_matrix
+    if book_df is None or similarity_matrix is None:
+        print("### Data missing, retraining model...")
+        book_df, similarity_matrix = retrain_model()   # retrain_model returns both
+
+        
+
 # Recommendation function
 def get_recommendation(book_title: str, top_n: int=10):
-
+    
+    # Ensure data was loaded
+    ensure_data_loaded()
+     
     # fetch latest Spring data if not loaded yet
     global book_df, similarity_matrix
 
-    if book_df is None or similarity_matrix is None:
-        print("### book_df or simmilarity_matrix is none retraining triggering")
-        # retrain_model()
-        
     titles = book_df['title'].tolist()
+    print(f"### Exsiting title list len : {len(titles)}")
+    for t in titles:
+        print(f"- {t}")
 
-    print(f"Title list len : {len(titles)}")
-
-    if book_title not in titles:
-        print("book_title not in titles")
-        return []
-
-    matches = get_close_matches(book_title, titles, n=1, cutoff=0.6)
+    # Use fuzzy matching
+    # matches = get_close_matches(book_title, titles, n=1, cutoff=0.6)
+    matches = get_best_match(book_title, titles)
     
     if not matches:
-        print(f"No close match found for '{book_title}'")
-        return
+        print(f"No close match found for '{book_title}', returning random books")
+        random_books = book_df.sample(n=min(top_n, len(book_df)))
+        results = [BookResponse(title=row['title'], isbn=str(row['isbn']), score=round(random.random(), 3)) for _, row in random_books.iterrows()]
+        return results
     
     best_match = matches[0]
-    print(f"best match {best_match}")
+    print(f"### best match {best_match}")
 
     # Finds the row number of the movie in new_df whose title exactly matches best_match
     index = book_df[book_df['title']==best_match].index[0]
@@ -165,11 +199,11 @@ def get_recommendation(book_title: str, top_n: int=10):
     distance_pairs = sorted(distance_pairs, key=lambda x: x[1], reverse=True)
     
     results = []
-    print(f"\nResults for: {best_match}\n")
+    print(f"\n### Results for: {best_match}\n")
 
     for i, score in distance_pairs[1:top_n+1]:
         book = book_df.iloc[i]
-        bookResponse = BookResponse(title=book['title'], score=round(score, 3))
+        bookResponse = BookResponse(title=book['title'], isbn=str(book['isbn']), score=round(score, 3))
         results.append(bookResponse)
-        print(f"{book['title']} (Similarity: {score:.3f})")
+        print(f"### {book['title']},  {book['isbn']} (Similarity: {score:.3f})")
     return results
