@@ -40,3 +40,26 @@ def manual_retrain():
 # .\recsys_env\Scripts\activate
 # python -m uvicorn app.main:app --reload
 # python -m uvicorn app.main:app
+
+
+"""
+book_recommendation_system/
+│
+├── app/
+│   ├── main.py              # FastAPI entrypoint
+│   ├── models.py            # Pydantic models
+│   ├── recommender/
+│   │   ├── __init__.py
+│   │   ├── model.py
+│   │   ├── recommender.py
+│   │   ├── embedding_model.py
+│   │   ├── data_cleaning_functions.py
+│   │   └── loader.py
+│   └── artifacts_v1/
+│       ├── book_df.pkl
+│       └── similarity_matrix.pkl
+|
+├── recsys_env/
+|
+└── requirements.txt
+"""
