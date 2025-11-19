@@ -1,12 +1,14 @@
 package com.devasee.product.controller;
 
-import com.devasee.product.dto.*;
-import com.devasee.product.entity.StationeryCategory;
-import com.devasee.product.entity.StationeryBrand;
+import com.devasee.product.dto.stationery.CreateStationeryDTO;
+import com.devasee.product.dto.stationery.DeleteStationeryDTO;
+import com.devasee.product.dto.stationery.RetrieveStationeryDTO;
+import com.devasee.product.entity.stationery.StationeryCategory;
+import com.devasee.product.entity.stationery.StationeryBrand;
 import com.devasee.product.response.CustomResponse;
-import com.devasee.product.services.StationeryCategoryService;
-import com.devasee.product.services.StationeryBrandService;
-import com.devasee.product.services.StationeryServices;
+import com.devasee.product.services.stationery.StationeryCategoryService;
+import com.devasee.product.services.stationery.StationeryBrandService;
+import com.devasee.product.services.stationery.StationeryServices;
 import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;

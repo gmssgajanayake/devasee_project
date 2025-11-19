@@ -1,16 +1,16 @@
 package com.devasee.product.controller;
 
-import com.devasee.product.dto.CreatePrintDTO;
-import com.devasee.product.dto.DeletePrintDTO;
-import com.devasee.product.dto.RetrievePrintDTO;
-import com.devasee.product.entity.PrintProductType;
-import com.devasee.product.entity.PrintingCategory;
-import com.devasee.product.entity.PrintingMaterial;
+import com.devasee.product.dto.printing.CreatePrintDTO;
+import com.devasee.product.dto.printing.DeletePrintDTO;
+import com.devasee.product.dto.printing.RetrievePrintDTO;
+import com.devasee.product.entity.printing.PrintProductType;
+import com.devasee.product.entity.printing.PrintingCategory;
+import com.devasee.product.entity.printing.PrintingMaterial;
 import com.devasee.product.response.CustomResponse;
-import com.devasee.product.services.PrintProductTypeService;
-import com.devasee.product.services.PrintServices;
-import com.devasee.product.services.PrintingCategoryService;
-import com.devasee.product.services.PrintingMaterialService;
+import com.devasee.product.services.printing.PrintProductTypeService;
+import com.devasee.product.services.printing.PrintServices;
+import com.devasee.product.services.printing.PrintingCategoryService;
+import com.devasee.product.services.printing.PrintingMaterialService;
 import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -43,7 +43,6 @@ public class PrintController {
 
     // GET /api/v1/product/printing?page=0&size=20
     @GetMapping
-    @PreAuthorize("isAuthenticated()")
     public CustomResponse<Page<RetrievePrintDTO>> getAllPrints(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size
@@ -53,7 +52,6 @@ public class PrintController {
     }
 
     // GET /api/v1/product/printing/{printId}
-    @PreAuthorize("isAuthenticated()")
     @GetMapping("/{printId}")
     public CustomResponse<RetrievePrintDTO> getPrintById(@PathVariable String printId) {
         RetrievePrintDTO printDTO = printServices.getPrintById(printId);
@@ -62,7 +60,6 @@ public class PrintController {
 
     // GET /api/v1/product/printing/search?field=type&value=mug&page=0&size=10
     @GetMapping("/search")
-    @PreAuthorize("isAuthenticated()")
     public CustomResponse<Page<RetrievePrintDTO>> searchPrintsByTerm(
             @RequestParam String field,
             @RequestParam String value,
@@ -78,7 +75,6 @@ public class PrintController {
     }
     // Categories
     @GetMapping("/categories")
-    @PreAuthorize("isAuthenticated()")
     public CustomResponse<List<String>> getAllCategories() {
         List<String> categories = categoryService.getAllCategories()
                 .stream()
@@ -87,9 +83,8 @@ public class PrintController {
         return new CustomResponse<>(true, "Categories fetched", categories);
     }
 
-    // Materials
+    // Get all Materials
     @GetMapping("/materials")
-    @PreAuthorize("isAuthenticated()")
     public CustomResponse<List<String>> getAllMaterials() {
         List<String> materials = materialService.getAllMaterials()
                 .stream()
@@ -98,9 +93,8 @@ public class PrintController {
         return new CustomResponse<>(true, "Materials fetched", materials);
     }
 
-    // Types
+    // Get all Types
     @GetMapping("/types")
-    @PreAuthorize("isAuthenticated()")
     public CustomResponse<List<String>> getAllProductTypes() {
         List<String> types = productTypeService.getAllTypes()
                 .stream()
@@ -123,7 +117,7 @@ public class PrintController {
         return new CustomResponse<>(true, "Print saved successfully", dtoResponse);
     }
 
-    // Update existing print type
+    // Update existing print
     @PutMapping
     @PreAuthorize("hasRole('ADMIN')")
     public CustomResponse<RetrievePrintDTO> updatePrint(
@@ -133,6 +127,7 @@ public class PrintController {
         RetrievePrintDTO dtoResponse = printServices.updatePrint(printJson, file);
         return new CustomResponse<>(true, "Print updated successfully", dtoResponse);
     }
+
     // Delete print type by ID
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{printId}")

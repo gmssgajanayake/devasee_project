@@ -20,7 +20,7 @@ spec:
           command: [ 'sh', '-c', 'until nc -z devasee-db 5432; do echo waiting for db; sleep 2; done;' ]
       containers:
         - name: devasee-orders
-          image: devaseebookstoreacr.azurecr.io/devasee-orders:1.0
+          image: devaseeacr.azurecr.io/orders:1.0
           ports:
             - containerPort: 8080
           env:

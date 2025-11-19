@@ -1,6 +1,6 @@
 package com.devasee.product.interfaces;
 
-import com.devasee.product.dto.InventoryRequestDTO;
+import com.devasee.product.dto.stationery.InventoryRequestDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 

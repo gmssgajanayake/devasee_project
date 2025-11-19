@@ -36,24 +36,27 @@ public class SecurityConfig {
                         .requestMatchers(
                                 HttpMethod.GET,
                                 "/api/v1/product/books/**",
+                                "/api/v1/product/books/",
                                 "/api/v1/product/books",
                                 "/api/v1/product/stationery/**",
+                                "/api/v1/product/stationery/",
                                 "/api/v1/product/stationery",
                                 "/api/v1/product/printing/**",
+                                "/api/v1/product/printing/",
                                 "/api/v1/product/printing"
                                 ).permitAll()
                         .requestMatchers(
                                 HttpMethod.POST,
-                                "api/v1/product/books",
-                                "api/v1/product/books/**"
+                                "/api/v1/product/books",
+                                "/api/v1/product/books/**"
                                 ).hasRole("ADMIN")
                         .requestMatchers(
                                 HttpMethod.PUT,
-                                "api/v1/product/books"
+                                "/api/v1/product/books"
                                 ).hasRole("ADMIN")
                         .requestMatchers(
                                 HttpMethod.DELETE,
-                                "api/v1/product/books/**"
+                                "/api/v1/product/books/**"
                                 ).hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .exceptionHandling(ex -> ex

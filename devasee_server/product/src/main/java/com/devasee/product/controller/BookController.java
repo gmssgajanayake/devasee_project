@@ -4,14 +4,14 @@ import com.devasee.product.dto.book.BookContentBasedFilteringDTO;
 import com.devasee.product.dto.book.CreateBookDTO;
 import com.devasee.product.dto.book.DeleteBookDTO;
 import com.devasee.product.dto.book.RetrieveBookDTO;
-import com.devasee.product.entity.BookCategory;
-import com.devasee.product.entity.BookGenre;
-import com.devasee.product.entity.BookLanguage;
+import com.devasee.product.entity.book.BookCategory;
+import com.devasee.product.entity.book.BookGenre;
+import com.devasee.product.entity.book.BookLanguage;
 import com.devasee.product.response.CustomResponse;
-import com.devasee.product.services.BookCategoryService;
-import com.devasee.product.services.BookGenreService;
-import com.devasee.product.services.BookLanguageService;
-import com.devasee.product.services.BookServices;
+import com.devasee.product.services.book.BookCategoryService;
+import com.devasee.product.services.book.BookGenreService;
+import com.devasee.product.services.book.BookLanguageService;
+import com.devasee.product.services.book.BookServices;
 import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -147,9 +147,6 @@ public class BookController {
     }
 
 
-
-
-
     // --------------------------------- Admin ---------------------------------
 
     // Save the book in database
@@ -183,14 +180,6 @@ public class BookController {
         DeleteBookDTO bookDTO = bookServices.deleteBook(bookId);
         return new CustomResponse<>(true, "Book deleted success", bookDTO);
     }
-
-//    // POST to create new book category
-//    @PreAuthorize("hasRole('ADMIN')")
-//    @PostMapping("/categories")
-//    public CustomResponse<BookCategory> createCategory(@RequestParam String name) {
-//        BookCategory category = bookCategoryService.createCategory(name);
-//        return new CustomResponse<>(true, "Category created", category);
-//    }
 
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/az")
