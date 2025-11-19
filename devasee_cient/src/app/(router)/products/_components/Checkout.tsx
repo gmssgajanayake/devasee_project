@@ -49,8 +49,8 @@ export default function Checkout() {
     );
 
     const deliveryFee = 300;
-    const taxRate = 0.08;
-    const discount = 500;
+    const taxRate = 0;
+    const discount = 100;
     const taxAmount = totalPrice * taxRate;
     const finalTotal = totalPrice + deliveryFee + taxAmount - discount;
 
@@ -466,7 +466,7 @@ export default function Checkout() {
                                             <p className="lg:text-lg text-gray-700">{new Intl.NumberFormat("en-LK", { style: "currency", currency: "LKR", minimumFractionDigits: 2 }).format(deliveryFee)}</p>
                                         </div>
                                         <div className="flex px-2 justify-between items-center border-b border-gray-400/20 py-3 lg:py-4">
-                                            <p className="lg:text-lg text-gray-700">Tax (8%)</p>
+                                            <p className="lg:text-lg text-gray-700">Tax (Free)</p>
                                             <p className="lg:text-lg text-gray-700">{new Intl.NumberFormat("en-LK", { style: "currency", currency: "LKR", minimumFractionDigits: 2 }).format(taxAmount)}</p>
                                         </div>
                                         <div className="flex px-2 justify-between items-center border-b border-gray-400/20 py-3 lg:py-4">
