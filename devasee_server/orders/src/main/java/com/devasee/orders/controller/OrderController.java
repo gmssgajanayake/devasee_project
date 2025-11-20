@@ -20,7 +20,7 @@ public class  OrderController {
         this.orderServices = orderServices;
     }
 
-    // --------------------- Public ---------------------
+
 
     // GET /api/v1/orders?page=0&size=20
     @GetMapping
@@ -41,9 +41,9 @@ public class  OrderController {
         return new CustomResponse<>(true, "Order found", order);
     }
 
-    // GET /api/v1/orders/customer/{customerName}?page=0&size=10
+    // GET /api/v1/orders/customer/{customerId}?page=0&size=10
     @PreAuthorize("isAuthenticated()")
-    @GetMapping("/customer/id/{customerId}")
+    @GetMapping("/customer/{customerId}")
     public CustomResponse<Page<RetrieveOrderDTO>> getOrdersByCustomerId(
             @PathVariable String customerId,
             @RequestParam(defaultValue = "0") int page,
@@ -52,17 +52,19 @@ public class  OrderController {
         Page<RetrieveOrderDTO> orders = orderServices.getOrdersByCustomerId(customerId, page, size);
         return new CustomResponse<>(true, "Orders for customer " + customerId, orders);
     }
-    // GET /api/v1/orders/recipient/{recipientName}?page=0&size=10
-    @PreAuthorize("isAuthenticated()")
-    @GetMapping("/recipient/{recipientName}")
-    public CustomResponse<Page<RetrieveOrderDTO>> getOrdersByRecipientName(
-            @PathVariable String recipientName,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
-    ) {
-        Page<RetrieveOrderDTO> orders = orderServices.getOrdersByRecipientName(recipientName, page, size);
-        return new CustomResponse<>(true, "Orders for recipient " + recipientName, orders);
-    }
+
+//    // GET /api/v1/orders/recipient/{recipientName}?page=0&size=10
+//    @PreAuthorize("isAuthenticated()")
+//    @GetMapping("/recipient/{recipientName}")
+//    public CustomResponse<Page<RetrieveOrderDTO>> getOrdersByRecipientName(
+//            @PathVariable String recipientName,
+//            @RequestParam(defaultValue = "0") int page,
+//            @RequestParam(defaultValue = "10") int size
+//    ) {
+//        Page<RetrieveOrderDTO> orders = orderServices.getOrdersByRecipientName(recipientName, page, size);
+//        return new CustomResponse<>(true, "Orders for recipient " + recipientName, orders);
+//    }
+
 
 
     //get order items in order
@@ -73,10 +75,7 @@ public class  OrderController {
         return new CustomResponse<>(true, "Items for order " + orderId, items);
     }
 
-
-    // --------------------- Admin ---------------------
-
-    // Save a new order
+    // Place a new order
     @PreAuthorize("isAuthenticated()")
     @PostMapping
     public CustomResponse<RetrieveOrderDTO> saveOrder(@RequestBody CreateOrderDTO orderDTO) {
@@ -93,20 +92,20 @@ public class  OrderController {
         return new CustomResponse<>(true, "Order updated successfully", updatedOrder);
     }
 
-    //get update order address
-    @PreAuthorize("isAuthenticated()")
-    @PatchMapping("/{orderId}/address")
-    public CustomResponse<RetrieveOrderDTO> updateOrderAddress(
-            @PathVariable String orderId,
-            @RequestBody String newAddress
-    ) {
-        RetrieveOrderDTO updatedOrder = orderServices.updateAddress(orderId, newAddress);
-        return new CustomResponse<>(true, "Address updated successfully", updatedOrder);
-    }
+//    //get update order address
+//    @PreAuthorize("isAuthenticated()")
+//    @PatchMapping("/{orderId}/address")
+//    public CustomResponse<RetrieveOrderDTO> updateOrderAddress(
+//            @PathVariable String orderId,
+//            @RequestBody String newAddress
+//    ) {
+//        RetrieveOrderDTO updatedOrder = orderServices.updateAddress(orderId, newAddress);
+//        return new CustomResponse<>(true, "Address updated successfully", updatedOrder);
+//    }
 
 
     // Delete order by ID
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public CustomResponse<DeleteOrderDTO> deleteOrder(@PathVariable String id) {
         DeleteOrderDTO deletedOrder = orderServices.deleteOrder(id);

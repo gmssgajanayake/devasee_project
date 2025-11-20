@@ -13,8 +13,4 @@ public interface OrderRepo extends JpaRepository<OrderEntity, String> {
     Page<OrderEntity> findByRecipientNameContainingIgnoreCase(String recipientName, Pageable pageable);
 
     Page<OrderEntity> findByCustomerId(String customerId, Pageable pageable);
-
-
-    // Check if an order with this number already exists
-    boolean existsByOrderNumber(String orderNumber);
 }

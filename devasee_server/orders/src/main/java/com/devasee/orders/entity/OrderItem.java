@@ -18,17 +18,13 @@ public class OrderItem {
     @GeneratedValue
     @UuidGenerator
     @Column(updatable = false, nullable = false, length = 36)
-    private String id;  // Unique ID for this order item
+    private String orderItemId;  // Unique ID for this order item
 
     @Column(nullable = false)
     private String productId;
 
     @Column(nullable = false, length = 150)
     private String productName;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
-    private PaymentStatus paymentStatus;
 
     @Column(nullable = false)
     private double unitPrice;

@@ -13,12 +13,13 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class RetrieveOrderDTO {
     private String orderId;
-    private String orderNumber;
     private String customerId;
     private String recipientAddress;
     private String recipientName;
     private String recipientPhoneNumber;
     private String recipientEmailAddress;
+    private String city;
+    private String postalCode;
     private double totalAmount;
     private List<OrderItemDTO> items;
     private LocalDateTime createdAt;
