@@ -30,10 +30,9 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                HttpMethod.GET,
-                                "/api/v1/orders/**",
-                                "/api/v1/orders/"
-                        ).authenticated()
+                                HttpMethod.DELETE,
+                                "/api/v1/orders/**"
+                        ).hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint(jsonAuthEntryPoint) // 401

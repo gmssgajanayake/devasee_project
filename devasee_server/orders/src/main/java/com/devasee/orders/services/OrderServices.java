@@ -4,8 +4,8 @@ import com.devasee.orders.dto.*;
 import com.devasee.orders.entity.OrderEntity;
 import com.devasee.orders.entity.OrderItem;
 import com.devasee.orders.enums.DeliveryStatus;
+import com.devasee.orders.enums.PaymentMethod;
 import com.devasee.orders.exception.InsufficientStockException;
-import com.devasee.orders.exception.OrderAlreadyExistsException;
 import com.devasee.orders.exception.OrderNotFoundException;
 import com.devasee.orders.exception.ServiceUnavailableException;
 import com.devasee.orders.interfaces.DeliveryClient;
@@ -50,8 +50,15 @@ public class OrderServices {
     public Page<RetrieveOrderDTO> getAllOrders(int page, int size) {
         try {
             Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-            return orderRepo.findAll(pageable)
+            Page<RetrieveOrderDTO> dtoPage = orderRepo.findAll(pageable)
                     .map(order -> modelMapper.map(order, RetrieveOrderDTO.class));
+
+            if(dtoPage.isEmpty()){
+                logger.error("### No books found is empty : {}", dtoPage.isEmpty());
+                throw new OrderNotFoundException("No orders found");
+            }
+            return  dtoPage;
+
         } catch (DataException | DataAccessException e) {
             logger.error("Database error while fetching all orders", e);
             throw new ServiceUnavailableException("Something went wrong on the server. Please try again later.");
@@ -67,19 +74,24 @@ public class OrderServices {
         } catch (DataAccessException e) {
             logger.error("Database error while fetching order {}", orderId, e);
             throw new ServiceUnavailableException("Unable to retrieve order at this time.");
+        } catch (OrderNotFoundException ex){
+            throw ex;
+        } catch (Exception ex){
+            logger.error("Service unavailable try again : {}", ex.getMessage());
+            throw new ServiceUnavailableException("Service unavailable try again");
         }
     }
 
-    public Page<RetrieveOrderDTO> getOrdersByRecipientName(String recipientName, int page, int size) {
-        try {
-            Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-            return orderRepo.findByRecipientNameContainingIgnoreCase(recipientName, pageable)
-                    .map(order -> modelMapper.map(order, RetrieveOrderDTO.class));
-        } catch (DataAccessException e) {
-            logger.error("Database error while fetching orders for recipient {}", recipientName, e);
-            throw new ServiceUnavailableException("Unable to retrieve recipient orders at this time.");
-        }
-    }
+//    public Page<RetrieveOrderDTO> getOrdersByRecipientName(String recipientName, int page, int size) {
+//        try {
+//            Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+//            return orderRepo.findByRecipientNameContainingIgnoreCase(recipientName, pageable)
+//                    .map(order -> modelMapper.map(order, RetrieveOrderDTO.class));
+//        } catch (DataAccessException e) {
+//            logger.error("Database error while fetching orders for recipient {}", recipientName, e);
+//            throw new ServiceUnavailableException("Unable to retrieve recipient orders at this time.");
+//        }
+//    }
 
 
     public Page<RetrieveOrderDTO> getOrdersByCustomerId(String customerId, int page, int size) {
@@ -112,45 +124,76 @@ public class OrderServices {
 
     public RetrieveOrderDTO saveOrder(CreateOrderDTO orderDTO) {
         try {
+            logger.info("### extracting items from orderDTO");
             for (OrderItemDTO item : orderDTO.getItems()) {
                 int availableStock = inventoryClient.getStockQuantity(item.getProductId());
+                logger.info("### availableStock : {}", availableStock);
                 if (availableStock < item.getOrderQuantity()) {
+                    logger.info("### InsufficientStockException : available - {}, ordered - {}", availableStock, item.getOrderQuantity());
                     throw new InsufficientStockException("Not enough stock for product: " + item.getProductId());
                 }
             }
 
+            logger.info("### Entity obj creating");
+            OrderEntity latestOrder = new OrderEntity();
+            latestOrder.setCustomerId(orderDTO.getCustomerId());
+            latestOrder.setCity(orderDTO.getCity());
+            latestOrder.setPostalCode(orderDTO.getPostalCode());
+            latestOrder.setRecipientAddress(orderDTO.getRecipientAddress());
+            latestOrder.setRecipientName(orderDTO.getRecipientName());
+            latestOrder.setRecipientPhoneNumber(orderDTO.getRecipientPhoneNumber());
+            latestOrder.setTotalAmount(orderDTO.getTotalAmount());
+            latestOrder.setRecipientEmailAddress(orderDTO.getRecipientEmailAddress());
+            latestOrder.setPaymentStatus(orderDTO.getPaymentStatus());
+            latestOrder.setPaymentMethod(orderDTO.getPaymentMethod());
 
-            if (orderRepo.existsByOrderNumber(orderDTO.getOrderNumber())) {
-                throw new OrderAlreadyExistsException(
-                        "Order with number: " + orderDTO.getOrderNumber() + " already exists"
-                );
+            logger.info("### Entity obj to helper method");
+            // Add items using helper
+            for (OrderItemDTO itemDTO : orderDTO.getItems()) {
+                OrderItem item = new OrderItem();
+                item.setProductId(itemDTO.getProductId());
+                item.setProductName(itemDTO.getProductName());
+                item.setUnitPrice(itemDTO.getUnitPrice());
+                item.setOrderQuantity(itemDTO.getOrderQuantity());
+                latestOrder.addItem(item);  // automatically sets order
             }
-            OrderEntity orderEntity = modelMapper.map(orderDTO, OrderEntity.class);
-            OrderEntity savedEntity = orderRepo.save(orderEntity);
 
-            logger.info("Order {} created successfully", savedEntity.getOrderId());
+            if(orderDTO.getPaymentMethod().equals(PaymentMethod.BANK)){
+                // upload payment slip and create url for using azure blob storage
+            }
+
+            logger.info("### Entity obj going to be saved");
+            OrderEntity savedOrder = orderRepo.save(latestOrder);
+            logger.info("Order {} created successfully", savedOrder.getOrderId());
+
             // Build delivery DTO
             Map<String, Integer> products = orderDTO.getItems().stream()
-                    .collect(Collectors.toMap(OrderItemDTO::getProductId, OrderItemDTO::getOrderQuantity));
+                    .collect(Collectors.toMap(OrderItemDTO::getProductId, OrderItemDTO::getOrderQuantity, Integer::sum));
 
+            logger.info("### Create initial delivery");
             try {
                 CreateDeliveryDTO deliveryDTO = new CreateDeliveryDTO(
-                        savedEntity.getOrderId(),
-                        orderDTO.getCustomerId(),
-                        orderDTO.getTotalAmount(),
-                        orderDTO.getRecipientAddress(),
-                        orderDTO.getRecipientName(),
+                        savedOrder.getOrderId(),
+                        savedOrder.getCustomerId(),
+                        savedOrder.getTotalAmount(),
+                        savedOrder.getRecipientAddress(),
+                        savedOrder.getRecipientName(),
                         products,
                         DeliveryStatus.PENDING
                 );
+
+                // Create initial delivery
                 deliveryClient.createDelivery(deliveryDTO);
+
+                return modelMapper.map(savedOrder, RetrieveOrderDTO.class);
+
             } catch (Exception ex) {
-                logger.error("Failed to create delivery for order {}", savedEntity.getOrderId(), ex);
+                logger.error("Failed to create delivery for order {}", savedOrder.getOrderId(), ex);
+                throw new ServiceUnavailableException("Server is not available");
             }
-            return modelMapper.map(savedEntity, RetrieveOrderDTO.class);
 
         } catch (DataAccessException e) {
-            logger.error("Database error while saving order {}", orderDTO.getOrderNumber(), e);
+            logger.error("Database error while saving order", e);
             throw new ServiceUnavailableException("Unable to save order at this time.");
         }
     }
@@ -175,12 +218,6 @@ public class OrderServices {
 
             if (updateOrderDTO.getTotalAmount() != null)
                 existingOrder.setTotalAmount(updateOrderDTO.getTotalAmount());
-
-            if (updateOrderDTO.getOrderNumber() != null)
-                existingOrder.setOrderNumber(updateOrderDTO.getOrderNumber());
-
-            if (updateOrderDTO.getCustomerId() != null)
-                existingOrder.setCustomerId(updateOrderDTO.getCustomerId());
 
             if (updateOrderDTO.getItems() != null && !updateOrderDTO.getItems().isEmpty()) {
                 List<OrderItem> items = updateOrderDTO.getItems().stream()

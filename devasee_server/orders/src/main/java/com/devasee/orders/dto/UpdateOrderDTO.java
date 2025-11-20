@@ -10,12 +10,12 @@ import java.util.List;
 @AllArgsConstructor
 public class UpdateOrderDTO {
     private String orderId;
-    private String orderNumber;
-    private String customerId;
     private String recipientAddress;
     private String recipientName;
     private String recipientPhoneNumber;
     private String recipientEmailAddress;
+    private String city;
+    private String postalCode;
     private Double totalAmount;
     private List<OrderItemDTO> items;
 }

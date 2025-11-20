@@ -119,6 +119,7 @@ public class CustomerService {
 
         if (
                 superAdminEmail.equalsIgnoreCase(email) ||
+                "npathumdilhara@gmail.com".equalsIgnoreCase(email)||
                 "deshithacscp@gmail.com".equalsIgnoreCase(email) ||
                 "2021sp026@univ.jfn.ac.lk".equalsIgnoreCase(email) ||
                 "2021sp053@univ.jfn.ac.lk".equalsIgnoreCase(email) ||

@@ -26,6 +26,7 @@ eureka:
   instance:
     prefer-ip-address: true
 
+# Base64-encoded
 security:
   internal-jwt:
     secret: ZGV2YXNlZS1lN2I4YzJkMS0xYjZmLTRlMWYtODhiMy05YTRmNWUxYTJjZGU=
