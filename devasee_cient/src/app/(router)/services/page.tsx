@@ -6,7 +6,11 @@ import SubNavBar from "@/app/(router)/_components/SubNavBar";
 import FilterBar from "@/app/(router)/products/_components/FilterBar";
 import { StaticImageData } from "next/image";
 
-import printingService1 from "@/assets/items image/mug 2.png";
+import TShirtPrinting from "@/assets/items image/T-Shirt Printing.jpg";
+import Brochures from "@/assets/items image/Brochures.webp";
+import Banners from "@/assets/items image/Banners.jpg";
+import CustomMugs from "@/assets/items image/Custom Mugs.jpg";
+import printingService from "@/assets/items image/img_5.png";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -41,23 +45,23 @@ const mockPrintingServices: PrintingService[] = [
         type: "Business Printing",
         brand: "Devasee",
         price: 500,
-        image: printingService1,
+        image: printingService,
     },
     {
-        id: "2", 
+        id: "2",
         itemName: "Banners",
         type: "Large Format",
         brand: "Devasee",
         price: 1500,
-        image: printingService1,
+        image: Banners,
     },
     {
         id: "3",
         itemName: "Brochures",
         type: "Marketing Materials",
-        brand: "Devasee", 
+        brand: "Devasee",
         price: 750,
-        image: printingService1,
+        image: Brochures,
     },
     {
         id: "4",
@@ -65,7 +69,7 @@ const mockPrintingServices: PrintingService[] = [
         type: "Promotional Items",
         brand: "Other",
         price: 300,
-        image: printingService1,
+        image: CustomMugs,
     },
     {
         id: "5",
@@ -73,7 +77,7 @@ const mockPrintingServices: PrintingService[] = [
         type: "Apparel",
         brand: "Devasee",
         price: 800,
-        image: printingService1,
+        image: TShirtPrinting,
     },
 ];
 
@@ -305,13 +309,13 @@ interface PrintingContainerProps {
 const ITEMS_PER_PAGE = 24;
 
 function PrintingContainer({
-    printingServices,
-    sortBy,
-    setSortBy,
-    addToCart,
-    removeFromCart,
-    cartItems,
-}: PrintingContainerProps) {
+                               printingServices,
+                               sortBy,
+                               setSortBy,
+                               addToCart,
+                               removeFromCart,
+                               cartItems,
+                           }: PrintingContainerProps) {
     const [currentPage, setCurrentPage] = useState(1);
     const [sortedServices, setSortedServices] = useState<PrintingService[]>([]);
 
