@@ -11,4 +11,5 @@ class RecommendationRequest(BaseModel):
 
 class BookResponse(BaseModel):
     title: str
+    isbn: str
     score: float

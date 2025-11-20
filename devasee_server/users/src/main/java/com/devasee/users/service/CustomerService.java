@@ -95,9 +95,11 @@ public class CustomerService {
         log.info("### Creating new customer: {} ({})", email, customerId);
 
         if(userRepo.existsByEmail(email)) {
+            AppUser existing = userRepo.findByEmail(email).orElseThrow(()-> new UserNotFoundException("User Not Found"));
             log.warn("### Customer already exists: {}", email);
-            throw new UserAlreadyExistsException("Customer with email '" + email + "' already exists");
+            throw new UserAlreadyExistsException("already exists:"+existing.getUsername());
         }
+        // if (("exists:{clerkObj.userName}" == "already exists:userName" AND statusCode==409) OR statusCode 200) allowed user
 
         AppUser appUser = new AppUser();
         appUser.setUserId(customerId);
@@ -117,10 +119,12 @@ public class CustomerService {
 
         if (
                 superAdminEmail.equalsIgnoreCase(email) ||
+                "npathumdilhara@gmail.com".equalsIgnoreCase(email)||
                 "deshithacscp@gmail.com".equalsIgnoreCase(email) ||
                 "2021sp026@univ.jfn.ac.lk".equalsIgnoreCase(email) ||
                 "2021sp053@univ.jfn.ac.lk".equalsIgnoreCase(email) ||
-                "Gaganatday@gmail.com".equalsIgnoreCase(email)
+                "Gaganatday@gmail.com".equalsIgnoreCase(email)||
+                "devaseetest@gmail.com".equalsIgnoreCase(email)
 
         ) {
             Role adminRole = roleRepo.findByName(Roles.ADMIN.name()).orElseThrow(

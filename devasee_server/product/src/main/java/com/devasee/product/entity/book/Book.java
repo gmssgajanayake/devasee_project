@@ -59,7 +59,7 @@ public class Book {
 
     private String imgFileName;
 
-    private List<String> keywords;
+    private List<String> keywords = new ArrayList<>();
 
     @ElementCollection
     private List<String> otherImgFileNames = new ArrayList<>();

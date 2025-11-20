@@ -1,5 +1,7 @@
 package com.devasee.orders.entity;
 
+import com.devasee.orders.enums.PaymentMethod;
+import com.devasee.orders.enums.PaymentStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -23,9 +25,6 @@ public class OrderEntity {
     @Column(updatable = false, nullable = false, length = 36)
     private String orderId;
 
-    @Column(nullable = false, unique = true, length = 50)
-    private String orderNumber;
-
     @Column(nullable = false, length = 100)
     private String customerId;
 
@@ -41,17 +40,42 @@ public class OrderEntity {
     @Column(length = 100)
     private String recipientName;
 
+    @Column(length = 100)
+    private String city;
+
+    @Column(length = 100)
+    private String postalCode;
+
     @Column(nullable = false)
     private double totalAmount;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private PaymentStatus paymentStatus;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private PaymentMethod paymentMethod;
+
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> items = new ArrayList<>();
-
+    
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @Column(nullable = false)
     private LocalDateTime updatedAt;
+
+    // --- Helper method ---
+    public void addItem(OrderItem item) {
+        items.add(item);
+        item.setOrder(this);  // automatically set parent
+    }
+
+    public void removeItem(OrderItem item) {
+        items.remove(item);
+        item.setOrder(null);
+    }
 
     @PrePersist
     protected void onCreate() {
