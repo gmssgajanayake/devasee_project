@@ -123,7 +123,8 @@ public class CustomerService {
                 "deshithacscp@gmail.com".equalsIgnoreCase(email) ||
                 "2021sp026@univ.jfn.ac.lk".equalsIgnoreCase(email) ||
                 "2021sp053@univ.jfn.ac.lk".equalsIgnoreCase(email) ||
-                "Gaganatday@gmail.com".equalsIgnoreCase(email)
+                "Gaganatday@gmail.com".equalsIgnoreCase(email)||
+                "devaseetest@gmail.com".equalsIgnoreCase(email)
 
         ) {
             Role adminRole = roleRepo.findByName(Roles.ADMIN.name()).orElseThrow(
