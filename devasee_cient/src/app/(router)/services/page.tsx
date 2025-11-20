@@ -265,6 +265,7 @@ export default function PrintingServicesPage() {
                                     className="text-2xl text-[#2b216d] cursor-pointer"
                                     onClick={() => setShowSortModal(false)}
                                 />
+
                             </div>
                             <div className="space-y-3">
                                 {["itemName", "price"].map((option) => (
